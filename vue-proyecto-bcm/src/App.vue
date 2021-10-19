@@ -21,9 +21,10 @@ export default Vue.extend({
 
 $font-family: 'Varta';
 
-body {
+html {
 	background: #f1f1f1;
 }
+
 .v-application {
 	font-family: $font-family;
 }
