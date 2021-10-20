@@ -53,7 +53,7 @@
 							<v-text-field
 								v-model="search"
 								append-icon="mdi-magnify"
-								label="Buscar por nombre o porcentaje"
+								label="Buscar por nombre"
 								single-line
 								hide-details
 								dark
@@ -134,7 +134,7 @@
 							<v-text-field
 								v-model="search"
 								append-icon="mdi-magnify"
-								label="Buscar por nombre o porcentaje"
+								label="Buscar por nombre"
 								single-line
 								hide-details
 								dark

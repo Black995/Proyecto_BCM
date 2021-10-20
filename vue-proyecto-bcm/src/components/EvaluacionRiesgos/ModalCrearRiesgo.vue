@@ -15,7 +15,7 @@
 		<v-card>
 			<v-form ref="formulario" v-model="formValido" lazy-validation>
 				<v-card-title class="header-table">
-					<v-row justify="space-between mx-auto" class="pa-1">
+					<v-row justify="space-between" class="pa-1">
 						<span class="text-h5">Crear nuevo riesgo</span>
 						<v-btn icon @click="dialog = false">
 							<v-icon color="white">mdi-close</v-icon>

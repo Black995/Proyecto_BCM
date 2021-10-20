@@ -14,7 +14,7 @@
 
 		<v-card>
 			<v-card-title class="header-table">
-				<v-row justify="space-between mx-auto" class="pa-1">
+				<v-row justify="space-between" class="pa-2">
 					<span class="text-h5">Detalle del riesgo</span>
 					<v-btn icon @click="dialog = false">
 						<v-icon color="white">mdi-close</v-icon>
