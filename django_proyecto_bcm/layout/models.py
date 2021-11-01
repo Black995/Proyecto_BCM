@@ -85,6 +85,7 @@ class InterestedParty(models.Model):
     name = models.CharField(max_length=100, unique=True)
     type = models.SmallIntegerField(choices=TYPE)
     description = models.CharField(max_length=200)
+
     organization = models.ForeignKey(
         Organization, related_name='organization_interested_party', on_delete=models.CASCADE)
 
@@ -113,6 +114,7 @@ class Location(models.Model):
 
 class Headquarter(models.Model):
     name = models.CharField(max_length=100, unique=True)
+
     location = models.OneToOneField(Location, related_name='location_headquarter', null=True,
                                     on_delete=models.SET_NULL)
 
@@ -131,6 +133,7 @@ class Staff(models.Model):
     names = models.CharField(max_length=100)
     surnames = models.CharField(max_length=100)
     earnings = models.IntegerField()
+
     user = models.OneToOneField(
         User, null=True, related_name='user_staff', on_delete=models.SET_NULL)
     Headquarter = models.ForeignKey(Headquarter, related_name='headquarter_staff', null=True,
@@ -154,6 +157,7 @@ class Scale(models.Model):
 
 class ScaleView(models.Model):
     name = models.CharField(max_length=100, unique=True)
+
     scale = models.ForeignKey(
         Scale, related_name='scale_view', on_delete=models.CASCADE)
 
@@ -169,13 +173,77 @@ class ServiceOffered(models.Model):
 
     name = models.CharField(max_length=100, unique=True)
     type = models.SmallIntegerField(choices=TYPE)
-    profit = models.IntegerField()
-    criticality = models.SmallIntegerField(null=True)
+    profit = models.FloatField()
     # frecuency =
-    # recovery_time =
+    recovery_time = models.DurationField()
+    criticality = models.SmallIntegerField(null=True)
+
     area = models.ForeignKey(Area, related_name='area_service_offered', null=True,
                              on_delete=models.SET_NULL)
     scale = models.OneToOneField(
         Scale, null=True, related_name='scale_service_offered', on_delete=models.SET_NULL)
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_service_offered')
+
+
+class ServiceUsed(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    spending = models.FloatField()
+    # frecuency =
+    recovery_time = models.DurationField()
+    criticality = models.SmallIntegerField(null=True)
+
+    services_offered = models.ManyToManyField(
+        ServiceOffered, related_name='service_offered_service_offered')
+    scale = models.OneToOneField(
+        Scale, null=True, related_name='scale_service_used', on_delete=models.SET_NULL)
+    headquarters = models.ManyToManyField(
+        Headquarter, related_name='headquarter_service_used')
+
+
+class OrganizationActivity(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200)
+    cost = models.FloatField()
+    # frecuency =
+    recovery_time = models.DurationField()
+    criticality = models.SmallIntegerField(null=True)
+
+    services_offered = models.ManyToManyField(
+        ServiceOffered, related_name='service_offered_organizacion_activity')
+    scale = models.OneToOneField(
+        Scale, null=True, related_name='scale_organization_activity', on_delete=models.SET_NULL)
+    headquarters = models.ManyToManyField(
+        Headquarter, related_name='headquarter_organization_activity')
+
+
+class Risk(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200)
+
+    services_offered = models.ManyToManyField(
+        ServiceUsed, related_name='service_used_risk')
+    organizacion_activities = models.ManyToManyField(
+        OrganizationActivity, related_name='organizacion_activity_risk')
+    headquarters = models.ManyToManyField(
+        Headquarter, related_name='headquarter_risk')
+    staffs = models.ManyToManyField(
+        Staff, related_name='staff_risk')
+
+
+class CrisisScenario(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    headquarters = models.ManyToManyField(
+        Headquarter, related_name='headquarter_crisis_scenario')
+    risks = models.ManyToManyField(
+        Risk, related_name='crisis_scenario_risk')
+
+
+class IncidentHistory(models.Model):
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    description = models.CharField(max_length=200, null=True, blank=True)
+
+    crisis_scenario = models.ForeignKey(
+        CrisisScenario, related_name='crisis_scenario_indicent_history', on_delete=models.CASCADE)
