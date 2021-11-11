@@ -22,17 +22,17 @@ const routes: Array<RouteConfig> = [
 			{
 				path: '/riesgos',
 				name: 'Evaluación de Riesgos',
-				component: () => import('../views/EvaluacionRiesgos.vue'),
+				component: () => import('../views/RiskAssessment.vue'),
 			},
 			{
 				path: '/partes-interesadas',
 				name: 'Partes Interesadas',
-				component: () => import('../views/PartesInteresadas.vue'),
+				component: () => import('../views/InterestedParties.vue'),
 			},
 			{
 				path: '/actividades',
 				name: 'Actividades del Negocio',
-				component: () => import('../views/ActividadesNegocio.vue'),
+				component: () => import('../views/BusinessActivity.vue'),
 			},
 		],
 	},

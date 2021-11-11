@@ -83,16 +83,19 @@
 					>
 						Cerrar
 					</v-btn>
-					<v-btn color="primary" v-on:click="crear">
+					<!--v-btn color="primary" v-on:click="crear">
 						Crear riesgo
-					</v-btn>
+					</v-btn-->
+					<modal-confirm-create-risk
+						v-on:crear="Crear"
+					></modal-confirm-create-risk>
 				</v-card-actions>
 
-				<alerta-error
-					:mensaje="mensajeError"
+				<alert-error
+					:message="mensajeError"
 					:snackbar="snackbar"
-					v-on:alertfin="alertaFin"
-				></alerta-error>
+					v-on:alertend="alertEnd"
+				></alert-error>
 			</v-form>
 		</v-card>
 	</v-dialog>
@@ -100,7 +103,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import AlertaError from '../Genericos/AlertaError.vue'
+import ModalConfirmCreateRisk from './ModalConfirmCreateRisk.vue'
+import AlertError from '../Genericos/AlertError.vue'
 
 interface Riesgo {
 	titulo: string
@@ -114,7 +118,8 @@ interface Riesgo {
 
 export default Vue.extend({
 	components: {
-		AlertaError,
+		AlertError,
+		ModalConfirmCreateRisk,
 	},
 
 	/*
@@ -163,7 +168,7 @@ export default Vue.extend({
 		*/
 	},
 	methods: {
-		crear() {
+		Crear() {
 			console.log('Objeto a enviar: ')
 			console.log(this.riesgo)
 
@@ -201,7 +206,7 @@ export default Vue.extend({
 			this.snackbar = true
 			*/
 		},
-		alertaFin() {
+		alertEnd() {
 			this.snackbar = false
 		},
 	},

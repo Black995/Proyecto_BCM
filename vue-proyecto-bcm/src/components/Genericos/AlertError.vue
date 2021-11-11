@@ -1,13 +1,13 @@
 <template>
 	<v-snackbar v-model="mostrar" :timeout="-1">
-		{{ mensaje }}
+		{{ message }}
 
 		<template v-slot:action="{ attrs }">
 			<v-btn
 				color="pink"
 				text
 				v-bind="attrs"
-				@click="cambiarEstadoSnackbar"
+				@click="changeSnackbarState"
 			>
 				Close
 			</v-btn>
@@ -18,15 +18,15 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-	props: ['mensaje', 'snackbar'],
+	props: ['message', 'snackbar'],
 	data() {
 		return {
 			mostrar: false,
 		}
 	},
 	methods: {
-		cambiarEstadoSnackbar() {
-			this.$emit('alertfin')
+		changeSnackbarState() {
+			this.$emit('alertend')
 		},
 	},
 	watch: {

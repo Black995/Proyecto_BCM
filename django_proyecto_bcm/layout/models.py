@@ -233,6 +233,7 @@ class Risk(models.Model):
 
 class CrisisScenario(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200)
 
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_crisis_scenario')

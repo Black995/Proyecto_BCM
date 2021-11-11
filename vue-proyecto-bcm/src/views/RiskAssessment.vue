@@ -9,14 +9,14 @@
 			</v-tabs>
 		</v-app-bar>
 
-		<alerta-exito
+		<alert-success
 			v-if="alertaExito"
-			:mensaje="mensajeExito"
-			v-on:dismissexito="dismissExito"
-		></alerta-exito>
+			:message="mensajeExito"
+			v-on:dismisssuccess="dismissSuccess"
+		></alert-success>
 
 		<v-fade-transition>
-			<div v-show="expandirRiesgo">
+			<div v-show="expandRisk">
 				<v-row
 					no-gutters
 					style="height: 150px"
@@ -32,9 +32,9 @@
 						<div class="text-center">
 							<div class="my-4">
 								<!--Llamamos al componente de crear riesgo-->
-								<modal-crear-riesgo
+								<modal-create-risk
 									v-on:alertexito="alertExito"
-								></modal-crear-riesgo>
+								></modal-create-risk>
 							</div>
 						</div>
 					</v-col>
@@ -61,21 +61,20 @@
 							></v-text-field>
 						</v-card-title>
 						<v-data-table
-							:headers="headersRiesgos"
-							:items="riesgos"
+							:headers="headersRisk"
+							:items="risks"
 							:search="search"
 							:items-per-page="5"
 						>
 							<template v-slot:item="row">
 								<tr>
-									<td>{{ row.item.titulo }}</td>
-									<td>{{ row.item.descripcion }}</td>
-									<td>{{ row.item.criticidad }}</td>
+									<td>{{ row.item.name }}</td>
+									<td>{{ row.item.description }}</td>
 									<td style="width: 100px">
 										<v-row style="display: inline-block">
-											<modal-detalle-riesgo
+											<modal-detail-risk
 												:id="row.item.id"
-											></modal-detalle-riesgo>
+											></modal-detail-risk>
 											<v-icon
 												color="yellow"
 												title="Editar riesgo"
@@ -96,7 +95,7 @@
 			</div>
 		</v-fade-transition>
 		<v-fade-transition>
-			<div v-show="expandirEscenario">
+			<div v-show="expandScenario">
 				<v-row
 					no-gutters
 					style="height: 150px"
@@ -142,15 +141,15 @@
 							></v-text-field>
 						</v-card-title>
 						<v-data-table
-							:headers="headersEscenarios"
-							:items="escenarios"
+							:headers="headersCrisisScenario"
+							:items="crisisScenarios"
 							:search="search"
 							:items-per-page="5"
 						>
 							<template v-slot:item="row">
 								<tr>
-									<td>{{ row.item.titulo }}</td>
-									<td>{{ row.item.descripcion }}</td>
+									<td>{{ row.item.name }}</td>
+									<td>{{ row.item.description }}</td>
 									<td style="width: 100px">
 										<v-row style="display: inline-block">
 											<v-icon
@@ -164,10 +163,10 @@
 												>mdi-delete-forever</v-icon
 											>
 											<!--Llamamos al componente de asociar riesgos-->
-											<modal-asociar-riesgos
+											<modal-associate-risks
 												:id="row.item.id"
 												v-on:alertexito="alertExito"
-											></modal-asociar-riesgos>
+											></modal-associate-risks>
 										</v-row>
 									</td>
 								</tr>
@@ -185,66 +184,36 @@
 <script lang="ts">
 import Vue from 'vue'
 
-import ModalCrearRiesgo from '../components/EvaluacionRiesgos/ModalCrearRiesgo.vue'
-import ModalDetalleRiesgo from '../components/EvaluacionRiesgos/ModalDetalleRiesgo.vue'
-import ModalAsociarRiesgos from '../components/EvaluacionRiesgos/ModalAsociarRiesgos.vue'
-import AlertaExito from '../components/Genericos/AlertaExito.vue'
+import ModalCreateRisk from '../components/EvaluacionRiesgos/ModalCreateRisk.vue'
+import ModalDetailRisk from '../components/EvaluacionRiesgos/ModalDetailRisk.vue'
+import ModalAssociateRisks from '../components/EvaluacionRiesgos/ModalAssociateRisks.vue'
+import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
 
-interface Riesgo {
+interface Risk {
 	id: number
-	titulo: string
-	descripcion: string
-	criticidad: string
+	name: string
+	description: string
 }
 
-interface Escenario {
+interface CrisisScenario {
 	id: number
-	titulo: string
-	descripcion: string
+	name: string
+	description: string
 }
 
 export default Vue.extend({
-	//name: 'EvaluacionRiesgos',
+	name: 'RiskAssessment',
 
 	components: {
-		AlertaExito,
-		ModalCrearRiesgo,
-		ModalDetalleRiesgo,
-		ModalAsociarRiesgos,
+		AlertSuccess,
+		ModalCreateRisk,
+		ModalDetailRisk,
+		ModalAssociateRisks,
 	},
 
 	data: () => ({
 		search: '',
-		headersRiesgos: [
-			{
-				text: 'Nombre',
-				align: 'start',
-				value: 'nombre',
-				class: 'header-table',
-			},
-			{
-				text: 'Descripción',
-				value: 'descripcion',
-				class: 'header-table',
-				filterable: false,
-			},
-			{
-				text: 'Criticidad',
-				value: 'criticidad',
-				class: 'header-table',
-				filterable: false,
-			},
-			{
-				text: 'Acciones',
-				value: 'acciones',
-				class: 'header-table',
-				align: 'center',
-				filterable: false,
-				disableSort: true,
-				disableFiltering: true,
-			},
-		],
-		headersEscenarios: [
+		headersRisk: [
 			{
 				text: 'Nombre',
 				align: 'start',
@@ -267,47 +236,67 @@ export default Vue.extend({
 				disableFiltering: true,
 			},
 		],
-		riesgos: [
+		headersCrisisScenario: [
+			{
+				text: 'Nombre',
+				align: 'start',
+				value: 'nombre',
+				class: 'header-table',
+			},
+			{
+				text: 'Descripción',
+				value: 'descripcion',
+				class: 'header-table',
+				filterable: false,
+			},
+			{
+				text: 'Acciones',
+				value: 'acciones',
+				class: 'header-table',
+				align: 'center',
+				filterable: false,
+				disableSort: true,
+				disableFiltering: true,
+			},
+		],
+		risks: [
 			{
 				id: 1,
-				titulo: 'Corte del servicio de energía eléctrica',
-				descripcion:
+				name: 'Corte del servicio de energía eléctrica',
+				description:
 					'Corte repentino de la electricidad en la totalidad de la organización.',
-				criticidad: 'Alta',
 			},
 			{
 				id: 2,
-				titulo: 'Corte del servicio de internet de Netuno',
-				descripcion:
+				name: 'Corte del servicio de internet de Netuno',
+				description:
 					'Corte del servicio de internet de fibra óptica de Netuno.',
-				criticidad: 'Mediana',
 			},
 			{
 				id: 3,
-				titulo: 'Corte del servicio de agua',
-				descripcion:
+				name: 'Corte del servicio de agua',
+				description:
 					'Corte del servicio del servicio de agua dentro de la organización.',
-				criticidad: 'Baja',
 			},
-		] as Riesgo[],
-		escenarios: [
+		] as Risk[],
+		crisisScenarios: [
 			{
 				id: 1,
-				titulo: 'Terremoto',
-				descripcion:
+				name: 'Terremoto',
+				description:
 					'Terremoto entre el grado 4 y 8 de la escala según la escala de Ritcher.',
 			},
 			{
 				id: 2,
-				titulo: 'Apagón nacional de luz',
-				descripcion:
+				name: 'Apagón nacional de luz',
+				description:
 					'Ausencia de la energía eléctrica en parte del territorio nacional o en su totalidad.',
 			},
-		] as Escenario[],
+		] as CrisisScenario[],
 
 		//Variables para expandir vistas
-		expandirRiesgo: true,
-		expandirEscenario: false,
+		expandRisk: true,
+		expandScenario: false,
 
 		//Para el manejo del mensaje de éxito
 		mensajeExito: '',
@@ -319,24 +308,24 @@ export default Vue.extend({
 			this.mensajeExito = mensaje
 			//this.recargarTabla();
 		},
-		dismissExito() {
+		dismissSuccess() {
 			console.log('Cerrar alerta exito padre')
 			this.alertaExito = !this.alertaExito
 		},
 		cambiarVistaRiesgo() {
-			if (!this.expandirRiesgo) {
-				this.expandirEscenario = !this.expandirEscenario
+			if (!this.expandRisk) {
+				this.expandScenario = !this.expandScenario
 				setTimeout(() => {
 					console.log('World!')
-					this.expandirRiesgo = !this.expandirRiesgo
+					this.expandRisk = !this.expandRisk
 				}, 500)
 			}
 		},
 		cambiarVistaEscenario() {
-			if (!this.expandirEscenario) {
-				this.expandirRiesgo = !this.expandirRiesgo
+			if (!this.expandScenario) {
+				this.expandRisk = !this.expandRisk
 				setTimeout(() => {
-					this.expandirEscenario = !this.expandirEscenario
+					this.expandScenario = !this.expandScenario
 					console.log('World!')
 				}, 500)
 			}

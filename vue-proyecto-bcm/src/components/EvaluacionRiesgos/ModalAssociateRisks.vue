@@ -68,18 +68,18 @@
 				</v-btn>
 			</v-card-actions>
 
-			<alerta-error
+			<alert-error
 				:mensaje="mensajeError"
 				:snackbar="snackbar"
 				v-on:alertfin="alertaFin"
-			></alerta-error>
+			></alert-error>
 		</v-card>
 	</v-dialog>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import AlertaError from '../Genericos/AlertaError.vue'
+import AlertError from '../Genericos/AlertError.vue'
 
 interface Riesgo {
 	id: number
@@ -91,7 +91,7 @@ interface Riesgo {
 
 export default Vue.extend({
 	components: {
-		AlertaError,
+		AlertError,
 	},
 
 	props: ['id'],

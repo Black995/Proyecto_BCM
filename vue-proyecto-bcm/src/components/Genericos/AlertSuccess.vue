@@ -6,21 +6,21 @@
 		dismissible
 		@click="dismissAlert"
 	>
-		{{ mensaje }}
+		{{ message }}
 	</v-alert>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-	props: ['mensaje'],
+	props: ['message'],
 	data() {
 		return {}
 	},
 	methods: {
 		dismissAlert() {
 			console.log('Cerrar alerta exito hijo')
-			this.$emit('dismissexito')
+			this.$emit('dismisssuccess')
 		},
 	},
 })

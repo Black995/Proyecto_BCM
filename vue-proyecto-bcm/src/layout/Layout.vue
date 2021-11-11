@@ -32,7 +32,7 @@
 						</v-list-item-icon>
 						<v-list-item-title>Editar perfil</v-list-item-title>
 					</v-list-item>
-					<!--v-list-item @click="cerrarSesion">
+					<!--v-list-item @click="closeSession">
 						<v-list-item-icon>
 							<v-icon>mdi-logout</v-icon>
 						</v-list-item-icon>
@@ -75,7 +75,7 @@
 
 			<template v-slot:append>
 				<div class="pa-2" style="height: 75px; position: relative">
-					<v-btn block top @click="cerrarSesion"> Logout </v-btn>
+					<v-btn block top @click="closeSession"> Logout </v-btn>
 				</div>
 			</template>
 		</v-navigation-drawer>
@@ -143,7 +143,7 @@ export default Vue.extend({
 
 	methods: {
 		//Se eliminan los datos de la caché
-		cerrarSesion() {
+		closeSession() {
 			this.$router.replace({ name: 'Login' })
 		},
 	},
