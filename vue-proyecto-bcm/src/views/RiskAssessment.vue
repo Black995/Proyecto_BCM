@@ -183,6 +183,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import axios from 'axios'
+import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
 import ModalCreateRisk from '../components/EvaluacionRiesgos/ModalCreateRisk.vue'
 import ModalDetailRisk from '../components/EvaluacionRiesgos/ModalDetailRisk.vue'
@@ -259,26 +261,7 @@ export default Vue.extend({
 				disableFiltering: true,
 			},
 		],
-		risks: [
-			{
-				id: 1,
-				name: 'Corte del servicio de energía eléctrica',
-				description:
-					'Corte repentino de la electricidad en la totalidad de la organización.',
-			},
-			{
-				id: 2,
-				name: 'Corte del servicio de internet de Netuno',
-				description:
-					'Corte del servicio de internet de fibra óptica de Netuno.',
-			},
-			{
-				id: 3,
-				name: 'Corte del servicio de agua',
-				description:
-					'Corte del servicio del servicio de agua dentro de la organización.',
-			},
-		] as Risk[],
+		risks: [] as Risk[],
 		crisisScenarios: [
 			{
 				id: 1,
@@ -302,10 +285,35 @@ export default Vue.extend({
 		mensajeExito: '',
 		alertaExito: false,
 	}),
+	mounted() {
+		this.getRisks()
+	},
 	methods: {
+		async getRisks() {
+			this.risks = []
+			axios
+				.get<Risk[]>(`${SERVER_ADDRESS}/api/risks/risks/`, {
+					withCredentials: true,
+					headers: {
+						Authorization: TOKEN,
+					},
+				})
+				.then((res) => {
+					console.log(res)
+					console.log(res.data)
+
+					this.risks = res.data
+				})
+				.catch(function (error) {
+					console.log('Ups! Ha ocurrido un error en el servidor')
+					console.log(error.toJSON())
+				})
+		},
+
 		alertExito(mensaje: string) {
 			this.alertaExito = true
 			this.mensajeExito = mensaje
+			this.getRisks()
 			//this.recargarTabla();
 		},
 		dismissSuccess() {

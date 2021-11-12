@@ -26,13 +26,13 @@
 				<v-card-text>
 					<v-container>
 						<v-text-field
-							v-model="riesgo.titulo"
+							v-model="risk.name"
 							:counter="50"
 							:rules="[(v) => !!v || 'Este campo es obligatorio']"
 							label="Ingrese el título del riesgo"
 						></v-text-field>
 
-						<v-row>
+						<!--v-row>
 							<v-col cols="6" sm="6" md="6" lg="6" xl="6">
 								<v-select
 									v-model="riesgo.criticidad"
@@ -57,11 +57,11 @@
 									required
 								></v-text-field>
 							</v-col>
-						</v-row>
+						</v-row-->
 						<v-row>
 							<v-col cols="12" sm="12" md="12" lg="12" xl="12">
 								<v-textarea
-									v-model="riesgo.descripcion"
+									v-model="risk.description"
 									label="Ingrese la descripción del riesgo"
 									hint="La descripción debería tener entre 10 y 200 caracteres"
 									:rules="[
@@ -103,15 +103,25 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import axios from 'axios'
+import { SERVER_ADDRESS, TOKEN } from '../../../config/config'
+
 import ModalConfirmCreateRisk from './ModalConfirmCreateRisk.vue'
 import AlertError from '../Genericos/AlertError.vue'
 
+interface Risk {
+	name: string
+	description: string
+}
+
+/*
 interface Riesgo {
 	titulo: string
 	descripcion: string
 	criticidad: string
 	porcentaje: number
 }
+*/
 
 //import { validationMixin } from 'vuelidate';
 //import { required, maxLength, email } from 'vuelidate/lib/valid;
@@ -143,17 +153,15 @@ export default Vue.extend({
 			formValido: true,
 			dialog: false,
 
-			riesgo: {
-				titulo: '',
-				descripcion: '',
-				criticidad: '',
-				porcentaje: 0,
-			} as Riesgo,
+			risk: {
+				name: '',
+				description: '',
+			} as Risk,
 			criticidad: ['Alto', 'Mediano', 'Bajo'],
 
 			//Para el manejo del mensaje
-			mensajeError: '',
-			snackbar: false,
+			mensajeError: '' as string,
+			snackbar: false as boolean,
 		}
 	},
 	computed: {
@@ -168,43 +176,52 @@ export default Vue.extend({
 		*/
 	},
 	methods: {
-		Crear() {
+		async Crear() {
 			console.log('Objeto a enviar: ')
-			console.log(this.riesgo)
+			console.log(this.risk)
 
-			/**
-			 * Cuando sea exitoso
-			 */
+			axios
+				.post(`${SERVER_ADDRESS}/api/risks/risks/`, this.risk, {
+					withCredentials: true,
+					headers: {
+						Authorization: TOKEN,
+					},
+				})
+				.then((res) => {
+					if (res.status == 200 || res.status == 201) {
+						this.estaCargando = false
 
-			this.estaCargando = false
+						console.log('[Oferta creada satisfactoriamente]')
 
-			console.log('[Oferta creada satisfactoriamente]')
+						//Si la oferta fue exitosamente creada, mostramos mensaje de éxito y cerramos el modal
+						this.dialog = false
 
-			//Si la oferta fue exitosamente creada, mostramos mensaje de éxito y cerramos el modal
-			this.dialog = false
+						//Reinicializamos variable del crear
+						this.risk = {
+							name: '',
+							description: '',
+						}
 
-			//Reinicializamos variable del crear
-			this.riesgo = {
-				titulo: '',
-				descripcion: '',
-				criticidad: '',
-				porcentaje: 0,
-			}
-
-			this.$emit(
-				'alertexito',
-				'¡El riesgo ha sido creado satisfactoriamente!'
-			)
-
-			/**
-			 * Cuando ocurra un error
-			 */
-			/*
-			console.warn('Algo pasó: ')
-			this.mensajeError =
-				'El nombre de este riesgo ya se encuentra registrado en el sistema'
-			this.snackbar = true
-			*/
+						this.$emit(
+							'alertexito',
+							'¡El riesgo ha sido creado satisfactoriamente!'
+						)
+					}
+				})
+				.catch((err) => {
+					try {
+						// Error 400 por unicidad o 500 generico
+						if (err.response.status) {
+							this.mensajeError = err.response.data
+							this.snackbar = true
+						}
+					} catch {
+						// Servidor no disponible
+						this.mensajeError =
+							'Ups! Ha ocurrido un error en el servidor'
+						this.snackbar = true
+					}
+				})
 		},
 		alertEnd() {
 			this.snackbar = false
