@@ -6,7 +6,7 @@
 				title="Asociar riesgos"
 				v-bind="attrs"
 				v-on="on"
-				v-on:click="obtenerRiesgos"
+				v-on:click="getRisks"
 				>mdi-clipboard-text</v-icon
 			>
 		</template>
@@ -161,7 +161,7 @@ export default Vue.extend({
 
 			this.estaCargando = false
 
-			console.log('[Oferta creada satisfactoriamente]')
+			console.log('[Riesgos asociados satisfactoriamente]')
 
 			//Si la oferta fue exitosamente creada, mostramos mensaje de éxito y cerramos el modal
 			this.dialog = false
@@ -181,7 +181,7 @@ export default Vue.extend({
 			this.snackbar = true
 			*/
 		},
-		obtenerRiesgos() {
+		getRisks() {
 			console.log('[ID del escenario] ', this.$props.id)
 
 			this.estaCargando = false

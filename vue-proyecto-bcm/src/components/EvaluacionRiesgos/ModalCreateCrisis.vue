@@ -7,8 +7,9 @@
 				rounded
 				v-bind="attrs"
 				v-on="on"
+				v-on:click="getRisks"
 			>
-				Agregar riesgo
+				Agregar escenario crítico
 			</v-btn>
 		</template>
 
@@ -16,7 +17,9 @@
 			<v-form ref="formulario" v-model="formValido" lazy-validation>
 				<v-card-title class="header-table">
 					<v-row justify="space-between" class="pa-1">
-						<span class="text-h5">Crear nuevo riesgo</span>
+						<span class="text-h5"
+							>Crear nuevo escenario crítico</span
+						>
 						<v-btn icon @click="dialog = false">
 							<v-icon color="white">mdi-close</v-icon>
 						</v-btn>
@@ -26,43 +29,16 @@
 				<v-card-text>
 					<v-container>
 						<v-text-field
-							v-model="risk.name"
+							v-model="crisis.name"
 							:counter="50"
 							:rules="[(v) => !!v || 'Este campo es obligatorio']"
-							label="Ingrese el título del riesgo"
+							label="Ingrese el título del escenario crítico"
 						></v-text-field>
-
-						<!--v-row>
-							<v-col cols="6" sm="6" md="6" lg="6" xl="6">
-								<v-select
-									v-model="riesgo.criticidad"
-									:items="criticidad"
-									:rules="[
-										(v) =>
-											!!v || 'Este campo es obligatorio',
-									]"
-									label="Criticidad"
-									required
-								></v-select>
-							</v-col>
-							<v-col cols="6" sm="6" md="6" lg="6" xl="6">
-								<v-text-field
-									v-model="riesgo.porcentaje"
-									:counter="3"
-									:rules="[
-										(v) =>
-											!!v || 'Este campo es obligatorio',
-									]"
-									label="Ingrese el porcentaje"
-									required
-								></v-text-field>
-							</v-col>
-						</v-row-->
 						<v-row>
 							<v-col cols="12" sm="12" md="12" lg="12" xl="12">
 								<v-textarea
-									v-model="risk.description"
-									label="Ingrese la descripción del riesgo"
+									v-model="crisis.description"
+									label="Ingrese la descripción del escenario crítico"
 									hint="La descripción debería tener entre 10 y 200 caracteres"
 									:rules="[
 										(v) =>
@@ -73,30 +49,62 @@
 						</v-row>
 					</v-container>
 				</v-card-text>
+			</v-form>
 
-				<v-card-actions>
-					<v-spacer></v-spacer>
-					<v-btn
-						color="primary darken-1"
-						@click="dialog = false"
-						text
-					>
-						Cerrar
-					</v-btn>
-					<!--v-btn color="primary" v-on:click="crear">
+			<v-card-text>
+				<v-container>
+					<h2 class="font-weight-medium text-center my-2">
+						Asocie los riesgos de la organización al escenario
+						crítico
+					</h2>
+					<v-list flat subheader three-line class="my-4">
+						<v-list-item-group
+							multiple
+							v-for="item in risks"
+							:key="item.key"
+						>
+							<v-list-item
+								@click="item.selected = !item.selected"
+							>
+								<v-list-item-action>
+									<v-checkbox
+										v-model="item.selected"
+										:input-value="item.selected"
+									></v-checkbox>
+								</v-list-item-action>
+
+								<v-list-item-content>
+									<v-list-item-title>{{
+										item.name
+									}}</v-list-item-title>
+									<v-list-item-subtitle>{{
+										item.description
+									}}</v-list-item-subtitle>
+								</v-list-item-content>
+							</v-list-item>
+						</v-list-item-group>
+					</v-list>
+				</v-container>
+			</v-card-text>
+
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn color="primary darken-1" @click="dialog = false" text>
+					Cerrar
+				</v-btn>
+				<!--v-btn color="primary" v-on:click="crear">
 						Crear riesgo
 					</v-btn-->
-					<modal-confirm-create-risk
-						v-on:crear="Crear"
-					></modal-confirm-create-risk>
-				</v-card-actions>
+				<modal-confirm-create-crisis
+					v-on:crear="Crear"
+				></modal-confirm-create-crisis>
+			</v-card-actions>
 
-				<alert-error
-					:message="mensajeError"
-					:snackbar="snackbar"
-					v-on:alertend="alertEnd"
-				></alert-error>
-			</v-form>
+			<alert-error
+				:message="mensajeError"
+				:snackbar="snackbar"
+				v-on:alertend="alertEnd"
+			></alert-error>
 		</v-card>
 	</v-dialog>
 </template>
@@ -106,22 +114,21 @@ import Vue from 'vue'
 import axios from 'axios'
 import { SERVER_ADDRESS, TOKEN } from '../../../config/config'
 
-import ModalConfirmCreateRisk from './ModalConfirmCreateRisk.vue'
+import ModalConfirmCreateCrisis from './ModalConfirmCreateCrisis.vue'
 import AlertError from '../Genericos/AlertError.vue'
 
+interface Crisis {
+	name: string
+	description: string
+	risks: number[]
+}
+
 interface Risk {
+	id: number
+	selected: boolean
 	name: string
 	description: string
 }
-
-/*
-interface Riesgo {
-	titulo: string
-	descripcion: string
-	criticidad: string
-	porcentaje: number
-}
-*/
 
 //import { validationMixin } from 'vuelidate';
 //import { required, maxLength, email } from 'vuelidate/lib/valid;
@@ -129,7 +136,7 @@ interface Riesgo {
 export default Vue.extend({
 	components: {
 		AlertError,
-		ModalConfirmCreateRisk,
+		ModalConfirmCreateCrisis,
 	},
 
 	/*
@@ -153,10 +160,12 @@ export default Vue.extend({
 			formValido: true,
 			dialog: false,
 
-			risk: {
+			crisis: {
 				name: '',
 				description: '',
-			} as Risk,
+				risks: [],
+			} as Crisis,
+			risks: [] as Risk[],
 			criticidad: ['Alto', 'Mediano', 'Bajo'],
 
 			//Para el manejo del mensaje
@@ -176,17 +185,57 @@ export default Vue.extend({
 		*/
 	},
 	methods: {
-		async Crear() {
-			console.log('Objeto a enviar: ')
-			console.log(this.risk)
-
+		async getRisks() {
+			this.risks = []
 			axios
-				.post(`${SERVER_ADDRESS}/api/risks/risks/`, this.risk, {
+				.get<Risk[]>(`${SERVER_ADDRESS}/api/risks/risks/`, {
 					withCredentials: true,
 					headers: {
 						Authorization: TOKEN,
 					},
 				})
+				.then((res) => {
+					console.log(res)
+					console.log(res.data)
+
+					for (let i = 0; i < res.data.length; i++) {
+						var risk: Risk = {
+							id: res.data[i].id,
+							name: res.data[i].name,
+							description: res.data[i].description,
+							selected: false,
+						}
+						this.risks.push(risk)
+					}
+					//this.risks = res.data
+				})
+				.catch(function (error) {
+					console.log('Ups! Ha ocurrido un error en el servidor')
+					console.log(error.toJSON())
+				})
+		},
+		async Crear() {
+			console.log('Objeto a enviar: ')
+			console.log(this.crisis)
+
+			console.log('Se asocian los riesgos al escenario que se va a crear')
+			for (let i = 0; i < this.risks.length; i++) {
+				if (this.risks[i].selected) {
+					this.crisis.risks.push(this.risks[i].id)
+				}
+			}
+
+			axios
+				.post(
+					`${SERVER_ADDRESS}/api/risks/crisis_scenarios/`,
+					this.crisis,
+					{
+						withCredentials: true,
+						headers: {
+							Authorization: TOKEN,
+						},
+					}
+				)
 				.then((res) => {
 					this.estaCargando = false
 
@@ -196,9 +245,10 @@ export default Vue.extend({
 					this.dialog = false
 
 					//Reinicializamos variable del crear
-					this.risk = {
+					this.crisis = {
 						name: '',
 						description: '',
+						risks: [],
 					}
 
 					this.$emit(
@@ -220,6 +270,9 @@ export default Vue.extend({
 						this.snackbar = true
 					}
 				})
+		},
+		selectCheckbox(item: boolean) {
+			item = !item
 		},
 		alertEnd() {
 			this.snackbar = false

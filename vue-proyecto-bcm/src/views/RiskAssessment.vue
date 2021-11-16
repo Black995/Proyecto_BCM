@@ -80,11 +80,11 @@
 												title="Editar riesgo"
 												>mdi-notebook-edit</v-icon
 											>
-											<v-icon
-												color="red"
-												title="Eliminar riesgo"
-												>mdi-delete-forever</v-icon
-											>
+
+											<modal-confirm-delete-risk
+												:id="row.item.id"
+												v-on:alertexito="alertExito"
+											></modal-confirm-delete-risk>
 										</v-row>
 									</td>
 								</tr>
@@ -108,13 +108,10 @@
 					<v-col cols="12" sm="4" md="4" lg="4" xl="4">
 						<div class="text-center">
 							<div class="my-4">
-								<v-btn
-									color="secondary"
-									style="color: black"
-									rounded
-								>
-									Agregar escenario crítico
-								</v-btn>
+								<!--Llamamos al componente de crear riesgo-->
+								<modal-create-crisis
+									v-on:alertexito="alertExito"
+								></modal-create-crisis>
 							</div>
 						</div>
 					</v-col>
@@ -157,11 +154,11 @@
 												title="Editar riesgo"
 												>mdi-notebook-edit</v-icon
 											>
-											<v-icon
-												color="red"
-												title="Eliminar riesgo"
-												>mdi-delete-forever</v-icon
-											>
+
+											<modal-confirm-delete-risk
+												:id="row.item.id"
+												v-on:alertexito="alertExito"
+											></modal-confirm-delete-risk>
 											<!--Llamamos al componente de asociar riesgos-->
 											<modal-associate-risks
 												:id="row.item.id"
@@ -187,7 +184,9 @@ import axios from 'axios'
 import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
 import ModalCreateRisk from '../components/EvaluacionRiesgos/ModalCreateRisk.vue'
+import ModalCreateCrisis from '../components/EvaluacionRiesgos/ModalCreateCrisis.vue'
 import ModalDetailRisk from '../components/EvaluacionRiesgos/ModalDetailRisk.vue'
+import ModalConfirmDeleteRisk from '../components/EvaluacionRiesgos/ModalConfirmDeleteRisk.vue'
 import ModalAssociateRisks from '../components/EvaluacionRiesgos/ModalAssociateRisks.vue'
 import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
 
@@ -209,8 +208,10 @@ export default Vue.extend({
 	components: {
 		AlertSuccess,
 		ModalCreateRisk,
+		ModalCreateCrisis,
 		ModalDetailRisk,
 		ModalAssociateRisks,
+		ModalConfirmDeleteRisk,
 	},
 
 	data: () => ({
@@ -276,6 +277,7 @@ export default Vue.extend({
 					'Ausencia de la energía eléctrica en parte del territorio nacional o en su totalidad.',
 			},
 		] as CrisisScenario[],
+		deleteRiskId: 0 as number,
 
 		//Variables para expandir vistas
 		expandRisk: true,
@@ -324,7 +326,6 @@ export default Vue.extend({
 			if (!this.expandRisk) {
 				this.expandScenario = !this.expandScenario
 				setTimeout(() => {
-					console.log('World!')
 					this.expandRisk = !this.expandRisk
 				}, 500)
 			}
@@ -334,7 +335,6 @@ export default Vue.extend({
 				this.expandRisk = !this.expandRisk
 				setTimeout(() => {
 					this.expandScenario = !this.expandScenario
-					console.log('World!')
 				}, 500)
 			}
 		},
