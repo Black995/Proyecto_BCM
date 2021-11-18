@@ -7,7 +7,7 @@
 				title="Detalle del riesgo"
 				v-bind="attrs"
 				v-on="on"
-				v-on:click="obtenerDetalle"
+				v-on:click="getDetail"
 				>mdi-magnify
 			</v-icon>
 		</template>
@@ -35,43 +35,11 @@
 							<v-list-item-content>
 								<v-list-item-title
 									><h2>
-										{{ riesgo.titulo }}
+										{{ crisis.name }}
 									</h2></v-list-item-title
 								>
 							</v-list-item-content>
 						</v-list-item>
-						<v-row>
-							<v-col cols="6" sm="6" md="6" lg="6" xl="6">
-								<v-list-item>
-									<v-list-item-content>
-										<v-list-item-title
-											><strong
-												>Criticidad</strong
-											></v-list-item-title
-										>
-										<v-list-item-title>{{
-											riesgo.criticidad
-										}}</v-list-item-title>
-									</v-list-item-content>
-								</v-list-item>
-							</v-col>
-							<v-col cols="6" sm="6" md="6" lg="6" xl="6">
-								<v-list-item>
-									<v-list-item-content>
-										<v-list-item-title
-											><strong
-												>Porcentaje</strong
-											></v-list-item-title
-										>
-										<v-list-item-title
-											>{{
-												riesgo.porcentaje
-											}}%</v-list-item-title
-										>
-									</v-list-item-content>
-								</v-list-item>
-							</v-col>
-						</v-row>
 						<v-row>
 							<v-list-item>
 								<v-list-item-content>
@@ -81,11 +49,33 @@
 										></v-list-item-title
 									>
 									<v-list-item-title>{{
-										riesgo.descripcion
+										crisis.description
 									}}</v-list-item-title>
 								</v-list-item-content>
 							</v-list-item>
 						</v-row>
+					</v-list>
+
+					<v-divider></v-divider>
+
+					<h2 class="text-center my-5">
+						Riesgos del escenario crítico
+					</h2>
+
+					<v-list flat subheader three-line class="my-4">
+						<v-list-item
+							v-for="item in crisis.risks"
+							:key="item.key"
+						>
+							<v-list-item-content>
+								<v-list-item-title>{{
+									item.name
+								}}</v-list-item-title>
+								<v-list-item-subtitle>{{
+									item.description
+								}}</v-list-item-subtitle>
+							</v-list-item-content>
+						</v-list-item>
 					</v-list>
 				</v-container>
 			</v-card-text>
@@ -102,11 +92,15 @@
 <script lang="ts">
 import Vue from 'vue'
 
-interface Riesgo {
-	titulo: string
-	descripcion: string
-	criticidad: string
-	porcentaje: number
+interface Risk {
+	name: string
+	description: string
+}
+
+interface CrisisScenario {
+	name: string
+	description: string
+	risks: Risk[]
 }
 
 export default Vue.extend({
@@ -114,23 +108,35 @@ export default Vue.extend({
 	data() {
 		return {
 			estaCargando: true,
-			riesgo: {} as Riesgo,
+			crisis: {} as CrisisScenario,
 			dialog: false,
 		}
 	},
 	methods: {
-		obtenerDetalle() {
+		getDetail() {
 			console.log('[ID del riesgo detalle] ', this.$props.id)
 
 			this.estaCargando = false
 
-			this.riesgo = {
-				titulo: 'Fallo de la electricidad',
-				descripcion:
-					'Fallo parcial o general del servicio eléctrico en la organización',
-				criticidad: 'Alto',
-				porcentaje: 25,
+			this.crisis = {
+				name: 'Terremoto',
+				description:
+					'Terremoto entre el grado 4 y 8 de la escala según la escala de Ritcher.',
+				risks: [
+					{
+						name: 'Corte de electricidad',
+						description:
+							'Corte imprevisto del suministro eléctrico',
+					},
+					{
+						name: 'Falla o caída del servidor',
+						description:
+							'Caída temporal del servidor debido al clima o a problemas de electricidad',
+					},
+				],
 			}
+			console.log('Riesgos de la crisis')
+			console.log(this.crisis.risks)
 		},
 	},
 })

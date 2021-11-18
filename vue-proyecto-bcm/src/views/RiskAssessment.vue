@@ -71,16 +71,12 @@
 									<td>{{ row.item.name }}</td>
 									<td>{{ row.item.description }}</td>
 									<td style="width: 100px">
-										<v-row style="display: inline-block">
-											<modal-detail-risk
-												:id="row.item.id"
-											></modal-detail-risk>
+										<v-row justify="center">
 											<v-icon
 												color="yellow"
 												title="Editar riesgo"
 												>mdi-notebook-edit</v-icon
 											>
-
 											<modal-confirm-delete-risk
 												:id="row.item.id"
 												v-on:alertexito="alertExito"
@@ -147,8 +143,11 @@
 								<tr>
 									<td>{{ row.item.name }}</td>
 									<td>{{ row.item.description }}</td>
-									<td style="width: 100px">
+									<td style="width: 120px">
 										<v-row style="display: inline-block">
+											<modal-detail-crisis
+												:id="row.item.id"
+											></modal-detail-crisis>
 											<v-icon
 												color="yellow"
 												title="Editar riesgo"
@@ -185,7 +184,7 @@ import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
 import ModalCreateRisk from '../components/EvaluacionRiesgos/ModalCreateRisk.vue'
 import ModalCreateCrisis from '../components/EvaluacionRiesgos/ModalCreateCrisis.vue'
-import ModalDetailRisk from '../components/EvaluacionRiesgos/ModalDetailRisk.vue'
+import ModalDetailCrisis from '../components/EvaluacionRiesgos/ModalDetailCrisis.vue'
 import ModalConfirmDeleteRisk from '../components/EvaluacionRiesgos/ModalConfirmDeleteRisk.vue'
 import ModalAssociateRisks from '../components/EvaluacionRiesgos/ModalAssociateRisks.vue'
 import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
@@ -209,7 +208,7 @@ export default Vue.extend({
 		AlertSuccess,
 		ModalCreateRisk,
 		ModalCreateCrisis,
-		ModalDetailRisk,
+		ModalDetailCrisis,
 		ModalAssociateRisks,
 		ModalConfirmDeleteRisk,
 	},
