@@ -48,7 +48,6 @@
 				>
 					<v-card>
 						<v-card-title class="header-table">
-							Riesgos
 							<v-spacer></v-spacer>
 							<v-text-field
 								v-model="search"
@@ -72,11 +71,15 @@
 									<td>{{ row.item.description }}</td>
 									<td style="width: 100px">
 										<v-row justify="center">
-											<v-icon
+											<!--v-icon
 												color="yellow"
 												title="Editar riesgo"
 												>mdi-notebook-edit</v-icon
-											>
+											-->
+											<modal-update-risk
+												:id="row.item.id"
+												v-on:alertexito="alertExito"
+											></modal-update-risk>
 											<modal-confirm-delete-risk
 												:id="row.item.id"
 												v-on:alertexito="alertExito"
@@ -121,7 +124,6 @@
 				>
 					<v-card>
 						<v-card-title class="header-table">
-							Riesgos
 							<v-spacer></v-spacer>
 							<v-text-field
 								v-model="search"
@@ -183,6 +185,7 @@ import axios from 'axios'
 import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
 import ModalCreateRisk from '../components/EvaluacionRiesgos/ModalCreateRisk.vue'
+import ModalUpdateRisk from '../components/EvaluacionRiesgos/ModalUpdateRisk.vue'
 import ModalCreateCrisis from '../components/EvaluacionRiesgos/ModalCreateCrisis.vue'
 import ModalDetailCrisis from '../components/EvaluacionRiesgos/ModalDetailCrisis.vue'
 import ModalConfirmDeleteRisk from '../components/EvaluacionRiesgos/ModalConfirmDeleteRisk.vue'
@@ -207,6 +210,7 @@ export default Vue.extend({
 	components: {
 		AlertSuccess,
 		ModalCreateRisk,
+		ModalUpdateRisk,
 		ModalCreateCrisis,
 		ModalDetailCrisis,
 		ModalAssociateRisks,

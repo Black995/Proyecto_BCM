@@ -18,7 +18,6 @@
 							v-on:alertexito="alertExito"
 						></modal-crear-riesgo-->
 					</div>
-					
 				</div>
 			</v-col>
 		</v-row>
@@ -75,13 +74,12 @@
 import Vue from 'vue'
 
 //import ModalCrearParte from '../components/PartesInteresadas/ModalCrearParte.vue'
-import AlertaExito from '../components/Genericos/AlertaExito.vue'
-
+import AlertaExito from '../components/Genericos/AlertSuccess.vue'
 
 interface parteInteresada {
-	id:number
-	nombre: string;
-	descripcion: string;
+	id: number
+	nombre: string
+	descripcion: string
 	tipo: string
 }
 
@@ -91,7 +89,6 @@ export default Vue.extend({
 	components: {
 		AlertaExito,
 		//ModalCrearParte,
-		
 	},
 
 	data: () => ({
@@ -115,7 +112,7 @@ export default Vue.extend({
 				class: 'header-table',
 				filterable: false,
 			},
-			
+
 			{
 				text: 'Acciones',
 				value: 'acciones',
@@ -130,23 +127,19 @@ export default Vue.extend({
 			{
 				id: 1,
 				nombre: 'Parte interesada 1',
-				descripcion:
-					'Parte interesada 1',
-				tipo: 'AAA',
-				
-			},
-			{
-				id: 2,
-				nombre: 'Parte interesada 2',
-				descripcion:
-					'Parte interesada 2',
+				descripcion: 'Parte interesada 1',
 				tipo: 'AAA',
 			},
 			{
 				id: 2,
 				nombre: 'Parte interesada 2',
-				descripcion:
-					'Parte interesada 2',
+				descripcion: 'Parte interesada 2',
+				tipo: 'AAA',
+			},
+			{
+				id: 2,
+				nombre: 'Parte interesada 2',
+				descripcion: 'Parte interesada 2',
 				tipo: 'AAA',
 			},
 		] as parteInteresada[],

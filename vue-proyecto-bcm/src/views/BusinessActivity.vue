@@ -8,7 +8,7 @@
 
 		<v-row no-gutters style="height: 150px" align="center" justify="center">
 			<v-col cols="12" sm="8" md="8" lg="8" xl="8">
-				<h2 class="font-weight-medium">Partes Interesadas</h2>
+				<h2 class="font-weight-medium">Actividades del negocio</h2>
 			</v-col>
 			<v-col cols="12" sm="4" md="4" lg="4" xl="4">
 				<div class="text-center">
@@ -18,7 +18,6 @@
 							v-on:alertexito="alertExito"
 						></modal-crear-riesgo-->
 					</div>
-					
 				</div>
 			</v-col>
 		</v-row>
@@ -79,14 +78,13 @@
 <script lang="ts">
 import Vue from 'vue'
 
-import AlertaExito from '../components/Genericos/AlertaExito.vue'
-
+import AlertaExito from '../components/Genericos/AlertSuccess.vue'
 
 interface Actividad {
 	id: number
 	nombre: string
 	descripcion: string
-	costo:string
+	costo: string
 	frecuencia: string
 	criticidad: string
 	tiempo_recuperacion: string
@@ -97,7 +95,6 @@ export default Vue.extend({
 	components: {
 		AlertaExito,
 		//ModalCrearParte,
-		
 	},
 	data: () => ({
 		search: '',
@@ -121,7 +118,7 @@ export default Vue.extend({
 				filterable: false,
 			},
 			{
-				text: 'Frecuencua',
+				text: 'Frecuencia',
 				value: 'Frecuencia',
 				class: 'header-table',
 				filterable: false,
@@ -152,35 +149,29 @@ export default Vue.extend({
 			{
 				id: 1,
 				nombre: 'Compra de materiales',
-				descripcion:
-					'Compra de materiales',
+				descripcion: 'Compra de materiales',
 				costo: '100',
 				frecuencia: 'Semanal',
-				criticidad:'3',
-				tiempo_recuperacion:'1 semana'
-				
+				criticidad: '3',
+				tiempo_recuperacion: '1 semana',
 			},
 			{
 				id: 2,
 				nombre: 'Compra de materiales',
-				descripcion:
-					'Compra de materiales',
+				descripcion: 'Compra de materiales',
 				costo: '100',
 				frecuencia: 'Semanal',
-				criticidad:'3',
-				tiempo_recuperacion:'1 semana'
-				
+				criticidad: '3',
+				tiempo_recuperacion: '1 semana',
 			},
 			{
 				id: 3,
 				nombre: 'Compra de materiales',
-				descripcion:
-					'Compra de materiales',
+				descripcion: 'Compra de materiales',
 				costo: '100',
 				frecuencia: 'Semanal',
-				criticidad:'3',
-				tiempo_recuperacion:'1 semana'
-				
+				criticidad: '3',
+				tiempo_recuperacion: '1 semana',
 			},
 		] as Actividad[],
 
