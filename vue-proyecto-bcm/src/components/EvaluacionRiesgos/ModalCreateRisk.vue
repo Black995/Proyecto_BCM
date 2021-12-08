@@ -123,7 +123,7 @@ interface Riesgo {
 }
 */
 
-//import { validationMixin } from 'vuelidate';
+//import { validationMixin } from 'vuelidate'
 //import { required, maxLength, email } from 'vuelidate/lib/valid;
 
 export default Vue.extend({
@@ -132,9 +132,9 @@ export default Vue.extend({
 		ModalConfirmCreateRisk,
 	},
 
-	/*
-	mixins: [validationMixin],
+	//mixins: [validationMixin],
 
+	/*
     validations: {
       name: { required, maxLength: maxLength(10) },
       email: { required, email },
@@ -145,7 +145,7 @@ export default Vue.extend({
         },
       },
     },
-	*/
+*/
 
 	data() {
 		return {
@@ -166,13 +166,14 @@ export default Vue.extend({
 	},
 	computed: {
 		/*
-      nameErrors () {
-        const errors = []
-        if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push('Name must be at most 10 characters long')
-        !this.$v.name.required && errors.push('Name is required.')
-        return errors
-      },
+		nameErrors() {
+			const errors = []
+			if (!this.$v.name.$dirty) return errors
+			!this.$v.name.maxLength &&
+				errors.push('Name must be at most 10 characters long')
+			!this.$v.name.required && errors.push('Name is required.')
+			return errors
+		},
 		*/
 	},
 	methods: {
