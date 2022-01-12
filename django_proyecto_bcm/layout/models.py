@@ -242,8 +242,12 @@ class CrisisScenario(models.Model):
 
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_crisis_scenario')
-    risks = models.ManyToManyField(
-        Risk, related_name='crisis_scenario_risk')
+    _risks = models.ManyToManyField(
+        Risk, related_name='crisis_scenario_risk', db_column='risks')
+    
+    @property
+    def risks(self):
+        return self._risks.values_list(flat=True)
 
 
 class IncidentHistory(models.Model):

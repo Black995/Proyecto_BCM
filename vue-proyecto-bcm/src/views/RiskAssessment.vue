@@ -156,10 +156,10 @@
 												>mdi-notebook-edit</v-icon
 											>
 
-											<modal-confirm-delete-risk
+											<modal-confirm-delete-crisis
 												:id="row.item.id"
 												v-on:alertexito="alertExito"
-											></modal-confirm-delete-risk>
+											></modal-confirm-delete-crisis>
 											<!--Llamamos al componente de asociar riesgos-->
 											<modal-associate-risks
 												:id="row.item.id"
@@ -189,6 +189,7 @@ import ModalUpdateRisk from '../components/EvaluacionRiesgos/ModalUpdateRisk.vue
 import ModalCreateCrisis from '../components/EvaluacionRiesgos/ModalCreateCrisis.vue'
 import ModalDetailCrisis from '../components/EvaluacionRiesgos/ModalDetailCrisis.vue'
 import ModalConfirmDeleteRisk from '../components/EvaluacionRiesgos/ModalConfirmDeleteRisk.vue'
+import ModalConfirmDeleteCrisis from '../components/EvaluacionRiesgos/ModalConfirmDeleteCrisis.vue'
 import ModalAssociateRisks from '../components/EvaluacionRiesgos/ModalAssociateRisks.vue'
 import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
 
@@ -215,6 +216,7 @@ export default Vue.extend({
 		ModalDetailCrisis,
 		ModalAssociateRisks,
 		ModalConfirmDeleteRisk,
+		ModalConfirmDeleteCrisis,
 	},
 
 	data: () => ({
@@ -266,20 +268,7 @@ export default Vue.extend({
 			},
 		],
 		risks: [] as Risk[],
-		crisisScenarios: [
-			{
-				id: 1,
-				name: 'Terremoto',
-				description:
-					'Terremoto entre el grado 4 y 8 de la escala según la escala de Ritcher.',
-			},
-			{
-				id: 2,
-				name: 'Apagón nacional de luz',
-				description:
-					'Ausencia de la energía eléctrica en parte del territorio nacional o en su totalidad.',
-			},
-		] as CrisisScenario[],
+		crisisScenarios: [] as CrisisScenario[],
 		deleteRiskId: 0 as number,
 
 		//Variables para expandir vistas
@@ -292,6 +281,7 @@ export default Vue.extend({
 	}),
 	mounted() {
 		this.getRisks()
+		this.getCrisisScenarios()
 	},
 	methods: {
 		async getRisks() {
@@ -315,10 +305,35 @@ export default Vue.extend({
 				})
 		},
 
+		async getCrisisScenarios() {
+			this.crisisScenarios = []
+			axios
+				.get<CrisisScenario[]>(
+					`${SERVER_ADDRESS}/api/risks/crisis_scenarios/`,
+					{
+						withCredentials: true,
+						headers: {
+							Authorization: TOKEN,
+						},
+					}
+				)
+				.then((res) => {
+					console.log(res)
+					console.log(res.data)
+
+					this.crisisScenarios = res.data
+				})
+				.catch(function (error) {
+					console.log('Ups! Ha ocurrido un error en el servidor')
+					console.log(error.toJSON())
+				})
+		},
+
 		alertExito(mensaje: string) {
 			this.alertaExito = true
 			this.mensajeExito = mensaje
 			this.getRisks()
+			this.getCrisisScenarios()
 			//this.recargarTabla();
 		},
 		dismissSuccess() {

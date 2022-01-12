@@ -16,4 +16,9 @@ urlpatterns = [
     path('crisis_scenarios/', CrisisScenarioViewSet.as_view({
         'get': 'list',
         'post': 'create'}), name='crisis_scenarios_list'),
+    path('crisis_scenario/<int:pk>/', CrisisScenarioViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'}), name='crisis_scenario_detail'),
 ]

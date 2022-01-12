@@ -91,8 +91,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import axios from 'axios'
+import { SERVER_ADDRESS, TOKEN } from '../../../config/config'
 
 interface Risk {
+	id: number
 	name: string
 	description: string
 }
@@ -110,33 +113,49 @@ export default Vue.extend({
 			estaCargando: true,
 			crisis: {} as CrisisScenario,
 			dialog: false,
+			risks: [
+				{
+					id: 1,
+					name: 'Corte de electricidad',
+					description: 'Corte imprevisto del suministro eléctrico',
+				},
+				{
+					id: 2,
+					name: 'Falla o caída del servidor',
+					description:
+						'Caída temporal del servidor debido al clima o a problemas de electricidad',
+				},
+			],
 		}
 	},
 	methods: {
 		getDetail() {
-			console.log('[ID del riesgo detalle] ', this.$props.id)
+			console.log('[ID del escenario crítico detalle] ', this.$props.id)
 
-			this.estaCargando = false
+			axios
+				.get<CrisisScenario>(
+					`${SERVER_ADDRESS}/api/risks/crisis_scenario/${this.$props.id}/`,
+					{
+						withCredentials: true,
+						headers: {
+							Authorization: TOKEN,
+						},
+					}
+				)
+				.then((res) => {
+					this.estaCargando = false
+					console.log(res)
+					console.log(res.data)
 
-			this.crisis = {
-				name: 'Terremoto',
-				description:
-					'Terremoto entre el grado 4 y 8 de la escala según la escala de Ritcher.',
-				risks: [
-					{
-						name: 'Corte de electricidad',
-						description:
-							'Corte imprevisto del suministro eléctrico',
-					},
-					{
-						name: 'Falla o caída del servidor',
-						description:
-							'Caída temporal del servidor debido al clima o a problemas de electricidad',
-					},
-				],
-			}
-			console.log('Riesgos de la crisis')
-			console.log(this.crisis.risks)
+					this.crisis = res.data
+
+					//Insertamos temporalmente riesgos con data dummy
+					this.crisis.risks = this.risks
+				})
+				.catch(function (error) {
+					console.log('Ups! Ha ocurrido un error en el servidor')
+					console.log(error.toJSON())
+				})
 		},
 	},
 })

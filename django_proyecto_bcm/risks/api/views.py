@@ -12,12 +12,13 @@ class RiskViewSet(viewsets.ModelViewSet):
     serializer_class = RiskSerializer
 
 
-class CrisisScenarioViewSet(viewsets.ViewSet):
+class CrisisScenarioViewSet(viewsets.ModelViewSet):
     model = CrisisScenario
     serializer_class = CrisisScenarioSerializer
     queryset = CrisisScenario.objects.all()
     # queryset = CrisisScenario.objects.annotate(risks_name=F('risks__name'))
 
+    """
     def list(self, request):
         queryset = CrisisScenario.objects.all()
         serializer = CrisisScenario(queryset, many=True)
@@ -26,7 +27,7 @@ class CrisisScenarioViewSet(viewsets.ViewSet):
     def create(self, serializer):
         serializer.save()
 
-    """
+    
     def create(self, serializer):
         id_risks = self.request.GET.get('risks')
         print(id_risks)
