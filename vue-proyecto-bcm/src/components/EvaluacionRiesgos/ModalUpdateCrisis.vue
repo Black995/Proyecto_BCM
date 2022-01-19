@@ -3,7 +3,7 @@
 		<template v-slot:activator="{ on, attrs }">
 			<v-icon
 				color="yellow"
-				title="Editar riesgo"
+				title="Editar escenario crítico"
 				v-bind="attrs"
 				v-on="on"
 				v-on:click="getDetail"
@@ -15,7 +15,7 @@
 			<v-form ref="formulario" v-model="formValido" lazy-validation>
 				<v-card-title class="header-table">
 					<v-row justify="space-between" class="pa-1">
-						<span class="text-h5">Editar riesgo</span>
+						<span class="text-h5">Editar escenario crítico</span>
 						<v-btn icon @click="dialog = false">
 							<v-icon color="white">mdi-close</v-icon>
 						</v-btn>
@@ -25,7 +25,7 @@
 				<v-card-text>
 					<v-container>
 						<v-text-field
-							v-model="risk.name"
+							v-model="crisis.name"
 							:counter="50"
 							:rules="[(v) => !!v || 'Este campo es obligatorio']"
 							label="Ingrese el título del escenario crítico"
@@ -33,7 +33,7 @@
 						<v-row>
 							<v-col cols="12" sm="12" md="12" lg="12" xl="12">
 								<v-textarea
-									v-model="risk.description"
+									v-model="crisis.description"
 									label="Ingrese la descripción del escenario crítico"
 									hint="La descripción debería tener entre 10 y 200 caracteres"
 									:rules="[
@@ -74,10 +74,10 @@ import Vue from 'vue'
 import axios from 'axios'
 import { SERVER_ADDRESS, TOKEN } from '../../../config/config'
 
-import ModalConfirmUpdateCrisis from './ModalConfirmUpdateRisk.vue'
+import ModalConfirmUpdateCrisis from './ModalConfirmUpdateCrisis.vue'
 import AlertError from '../Genericos/AlertError.vue'
 
-interface Risk {
+interface Crisis {
 	name: string
 	description: string
 }
@@ -113,10 +113,10 @@ export default Vue.extend({
 			formValido: true,
 			dialog: false,
 
-			risk: {
+			crisis: {
 				name: '',
 				description: '',
-			} as Risk,
+			} as Crisis,
 
 			//Para el manejo del mensaje
 			mensajeError: '' as string,
@@ -139,8 +139,8 @@ export default Vue.extend({
 			console.log('[ID del riesgo detalle] ', this.$props.id)
 
 			axios
-				.get<Risk>(
-					`${SERVER_ADDRESS}/api/risks/risk/${this.$props.id}/`,
+				.get<Crisis>(
+					`${SERVER_ADDRESS}/api/risks/crisis_scenario/${this.$props.id}/`,
 					{
 						withCredentials: true,
 						headers: {
@@ -149,10 +149,12 @@ export default Vue.extend({
 					}
 				)
 				.then((res) => {
-					console.log(res)
 					console.log(res.data)
 
-					this.risk = res.data
+					this.crisis = {
+						name: res.data.name,
+						description: res.data.description,
+					}
 				})
 				.catch(function (error) {
 					console.log('Ups! Ha ocurrido un error en el servidor')
@@ -160,13 +162,13 @@ export default Vue.extend({
 				})
 		},
 		async Editar() {
-			console.log('Objeto a enviar: ')
-			console.log(this.risk)
+			console.log('Objeto a enviar para actualizar crisis: ')
+			console.log(this.crisis)
 
 			axios
 				.patch(
-					`${SERVER_ADDRESS}/api/risks/risk/${this.$props.id}/`,
-					this.risk,
+					`${SERVER_ADDRESS}/api/risks/crisis_scenario/${this.$props.id}/`,
+					this.crisis,
 					{
 						withCredentials: true,
 						headers: {
@@ -177,23 +179,28 @@ export default Vue.extend({
 				.then((res) => {
 					this.estaCargando = false
 
-					console.log('[Riesgo actualizado satisfactoriamente]')
+					console.log(
+						'[Escenario crítico actualizado satisfactoriamente]'
+					)
 
 					this.dialog = false
 
 					//Reinicializamos variable del crear
-					this.risk = {
+					this.crisis = {
 						name: '',
 						description: '',
 					}
 
 					this.$emit(
 						'alertexito',
-						'¡El riesgo ha sido actualizado satisfactoriamente!'
+						'¡El escenario crítico ha sido actualizado satisfactoriamente!'
 					)
 				})
 				.catch((err) => {
 					try {
+						console.log('Error')
+						console.log(err)
+						console.log(err.response)
 						// Error 400 por unicidad o 500 generico
 						if (err.response.status == 400) {
 							this.mensajeError = err.response.data

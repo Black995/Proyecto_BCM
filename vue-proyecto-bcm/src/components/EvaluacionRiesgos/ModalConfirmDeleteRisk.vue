@@ -1,5 +1,5 @@
 <template>
-	<v-dialog v-model="dialog" persistent max-width="290">
+	<v-dialog v-model="dialog" persistent max-width="350">
 		<template v-slot:activator="{ on, attrs }">
 			<v-icon
 				color="red"
@@ -14,7 +14,7 @@
 
 		<v-card>
 			<v-card-title class="text-h5">
-				¿Está seguro de <strong>eliminar </strong> este riesgo?
+				¿Está seguro de eliminar este riesgo?
 			</v-card-title>
 			<v-card-actions>
 				<v-spacer></v-spacer>
@@ -79,8 +79,13 @@ export default Vue.extend({
 				.catch((err) => {
 					try {
 						// Error 400 por unicidad o 500 generico
-						if (err.response.status) {
+						if (err.response.status == 400) {
 							this.mensajeError = err.response.data
+							this.snackbar = true
+						} else {
+							// Servidor no disponible
+							this.mensajeError =
+								'Ups! Ha ocurrido un error en el servidor'
 							this.snackbar = true
 						}
 					} catch {

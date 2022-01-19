@@ -259,8 +259,13 @@ export default Vue.extend({
 				.catch((err) => {
 					try {
 						// Error 400 por unicidad o 500 generico
-						if (err.response.status) {
+						if (err.response.status == 400) {
 							this.mensajeError = err.response.data
+							this.snackbar = true
+						} else {
+							// Servidor no disponible
+							this.mensajeError =
+								'Ups! Ha ocurrido un error en el servidor'
 							this.snackbar = true
 						}
 					} catch {

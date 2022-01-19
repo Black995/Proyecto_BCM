@@ -1,5 +1,5 @@
 <template>
-	<v-dialog v-model="dialog" persistent max-width="290">
+	<v-dialog v-model="dialog" persistent max-width="350">
 		<template v-slot:activator="{ on, attrs }">
 			<v-btn color="primary" v-bind="attrs" v-on="on">
 				Crear riesgo
@@ -36,7 +36,6 @@ export default Vue.extend({
 	methods: {
 		confirmarCrear() {
 			this.dialog = false
-
 			this.$emit('crear')
 		},
 	},

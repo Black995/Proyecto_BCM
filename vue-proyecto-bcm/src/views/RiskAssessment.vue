@@ -19,45 +19,37 @@
 			<div v-show="expandRisk">
 				<v-row
 					no-gutters
-					style="height: 150px"
+					style="height: 25px"
 					align="center"
 					justify="center"
 				>
-					<v-col cols="12" sm="8" md="8" lg="8" xl="8">
-						<h2 class="font-weight-medium">
-							Riesgos de la organización
-						</h2>
-					</v-col>
-					<v-col cols="12" sm="4" md="4" lg="4" xl="4">
-						<div class="text-center">
-							<div class="my-4">
-								<!--Llamamos al componente de crear riesgo-->
-								<modal-create-risk
-									v-on:alertexito="alertExito"
-								></modal-create-risk>
-							</div>
-						</div>
-					</v-col>
 				</v-row>
 
-				<v-row
-					no-gutters
-					style="height: 150px"
-					align="center"
-					justify="center"
-				>
+				<v-layout child-flex>
 					<v-card>
 						<v-card-title class="header-table">
 							<v-spacer></v-spacer>
-							<v-text-field
-								v-model="search"
-								append-icon="mdi-magnify"
-								label="Buscar por nombre"
-								single-line
-								hide-details
-								dark
-								class="header-table"
-							></v-text-field>
+							<v-col cols="12" sm="4" md="4" lg="4" xl="4">
+								<div class="text-center">
+									<div class="my-4">
+										<!--Llamamos al componente de crear riesgo-->
+										<modal-create-risk
+											v-on:alertexito="alertExito"
+										></modal-create-risk>
+									</div>
+								</div>
+							</v-col>
+							<v-col cols="12" sm="8" md="8" lg="8" xl="8">
+								<v-text-field
+									v-model="search"
+									append-icon="mdi-magnify"
+									label="Buscar por nombre"
+									single-line
+									hide-details
+									dark
+									class="header-table"
+								></v-text-field>
+							</v-col>
 						</v-card-title>
 						<v-data-table
 							:headers="headersRisk"
@@ -90,50 +82,42 @@
 							</template>
 						</v-data-table>
 					</v-card>
-				</v-row>
+				</v-layout>
 			</div>
 		</v-fade-transition>
 		<v-fade-transition>
 			<div v-show="expandScenario">
 				<v-row
 					no-gutters
-					style="height: 150px"
+					style="height: 25px"
 					align="center"
 					justify="center"
-				>
-					<v-col cols="12" sm="8" md="8" lg="8" xl="8">
-						<h2 class="font-weight-medium">Escenarios críticos</h2>
-					</v-col>
-					<v-col cols="12" sm="4" md="4" lg="4" xl="4">
-						<div class="text-center">
-							<div class="my-4">
-								<!--Llamamos al componente de crear riesgo-->
-								<modal-create-crisis
-									v-on:alertexito="alertExito"
-								></modal-create-crisis>
-							</div>
-						</div>
-					</v-col>
-				</v-row>
+				></v-row>
 
-				<v-row
-					no-gutters
-					style="height: 150px"
-					align="center"
-					justify="center"
-				>
+				<v-layout child-flex>
 					<v-card>
 						<v-card-title class="header-table">
 							<v-spacer></v-spacer>
-							<v-text-field
-								v-model="search"
-								append-icon="mdi-magnify"
-								label="Buscar por nombre"
-								single-line
-								hide-details
-								dark
-								class="header-table"
-							></v-text-field>
+							<v-col cols="12" sm="4" md="4" lg="4" xl="4">
+								<div class="text-center">
+									<div class="my-4">
+										<modal-create-crisis
+											v-on:alertexito="alertExito"
+										></modal-create-crisis>
+									</div>
+								</div>
+							</v-col>
+							<v-col cols="12" sm="8" md="8" lg="8" xl="8">
+								<v-text-field
+									v-model="search"
+									append-icon="mdi-magnify"
+									label="Buscar por nombre"
+									single-line
+									hide-details
+									dark
+									class="header-table"
+								></v-text-field>
+							</v-col>
 						</v-card-title>
 						<v-data-table
 							:headers="headersCrisisScenario"
@@ -150,12 +134,10 @@
 											<modal-detail-crisis
 												:id="row.item.id"
 											></modal-detail-crisis>
-											<v-icon
-												color="yellow"
-												title="Editar riesgo"
-												>mdi-notebook-edit</v-icon
-											>
-
+											<modal-update-crisis
+												:id="row.item.id"
+												v-on:alertexito="alertExito"
+											></modal-update-crisis>
 											<modal-confirm-delete-crisis
 												:id="row.item.id"
 												v-on:alertexito="alertExito"
@@ -171,7 +153,7 @@
 							</template>
 						</v-data-table>
 					</v-card>
-				</v-row>
+				</v-layout>
 			</div>
 		</v-fade-transition>
 
@@ -185,8 +167,9 @@ import axios from 'axios'
 import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
 import ModalCreateRisk from '../components/EvaluacionRiesgos/ModalCreateRisk.vue'
-import ModalUpdateRisk from '../components/EvaluacionRiesgos/ModalUpdateRisk.vue'
 import ModalCreateCrisis from '../components/EvaluacionRiesgos/ModalCreateCrisis.vue'
+import ModalUpdateRisk from '../components/EvaluacionRiesgos/ModalUpdateRisk.vue'
+import ModalUpdateCrisis from '../components/EvaluacionRiesgos/ModalUpdateCrisis.vue'
 import ModalDetailCrisis from '../components/EvaluacionRiesgos/ModalDetailCrisis.vue'
 import ModalConfirmDeleteRisk from '../components/EvaluacionRiesgos/ModalConfirmDeleteRisk.vue'
 import ModalConfirmDeleteCrisis from '../components/EvaluacionRiesgos/ModalConfirmDeleteCrisis.vue'
@@ -211,8 +194,9 @@ export default Vue.extend({
 	components: {
 		AlertSuccess,
 		ModalCreateRisk,
-		ModalUpdateRisk,
 		ModalCreateCrisis,
+		ModalUpdateRisk,
+		ModalUpdateCrisis,
 		ModalDetailCrisis,
 		ModalAssociateRisks,
 		ModalConfirmDeleteRisk,

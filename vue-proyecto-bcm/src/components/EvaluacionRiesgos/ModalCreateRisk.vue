@@ -13,7 +13,7 @@
 		</template>
 
 		<v-card>
-			<v-form ref="formulario" v-model="formValido" lazy-validation>
+			<v-form ref="form" v-model="formValido" lazy-validation>
 				<v-card-title class="header-table">
 					<v-row justify="space-between" class="pa-1">
 						<span class="text-h5">Crear nuevo riesgo</span>
@@ -123,29 +123,11 @@ interface Riesgo {
 }
 */
 
-//import { validationMixin } from 'vuelidate'
-//import { required, maxLength, email } from 'vuelidate/lib/valid;
-
 export default Vue.extend({
 	components: {
 		AlertError,
 		ModalConfirmCreateRisk,
 	},
-
-	//mixins: [validationMixin],
-
-	/*
-    validations: {
-      name: { required, maxLength: maxLength(10) },
-      email: { required, email },
-      select: { required },
-      checkbox: {
-        checked (val) {
-          return val
-        },
-      },
-    },
-*/
 
 	data() {
 		return {
@@ -164,22 +146,19 @@ export default Vue.extend({
 			snackbar: false as boolean,
 		}
 	},
-	computed: {
-		/*
-		nameErrors() {
-			const errors = []
-			if (!this.$v.name.$dirty) return errors
-			!this.$v.name.maxLength &&
-				errors.push('Name must be at most 10 characters long')
-			!this.$v.name.required && errors.push('Name is required.')
-			return errors
-		},
-		*/
-	},
+
 	methods: {
 		async Crear() {
 			console.log('Objeto a enviar: ')
 			console.log(this.risk)
+
+			//Validación de los inputs
+			if (
+				!(
+					this.$refs.form as Vue & { validate: () => boolean }
+				).validate()
+			)
+				return
 
 			axios
 				.post(`${SERVER_ADDRESS}/api/risks/risks/`, this.risk, {
@@ -210,8 +189,13 @@ export default Vue.extend({
 				.catch((err) => {
 					try {
 						// Error 400 por unicidad o 500 generico
-						if (err.response.status) {
+						if (err.response.status == 400) {
 							this.mensajeError = err.response.data
+							this.snackbar = true
+						} else {
+							// Servidor no disponible
+							this.mensajeError =
+								'Ups! Ha ocurrido un error en el servidor'
 							this.snackbar = true
 						}
 					} catch {
