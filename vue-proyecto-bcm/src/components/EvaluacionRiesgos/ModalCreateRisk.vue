@@ -13,7 +13,7 @@
 		</template>
 
 		<v-card>
-			<v-form ref="form" v-model="formValido" lazy-validation>
+			<v-form ref="form" v-model="validForm" lazy-validation>
 				<v-card-title class="header-table">
 					<v-row justify="space-between" class="pa-1">
 						<span class="text-h5">Crear nuevo riesgo</span>
@@ -28,7 +28,7 @@
 						<v-text-field
 							v-model="risk.name"
 							:counter="50"
-							:rules="[(v) => !!v || 'Este campo es obligatorio']"
+							:rules="rules.name"
 							label="Ingrese el título del riesgo"
 						></v-text-field>
 
@@ -62,12 +62,10 @@
 							<v-col cols="12" sm="12" md="12" lg="12" xl="12">
 								<v-textarea
 									v-model="risk.description"
+									:counter="200"
 									label="Ingrese la descripción del riesgo"
 									hint="La descripción debería tener entre 10 y 200 caracteres"
-									:rules="[
-										(v) =>
-											!!v || 'Este campo es obligatorio',
-									]"
+									:rules="rules.description"
 								></v-textarea>
 							</v-col>
 						</v-row>
@@ -87,6 +85,7 @@
 						Crear riesgo
 					</v-btn-->
 					<modal-confirm-create-risk
+						:disabled="validForm"
 						v-on:crear="Crear"
 					></modal-confirm-create-risk>
 				</v-card-actions>
@@ -131,8 +130,8 @@ export default Vue.extend({
 
 	data() {
 		return {
-			estaCargando: true,
-			formValido: true,
+			loading: true,
+			validForm: false,
 			dialog: false,
 
 			risk: {
@@ -144,9 +143,25 @@ export default Vue.extend({
 			//Para el manejo del mensaje
 			mensajeError: '' as string,
 			snackbar: false as boolean,
+
+			rules: {
+				name: [
+					(v: any) => !!v || 'Este campo es obligatorio',
+					(v: any) =>
+						(v && v.length <= 50) ||
+						'El nombre debe contener como máximo 50 caracteres',
+					//Validación de correo
+					//v => v === null || v.length === 0 || (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v)) || 'Debe ser un correo electrónico valido'
+				],
+				description: [
+					(v: any) => !!v || 'Este campo es obligatorio',
+					(v: any) =>
+						(v && v.length >= 10 && v && v.length <= 200) ||
+						'La descripción debe contener entre 10 y 200 caracteres',
+				],
+			},
 		}
 	},
-
 	methods: {
 		async Crear() {
 			console.log('Objeto a enviar: ')
@@ -168,7 +183,7 @@ export default Vue.extend({
 					},
 				})
 				.then((res) => {
-					this.estaCargando = false
+					this.loading = false
 
 					console.log('[Oferta creada satisfactoriamente]')
 

@@ -144,6 +144,7 @@ export default Vue.extend({
 	methods: {
 		//Se eliminan los datos de la caché
 		closeSession() {
+			localStorage.removeItem('token')
 			this.$router.replace({ name: 'Login' })
 		},
 	},

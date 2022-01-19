@@ -12,7 +12,7 @@
 		</template>
 
 		<v-card>
-			<v-form ref="formulario" v-model="formValido" lazy-validation>
+			<v-form ref="form" v-model="validForm" lazy-validation>
 				<v-card-title class="header-table">
 					<v-row justify="space-between" class="pa-1">
 						<span class="text-h5">Editar riesgo</span>
@@ -24,22 +24,26 @@
 				<v-divider></v-divider>
 				<v-card-text>
 					<v-container>
+						<v-row v-show="loading">
+							<v-progress-linear
+								indeterminate
+								color="primary"
+							></v-progress-linear
+						></v-row>
 						<v-text-field
 							v-model="risk.name"
 							:counter="50"
-							:rules="[(v) => !!v || 'Este campo es obligatorio']"
+							:rules="rules.name"
 							label="Ingrese el título del escenario crítico"
 						></v-text-field>
 						<v-row>
 							<v-col cols="12" sm="12" md="12" lg="12" xl="12">
 								<v-textarea
 									v-model="risk.description"
+									:counter="200"
 									label="Ingrese la descripción del escenario crítico"
 									hint="La descripción debería tener entre 10 y 200 caracteres"
-									:rules="[
-										(v) =>
-											!!v || 'Este campo es obligatorio',
-									]"
+									:rules="rules.description"
 								></v-textarea>
 							</v-col>
 						</v-row>
@@ -56,6 +60,7 @@
 						Crear riesgo
 					</v-btn-->
 				<modal-confirm-update-crisis
+					:disabled="validForm"
 					v-on:editar="Editar"
 				></modal-confirm-update-crisis>
 			</v-card-actions>
@@ -82,9 +87,6 @@ interface Risk {
 	description: string
 }
 
-//import { validationMixin } from 'vuelidate';
-//import { required, maxLength, email } from 'vuelidate/lib/valid;
-
 export default Vue.extend({
 	components: {
 		AlertError,
@@ -92,25 +94,10 @@ export default Vue.extend({
 	},
 	props: ['id'],
 
-	/*
-	mixins: [validationMixin],
-
-    validations: {
-      name: { required, maxLength: maxLength(10) },
-      email: { required, email },
-      select: { required },
-      checkbox: {
-        checked (val) {
-          return val
-        },
-      },
-    },
-	*/
-
 	data() {
 		return {
-			estaCargando: true,
-			formValido: true,
+			loading: true,
+			validForm: false,
 			dialog: false,
 
 			risk: {
@@ -121,18 +108,24 @@ export default Vue.extend({
 			//Para el manejo del mensaje
 			mensajeError: '' as string,
 			snackbar: false as boolean,
+
+			rules: {
+				name: [
+					(v: any) => !!v || 'Este campo es obligatorio',
+					(v: any) =>
+						(v && v.length <= 50) ||
+						'El nombre debe contener como máximo 50 caracteres',
+					//Validación de correo
+					//v => v === null || v.length === 0 || (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v)) || 'Debe ser un correo electrónico valido'
+				],
+				description: [
+					(v: any) => !!v || 'Este campo es obligatorio',
+					(v: any) =>
+						(v && v.length >= 10 && v && v.length <= 200) ||
+						'La descripción debe contener entre 10 y 200 caracteres',
+				],
+			},
 		}
-	},
-	computed: {
-		/*
-      nameErrors () {
-        const errors = []
-        if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push('Name must be at most 10 characters long')
-        !this.$v.name.required && errors.push('Name is required.')
-        return errors
-      },
-		*/
 	},
 	methods: {
 		async getDetail() {
@@ -149,8 +142,7 @@ export default Vue.extend({
 					}
 				)
 				.then((res) => {
-					console.log(res)
-					console.log(res.data)
+					this.loading = false
 
 					this.risk = res.data
 				})
@@ -162,6 +154,14 @@ export default Vue.extend({
 		async Editar() {
 			console.log('Objeto a enviar: ')
 			console.log(this.risk)
+
+			//Validación de los inputs
+			if (
+				!(
+					this.$refs.form as Vue & { validate: () => boolean }
+				).validate()
+			)
+				return
 
 			axios
 				.patch(
@@ -175,7 +175,7 @@ export default Vue.extend({
 					}
 				)
 				.then((res) => {
-					this.estaCargando = false
+					this.loading = false
 
 					console.log('[Riesgo actualizado satisfactoriamente]')
 

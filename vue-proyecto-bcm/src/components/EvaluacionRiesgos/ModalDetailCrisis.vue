@@ -24,7 +24,7 @@
 			<v-divider></v-divider>
 			<v-card-text>
 				<v-container>
-					<v-row v-show="estaCargando">
+					<v-row v-show="loading">
 						<v-progress-linear
 							indeterminate
 							color="primary"
@@ -110,7 +110,7 @@ export default Vue.extend({
 	props: ['id'],
 	data() {
 		return {
-			estaCargando: true,
+			loading: true,
 			crisis: {} as CrisisScenario,
 			dialog: false,
 			risks: [
@@ -143,7 +143,7 @@ export default Vue.extend({
 					}
 				)
 				.then((res) => {
-					this.estaCargando = false
+					this.loading = false
 					console.log(res)
 					console.log(res.data)
 

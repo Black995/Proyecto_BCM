@@ -1,7 +1,12 @@
 <template>
 	<v-dialog v-model="dialog" persistent max-width="350">
 		<template v-slot:activator="{ on, attrs }">
-			<v-btn color="primary" v-bind="attrs" v-on="on">
+			<v-btn
+				color="primary"
+				:disabled="!$props.disabled"
+				v-bind="attrs"
+				v-on="on"
+			>
 				Crear escenario crítico
 			</v-btn>
 		</template>
@@ -28,6 +33,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+	props: ['disabled'],
 	data() {
 		return {
 			dialog: false,
