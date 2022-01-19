@@ -6,21 +6,6 @@
 			v-on:dismissexito="dismissExito"
 		></alerta-exito>
 
-		<v-row no-gutters style="height: 150px" align="center" justify="center">
-			<v-col cols="12" sm="8" md="8" lg="8" xl="8">
-				<h2 class="font-weight-medium">Partes Interesadas</h2>
-			</v-col>
-			<v-col cols="12" sm="4" md="4" lg="4" xl="4">
-				<div class="text-center">
-					<div class="my-4">
-						<!--Llamamos al componente de crear riesgo-->
-						<!--modal-crear-parte
-							v-on:alertexito="alertExito"
-						></modal-crear-riesgo-->
-					</div>
-				</div>
-			</v-col>
-		</v-row>
 
 		<v-row no-gutters style="height: 150px" align="center" justify="center">
 			<v-card>
@@ -45,9 +30,9 @@
 				>
 					<template v-slot:item="row">
 						<tr>
-							<td>{{ row.item.nombre }}</td>
-							<td>{{ row.item.descripcion }}</td>
-							<td>{{ row.item.tipo }}</td>
+							<td style="width: 300px">{{ row.item.nombre }}</td>
+							<td style="width: 300px">{{ row.item.descripcion }}</td>
+							<td style="width: 300px">{{ row.item.tipo }}</td>
 							<td style="width: 100px">
 								<v-row style="display: inline-block">
 									<modal-detalle-riesgo
