@@ -7,22 +7,6 @@
 		></alerta-exito>
 
 		<v-row no-gutters style="height: 150px" align="center" justify="center">
-			<v-col cols="12" sm="8" md="8" lg="8" xl="8">
-				<h2 class="font-weight-medium">Actividades del negocio</h2>
-			</v-col>
-			<v-col cols="12" sm="4" md="4" lg="4" xl="4">
-				<div class="text-center">
-					<div class="my-4">
-						<!--Llamamos al componente de crear riesgo-->
-						<!--modal-crear-parte
-							v-on:alertexito="alertExito"
-						></modal-crear-riesgo-->
-					</div>
-				</div>
-			</v-col>
-		</v-row>
-
-		<v-row no-gutters style="height: 150px" align="center" justify="center">
 			<v-card>
 				<v-card-title class="header-table">
 					Actividades
@@ -45,12 +29,12 @@
 				>
 					<template v-slot:item="row">
 						<tr>
-							<td>{{ row.item.nombre }}</td>
-							<td>{{ row.item.descripcion }}</td>
-							<td>{{ row.item.costo }}</td>
-							<td>{{ row.item.frecuencia }}</td>
-							<td>{{ row.item.criticidad }}</td>
-							<td>{{ row.item.tiempo_recuperacion }}</td>
+							<td style="width: 200px">{{ row.item.nombre }}</td>
+							<td style="width: 200px">{{ row.item.descripcion }}</td>
+							<td style="width: 200px">{{ row.item.costo }}</td>
+							<td style="width: 200px">{{ row.item.frecuencia }}</td>
+							<td style="width: 200px">{{ row.item.criticidad }}</td>
+							<td style="width: 200px">{{ row.item.tiempo_recuperacion }}</td>
 							<td style="width: 100px">
 								<v-row style="display: inline-block">
 									<modal-detalle-riesgo
