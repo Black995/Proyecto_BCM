@@ -1,7 +1,40 @@
 <template>
-	<v-container fill-height fill-width class="fondo-primary" fluid>
+	<v-container class="login" fill-height fill-width fluid>
 		<v-row no-gutters justify="center">
-			<h3>Iniciar sesión</h3>
+			<!--h3>Iniciar sesión</h3-->
+			<v-layout align-center justify-center>
+				<v-flex xs12 sm8 md4>
+					<v-card class="elevation-12">
+						<v-toolbar dark color="primary">
+							<v-spacer>
+								<v-toolbar-title class="text-center"
+									>Iniciar sesión</v-toolbar-title
+								>
+							</v-spacer>
+						</v-toolbar>
+						<v-card-text>
+							<v-form>
+								<v-text-field
+									prepend-icon="mdi-account"
+									name="login"
+									label="Usuario"
+									type="text"
+								></v-text-field>
+								<v-text-field
+									prepend-icon="mdi-shield-lock"
+									name="password"
+									label="Contraseña"
+									type="password"
+								></v-text-field>
+							</v-form>
+						</v-card-text>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="primary" to="/riesgos">Login</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-flex>
+			</v-layout>
 		</v-row>
 	</v-container>
 </template>
@@ -33,3 +66,9 @@ export default Vue.extend({
 	},
 })
 </script>
+
+<style lang="scss">
+.login {
+	background: #f1f1f1;
+}
+</style>

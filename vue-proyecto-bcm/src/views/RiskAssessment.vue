@@ -157,7 +157,7 @@
 			</div>
 		</v-fade-transition>
 
-		<v-row align="center" no-gutters style="height: 200px"> </v-row>
+		<!--v-row align="center" no-gutters style="height: 100px"> </v-row-->
 	</v-container>
 </template>
 

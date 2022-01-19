@@ -6,7 +6,6 @@
 			v-on:dismissexito="dismissExito"
 		></alerta-exito>
 
-
 		<v-row no-gutters style="height: 150px" align="center" justify="center">
 			<v-card>
 				<v-card-title class="header-table">
@@ -31,7 +30,9 @@
 					<template v-slot:item="row">
 						<tr>
 							<td style="width: 300px">{{ row.item.nombre }}</td>
-							<td style="width: 300px">{{ row.item.descripcion }}</td>
+							<td style="width: 300px">
+								{{ row.item.descripcion }}
+							</td>
 							<td style="width: 300px">{{ row.item.tipo }}</td>
 							<td style="width: 100px">
 								<v-row style="display: inline-block">
@@ -52,7 +53,7 @@
 			</v-card>
 		</v-row>
 
-		<v-row align="center" no-gutters style="height: 200px"> </v-row>
+		<v-row align="center" no-gutters style="height: 350px"> </v-row>
 	</v-container>
 </template>
 <script lang="ts">

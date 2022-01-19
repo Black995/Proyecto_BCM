@@ -30,11 +30,19 @@
 					<template v-slot:item="row">
 						<tr>
 							<td style="width: 200px">{{ row.item.nombre }}</td>
-							<td style="width: 200px">{{ row.item.descripcion }}</td>
+							<td style="width: 200px">
+								{{ row.item.descripcion }}
+							</td>
 							<td style="width: 200px">{{ row.item.costo }}</td>
-							<td style="width: 200px">{{ row.item.frecuencia }}</td>
-							<td style="width: 200px">{{ row.item.criticidad }}</td>
-							<td style="width: 200px">{{ row.item.tiempo_recuperacion }}</td>
+							<td style="width: 200px">
+								{{ row.item.frecuencia }}
+							</td>
+							<td style="width: 200px">
+								{{ row.item.criticidad }}
+							</td>
+							<td style="width: 200px">
+								{{ row.item.tiempo_recuperacion }}
+							</td>
 							<td style="width: 100px">
 								<v-row style="display: inline-block">
 									<modal-detalle-riesgo
@@ -54,7 +62,7 @@
 			</v-card>
 		</v-row>
 
-		<v-row align="center" no-gutters style="height: 200px"> </v-row>
+		<v-row align="center" no-gutters style="height: 350px"> </v-row>
 	</v-container>
 </template>
 
