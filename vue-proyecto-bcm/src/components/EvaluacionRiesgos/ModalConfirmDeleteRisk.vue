@@ -66,8 +66,6 @@ export default Vue.extend({
 					},
 				})
 				.then((res) => {
-					console.log('[Riesgo eliminado satisfactoriamente]')
-
 					//Si la oferta fue eliminada exitosamente, mostramos mensaje de éxito y cerramos el modal
 					this.dialog = false
 

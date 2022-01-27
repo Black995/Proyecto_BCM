@@ -64,7 +64,7 @@
 
 					<v-list flat subheader three-line class="my-4">
 						<v-list-item
-							v-for="item in crisis.risks"
+							v-for="item in crisis._risks"
 							:key="item.key"
 						>
 							<v-list-item-content>
@@ -103,7 +103,7 @@ interface Risk {
 interface CrisisScenario {
 	name: string
 	description: string
-	risks: Risk[]
+	_risks: Risk[]
 }
 
 export default Vue.extend({
@@ -113,19 +113,10 @@ export default Vue.extend({
 			loading: true,
 			crisis: {} as CrisisScenario,
 			dialog: false,
-			risks: [
-				{
-					id: 1,
-					name: 'Corte de electricidad',
-					description: 'Corte imprevisto del suministro eléctrico',
-				},
-				{
-					id: 2,
-					name: 'Falla o caída del servidor',
-					description:
-						'Caída temporal del servidor debido al clima o a problemas de electricidad',
-				},
-			],
+
+			//Para el manejo del mensaje
+			mensajeError: '' as string,
+			snackbar: false as boolean,
 		}
 	},
 	methods: {
@@ -144,17 +135,26 @@ export default Vue.extend({
 				)
 				.then((res) => {
 					this.loading = false
-					console.log(res)
-					console.log(res.data)
-
 					this.crisis = res.data
-
-					//Insertamos temporalmente riesgos con data dummy
-					this.crisis.risks = this.risks
 				})
-				.catch(function (error) {
-					console.log('Ups! Ha ocurrido un error en el servidor')
-					console.log(error.toJSON())
+				.catch((err) => {
+					try {
+						// Error 400 por unicidad o 500 generico
+						if (err.response.status == 400) {
+							this.mensajeError = err.response.data
+							this.snackbar = true
+						} else {
+							// Servidor no disponible
+							this.mensajeError =
+								'Ups! Ha ocurrido un error en el servidor'
+							this.snackbar = true
+						}
+					} catch {
+						// Servidor no disponible
+						this.mensajeError =
+							'Ups! Ha ocurrido un error en el servidor'
+						this.snackbar = true
+					}
 				})
 		},
 	},

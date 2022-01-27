@@ -129,8 +129,6 @@ export default Vue.extend({
 	},
 	methods: {
 		async getDetail() {
-			console.log('[ID del riesgo detalle] ', this.$props.id)
-
 			axios
 				.get<Crisis>(
 					`${SERVER_ADDRESS}/api/risks/crisis_scenario/${this.$props.id}/`,
@@ -149,15 +147,27 @@ export default Vue.extend({
 						description: res.data.description,
 					}
 				})
-				.catch(function (error) {
-					console.log('Ups! Ha ocurrido un error en el servidor')
-					console.log(error.toJSON())
+				.catch((err) => {
+					try {
+						// Error 400 por unicidad o 500 generico
+						if (err.response.status == 400) {
+							this.mensajeError = err.response.data
+							this.snackbar = true
+						} else {
+							// Servidor no disponible
+							this.mensajeError =
+								'Ups! Ha ocurrido un error en el servidor'
+							this.snackbar = true
+						}
+					} catch {
+						// Servidor no disponible
+						this.mensajeError =
+							'Ups! Ha ocurrido un error en el servidor'
+						this.snackbar = true
+					}
 				})
 		},
 		async Editar() {
-			console.log('Objeto a enviar para actualizar crisis: ')
-			console.log(this.crisis)
-
 			//Validación de los inputs
 			if (
 				!(
@@ -179,11 +189,6 @@ export default Vue.extend({
 				)
 				.then((res) => {
 					this.loading = false
-
-					console.log(
-						'[Escenario crítico actualizado satisfactoriamente]'
-					)
-
 					this.dialog = false
 
 					//Reinicializamos variable del crear
@@ -199,9 +204,6 @@ export default Vue.extend({
 				})
 				.catch((err) => {
 					try {
-						console.log('Error')
-						console.log(err)
-						console.log(err.response)
 						// Error 400 por unicidad o 500 generico
 						if (err.response.status == 400) {
 							this.mensajeError = err.response.data

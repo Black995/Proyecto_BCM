@@ -13,7 +13,6 @@
 				<template v-slot:activator="{ on, attrs }">
 					<v-btn
 						style="position: relative; left: -15px"
-						text
 						icon
 						v-bind="attrs"
 						v-on="on"
@@ -152,11 +151,7 @@ export default Vue.extend({
 </script>
 
 
-<style lang="scss">
-body {
-	nav-down: abs($number: 10);
-}
-
+<style>
 .header-table {
 	background: #002060;
 	color: #ffffff !important;
@@ -164,5 +159,6 @@ body {
 
 .main-background {
 	background: #f1f1f1;
+	background-size: 100%;
 }
 </style>

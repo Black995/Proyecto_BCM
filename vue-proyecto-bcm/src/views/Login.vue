@@ -49,12 +49,14 @@
 								>
 								<v-text-field
 									v-model="user.email"
+									v-on:keyup.enter="login"
 									prepend-icon="mdi-account"
 									label="Usuario"
 									type="email"
 								></v-text-field>
 								<v-text-field
 									v-model="user.password"
+									v-on:keyup.enter="login"
 									prepend-icon="mdi-shield-lock"
 									label="Contraseña"
 									type="password"
@@ -119,8 +121,8 @@ export default Vue.extend({
 						/**
 						 * Se guarda el token en local storage (provicionalmente)
 						 */
-						this.$router.push('/riesgos')
 						localStorage.setItem('token', res.data.access)
+						this.$router.push('/riesgos')
 					}
 				})
 				.catch((error) => {

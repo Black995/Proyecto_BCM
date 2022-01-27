@@ -24,7 +24,7 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
 
     path('admin/', admin.site.urls),
-    path('api/risks/',  include('risks.api.urls')),
+    path('api/risks/',  include('bcm_phase1.api.urls')),
 
 
     # URLs de Django REST framework

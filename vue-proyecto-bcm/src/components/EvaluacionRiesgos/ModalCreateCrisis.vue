@@ -7,7 +7,6 @@
 				rounded
 				v-bind="attrs"
 				v-on="on"
-				v-on:click="getRisks"
 			>
 				Agregar escenario crítico
 			</v-btn>
@@ -49,7 +48,7 @@
 				</v-card-text>
 			</v-form>
 
-			<v-card-text>
+			<!--v-card-text>
 				<v-container>
 					<h2 class="font-weight-medium text-center my-2">
 						Asocie los riesgos de la organización al escenario
@@ -83,16 +82,13 @@
 						</v-list-item-group>
 					</v-list>
 				</v-container>
-			</v-card-text>
+			</v-card-text-->
 
 			<v-card-actions>
 				<v-spacer></v-spacer>
 				<v-btn color="primary darken-1" @click="dialog = false" text>
 					Cerrar
 				</v-btn>
-				<!--v-btn color="primary" v-on:click="crear">
-						Crear riesgo
-					</v-btn-->
 				<modal-confirm-create-crisis
 					:disabled="validForm"
 					v-on:crear="Crear"
@@ -119,7 +115,7 @@ import AlertError from '../Genericos/AlertError.vue'
 interface Crisis {
 	name: string
 	description: string
-	risks: number[]
+	//risks: number[]
 }
 
 interface Risk {
@@ -144,7 +140,7 @@ export default Vue.extend({
 			crisis: {
 				name: '',
 				description: '',
-				risks: [],
+				//risks: [],
 			} as Crisis,
 			risks: [] as Risk[],
 			criticidad: ['Alto', 'Mediano', 'Bajo'],
@@ -171,18 +167,8 @@ export default Vue.extend({
 			},
 		}
 	},
-	computed: {
-		/*
-      nameErrors () {
-        const errors = []
-        if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push('Name must be at most 10 characters long')
-        !this.$v.name.required && errors.push('Name is required.')
-        return errors
-      },
-		*/
-	},
 	methods: {
+		/*
 		async getRisks() {
 			this.risks = []
 			axios
@@ -193,8 +179,6 @@ export default Vue.extend({
 					},
 				})
 				.then((res) => {
-					console.log(res)
-					console.log(res.data)
 
 					for (let i = 0; i < res.data.length; i++) {
 						var risk: Risk = {
@@ -207,15 +191,28 @@ export default Vue.extend({
 					}
 					//this.risks = res.data
 				})
-				.catch(function (error) {
-					console.log('Ups! Ha ocurrido un error en el servidor')
-					console.log(error.toJSON())
+				.catch((err) => {
+					try {
+						// Error 400 por unicidad o 500 generico
+						if (err.response.status == 400) {
+							this.mensajeError = err.response.data
+							this.snackbar = true
+						} else {
+							// Servidor no disponible
+							this.mensajeError =
+								'Ups! Ha ocurrido un error en el servidor'
+							this.snackbar = true
+						}
+					} catch {
+						// Servidor no disponible
+						this.mensajeError =
+							'Ups! Ha ocurrido un error en el servidor'
+						this.snackbar = true
+					}
 				})
 		},
+		*/
 		async Crear() {
-			console.log('Objeto a enviar: ')
-			console.log(this.crisis)
-
 			//Validación de los inputs
 			if (
 				!(
@@ -224,12 +221,13 @@ export default Vue.extend({
 			)
 				return
 
-			console.log('Se asocian los riesgos al escenario que se va a crear')
+			/*
 			for (let i = 0; i < this.risks.length; i++) {
 				if (this.risks[i].selected) {
 					this.crisis.risks.push(this.risks[i].id)
 				}
 			}
+			*/
 
 			axios
 				.post(
@@ -245,16 +243,14 @@ export default Vue.extend({
 				.then((res) => {
 					this.estaCargando = false
 
-					console.log('[Oferta creada satisfactoriamente]')
-
-					//Si la oferta fue exitosamente creada, mostramos mensaje de éxito y cerramos el modal
+					//Si el escenario crítico fue exitosamente creada, mostramos mensaje de éxito y cerramos el modal
 					this.dialog = false
 
 					//Reinicializamos variable del crear
 					this.crisis = {
 						name: '',
 						description: '',
-						risks: [],
+						//risks: [],
 					}
 
 					this.$emit(

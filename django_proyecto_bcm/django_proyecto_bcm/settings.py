@@ -49,10 +49,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'layout'
+    'users',
+    'configuration',
+    'bcm_phase1',
+    'bcm_phase2',
+    'bcm_phase3'
 ]
 
-AUTH_USER_MODEL = 'layout.User'
+AUTH_USER_MODEL = 'users.User'
 
 """
     Configuraciones del cors

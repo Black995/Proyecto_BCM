@@ -164,9 +164,6 @@ export default Vue.extend({
 	},
 	methods: {
 		async Crear() {
-			console.log('Objeto a enviar: ')
-			console.log(this.risk)
-
 			//Validación de los inputs
 			if (
 				!(
@@ -184,10 +181,6 @@ export default Vue.extend({
 				})
 				.then((res) => {
 					this.loading = false
-
-					console.log('[Oferta creada satisfactoriamente]')
-
-					//Si la oferta fue exitosamente creada, mostramos mensaje de éxito y cerramos el modal
 					this.dialog = false
 
 					//Reinicializamos variable del crear

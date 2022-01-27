@@ -34,6 +34,11 @@ const routes: Array<RouteConfig> = [
 				name: 'Actividades del Negocio',
 				component: () => import('../views/BusinessActivity.vue'),
 			},
+			{
+				path: '/servicios-ofrecidos',
+				name: 'Servicios Ofrecidos',
+				component: () => import('../views/ServicesOffered.vue'),
+			},
 		],
 	},
 ]
