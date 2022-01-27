@@ -60,7 +60,7 @@ export default Vue.extend({
 		async confirmDelete() {
 			axios
 				.delete(
-					`${SERVER_ADDRESS}/api/risks/crisis_scenario/${this.$props.id}/`,
+					`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.$props.id}/`,
 					{
 						withCredentials: true,
 						headers: {

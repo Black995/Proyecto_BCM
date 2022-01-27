@@ -65,7 +65,7 @@
 			</v-card>
 		</v-row>
 
-		<v-row align="center" no-gutters style="height: 100px"> </v-row>
+		<v-row align="center" no-gutters style="height: 300px"> </v-row>
 	</v-container>
 </template>
 
@@ -109,53 +109,26 @@ export default Vue.extend({
 				align: 'start',
 				value: 'nombre',
 				class: 'header-table',
+				sortable: true,
+				filterable: true,
 			},
 			{
 				text: 'Descripción',
 				value: 'descripcion',
 				class: 'header-table',
-				filterable: false,
+				filterable: true,
 			},
 			{
 				text: 'Acciones',
 				value: 'acciones',
 				class: 'header-table',
 				align: 'center',
-				filterable: false,
-				disableSort: true,
-				disableFiltering: true,
-			},
-		],
-		headersCrisisScenario: [
-			{
-				text: 'Nombre',
-				align: 'start',
-				value: 'nombre',
-				class: 'header-table',
-			},
-			{
-				text: 'Descripción',
-				value: 'descripcion',
-				class: 'header-table',
-				filterable: false,
-			},
-			{
-				text: 'Acciones',
-				value: 'acciones',
-				class: 'header-table',
-				align: 'center',
-				filterable: false,
 				disableSort: true,
 				disableFiltering: true,
 			},
 		],
 		risks: [] as Risk[],
-		crisisScenarios: [] as CrisisScenario[],
 		deleteRiskId: 0 as number,
-
-		//Variables para expandir vistas
-		expandRisk: true,
-		expandScenario: false,
 
 		//Para el manejo del mensaje de éxito
 		mensajeExito: '',
@@ -167,13 +140,12 @@ export default Vue.extend({
 	}),
 	mounted() {
 		this.getRisks()
-		this.getCrisisScenarios()
 	},
 	methods: {
 		async getRisks() {
 			this.risks = []
 			axios
-				.get<Risk[]>(`${SERVER_ADDRESS}/api/risks/risks/`, {
+				.get<Risk[]>(`${SERVER_ADDRESS}/api/phase1/risks/`, {
 					withCredentials: true,
 					headers: {
 						Authorization: TOKEN,
@@ -203,67 +175,13 @@ export default Vue.extend({
 				})
 		},
 
-		async getCrisisScenarios() {
-			this.crisisScenarios = []
-			axios
-				.get<CrisisScenario[]>(
-					`${SERVER_ADDRESS}/api/risks/crisis_scenarios_list/`,
-					{
-						withCredentials: true,
-						headers: {
-							Authorization: TOKEN,
-						},
-					}
-				)
-				.then((res) => {
-					this.crisisScenarios = res.data
-				})
-				.catch((err) => {
-					try {
-						// Error 400 por unicidad o 500 generico
-						if (err.response.status == 400) {
-							this.mensajeError = err.response.data
-							this.snackbar = true
-						} else {
-							// Servidor no disponible
-							this.mensajeError =
-								'Ups! Ha ocurrido un error en el servidor'
-							this.snackbar = true
-						}
-					} catch {
-						// Servidor no disponible
-						this.mensajeError =
-							'Ups! Ha ocurrido un error en el servidor'
-						this.snackbar = true
-					}
-				})
-		},
-
 		alertExito(mensaje: string) {
 			this.alertaExito = true
 			this.mensajeExito = mensaje
 			this.getRisks()
-			this.getCrisisScenarios()
-			//this.recargarTabla();
 		},
 		dismissSuccess() {
 			this.alertaExito = !this.alertaExito
-		},
-		cambiarVistaRiesgo() {
-			if (!this.expandRisk) {
-				this.expandScenario = !this.expandScenario
-				setTimeout(() => {
-					this.expandRisk = !this.expandRisk
-				}, 500)
-			}
-		},
-		cambiarVistaEscenario() {
-			if (!this.expandScenario) {
-				this.expandRisk = !this.expandRisk
-				setTimeout(() => {
-					this.expandScenario = !this.expandScenario
-				}, 500)
-			}
 		},
 	},
 })

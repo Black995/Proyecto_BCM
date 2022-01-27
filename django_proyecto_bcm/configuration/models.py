@@ -51,6 +51,23 @@ class Area(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
 
+class Scale(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    min_value = models.SmallIntegerField()
+    max_value = models.SmallIntegerField()
+
+
+"""
+    This model is used for restrict the use of a scale in front-end views
+"""
+
+class ScaleView(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    scale = models.ForeignKey(
+        Scale, related_name='scale_view', on_delete=models.CASCADE)
+
+
 class Staff(models.Model):
     staff_number = models.IntegerField(null=True)
     names = models.CharField(max_length=100)

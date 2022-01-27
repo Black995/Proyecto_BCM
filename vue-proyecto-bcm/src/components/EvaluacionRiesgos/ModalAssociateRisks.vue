@@ -140,7 +140,7 @@ export default Vue.extend({
 
 			axios
 				.patch(
-					`${SERVER_ADDRESS}/api/risks/crisis_scenario/${this.$props.id}/`,
+					`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.$props.id}/`,
 					ids,
 					{
 						withCredentials: true,
@@ -220,7 +220,7 @@ export default Vue.extend({
 		async getRisks() {
 			this.risks = []
 			axios
-				.get<Risk[]>(`${SERVER_ADDRESS}/api/risks/risks/`, {
+				.get<Risk[]>(`${SERVER_ADDRESS}/api/phase1/risks/`, {
 					withCredentials: true,
 					headers: {
 						Authorization: TOKEN,

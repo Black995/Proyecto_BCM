@@ -211,19 +211,20 @@ export default Vue.extend({
 				align: 'start',
 				value: 'nombre',
 				class: 'header-table',
+				sortable: true,
+				filterable: true,
 			},
 			{
 				text: 'Descripción',
 				value: 'descripcion',
 				class: 'header-table',
-				filterable: false,
+				filterable: true,
 			},
 			{
 				text: 'Acciones',
 				value: 'acciones',
 				class: 'header-table',
 				align: 'center',
-				filterable: false,
 				disableSort: true,
 				disableFiltering: true,
 			},
@@ -234,6 +235,7 @@ export default Vue.extend({
 				align: 'start',
 				value: 'nombre',
 				class: 'header-table',
+				sortable: true,
 			},
 			{
 				text: 'Descripción',
@@ -275,7 +277,7 @@ export default Vue.extend({
 		async getRisks() {
 			this.risks = []
 			axios
-				.get<Risk[]>(`${SERVER_ADDRESS}/api/risks/risks/`, {
+				.get<Risk[]>(`${SERVER_ADDRESS}/api/phase1/risks/`, {
 					withCredentials: true,
 					headers: {
 						Authorization: TOKEN,
@@ -309,7 +311,7 @@ export default Vue.extend({
 			this.crisisScenarios = []
 			axios
 				.get<CrisisScenario[]>(
-					`${SERVER_ADDRESS}/api/risks/crisis_scenarios_list/`,
+					`${SERVER_ADDRESS}/api/phase1/crisis_scenarios_list/`,
 					{
 						withCredentials: true,
 						headers: {
@@ -346,7 +348,6 @@ export default Vue.extend({
 			this.mensajeExito = mensaje
 			this.getRisks()
 			this.getCrisisScenarios()
-			//this.recargarTabla();
 		},
 		dismissSuccess() {
 			this.alertaExito = !this.alertaExito

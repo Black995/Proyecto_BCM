@@ -4,7 +4,6 @@ from .views import (RiskViewSet, CrisisScenarioViewSet, CrisisScenarioListViewSe
 
 
 urlpatterns = [
-
     path('risks/', RiskViewSet.as_view({
         'get': 'list',
         'post': 'create'}), name='risk_list'),

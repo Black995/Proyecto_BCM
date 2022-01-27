@@ -133,7 +133,7 @@ export default Vue.extend({
 
 			axios
 				.get<Risk>(
-					`${SERVER_ADDRESS}/api/risks/risk/${this.$props.id}/`,
+					`${SERVER_ADDRESS}/api/phase1/risk/${this.$props.id}/`,
 					{
 						withCredentials: true,
 						headers: {
@@ -165,7 +165,7 @@ export default Vue.extend({
 
 			axios
 				.patch(
-					`${SERVER_ADDRESS}/api/risks/risk/${this.$props.id}/`,
+					`${SERVER_ADDRESS}/api/phase1/risk/${this.$props.id}/`,
 					this.risk,
 					{
 						withCredentials: true,

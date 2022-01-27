@@ -173,7 +173,7 @@ export default Vue.extend({
 				return
 
 			axios
-				.post(`${SERVER_ADDRESS}/api/risks/risks/`, this.risk, {
+				.post(`${SERVER_ADDRESS}/api/phase1/risks/`, this.risk, {
 					withCredentials: true,
 					headers: {
 						Authorization: TOKEN,

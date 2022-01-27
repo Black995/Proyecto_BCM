@@ -59,12 +59,15 @@ export default Vue.extend({
 	methods: {
 		async confirmDelete() {
 			axios
-				.delete(`${SERVER_ADDRESS}/api/risks/risk/${this.$props.id}/`, {
-					withCredentials: true,
-					headers: {
-						Authorization: TOKEN,
-					},
-				})
+				.delete(
+					`${SERVER_ADDRESS}/api/phase1/risk/${this.$props.id}/`,
+					{
+						withCredentials: true,
+						headers: {
+							Authorization: TOKEN,
+						},
+					}
+				)
 				.then((res) => {
 					//Si la oferta fue eliminada exitosamente, mostramos mensaje de éxito y cerramos el modal
 					this.dialog = false

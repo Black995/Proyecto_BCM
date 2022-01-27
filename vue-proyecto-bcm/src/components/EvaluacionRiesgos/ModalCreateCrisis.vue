@@ -172,7 +172,7 @@ export default Vue.extend({
 		async getRisks() {
 			this.risks = []
 			axios
-				.get<Risk[]>(`${SERVER_ADDRESS}/api/risks/risks/`, {
+				.get<Risk[]>(`${SERVER_ADDRESS}/api/phase1/risks/`, {
 					withCredentials: true,
 					headers: {
 						Authorization: TOKEN,
@@ -231,7 +231,7 @@ export default Vue.extend({
 
 			axios
 				.post(
-					`${SERVER_ADDRESS}/api/risks/crisis_scenarios/`,
+					`${SERVER_ADDRESS}/api/phase1/crisis_scenarios/`,
 					this.crisis,
 					{
 						withCredentials: true,

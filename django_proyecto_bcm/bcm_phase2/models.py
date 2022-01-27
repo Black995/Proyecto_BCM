@@ -1,5 +1,5 @@
 from django.db import models
-from configuration.models import Organization, Headquarter, Area
+from configuration.models import Organization, Headquarter, Area, Scale
 
 
 class InterestedParty(models.Model):
@@ -22,23 +22,6 @@ class InterestedParty(models.Model):
     organization = models.ForeignKey(
         Organization, related_name='organization_interested_party', on_delete=models.CASCADE)
 
-
-class Scale(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    min_value = models.SmallIntegerField()
-    max_value = models.SmallIntegerField()
-
-
-"""
-    This model is used for restrict the use of a scale in front-end views
-"""
-
-
-class ScaleView(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    scale = models.ForeignKey(
-        Scale, related_name='scale_view', on_delete=models.CASCADE)
 
 
 class ServiceOffered(models.Model):
