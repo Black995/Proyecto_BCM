@@ -59,7 +59,7 @@
 <script lang="ts">
 import Vue from 'vue'
 
-//import ModalCrearParte from '../components/PartesInteresadas/ModalCrearParte.vue'
+import ModalCrearParte from '../components/PartesInteresadas/ModalCrearParte.vue'
 import AlertaExito from '../components/Genericos/AlertSuccess.vue'
 
 interface parteInteresada {
@@ -74,7 +74,7 @@ export default Vue.extend({
 
 	components: {
 		AlertaExito,
-		//ModalCrearParte,
+		ModalCrearParte,
 	},
 
 	data: () => ({
