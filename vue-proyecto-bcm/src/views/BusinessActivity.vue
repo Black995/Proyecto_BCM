@@ -1,26 +1,37 @@
 <template>
 	<v-container>
-		<alerta-exito
+		<alert-exito
 			v-if="alertaExito"
 			:mensaje="mensajeExito"
 			v-on:dismissexito="dismissExito"
-		></alerta-exito>
+		></alert-exito>
 
 		<v-row no-gutters style="height: 150px" align="center" justify="center">
 			<v-card>
 				<v-card-title class="header-table">
-					Actividades
-					<v-spacer></v-spacer>
-					<v-text-field
-						v-model="search"
-						append-icon="mdi-magnify"
-						label="Buscar por nombre o tipo"
-						single-line
-						hide-details
-						dark
-						class="header-table"
-					></v-text-field>
-				</v-card-title>
+							<v-spacer></v-spacer>
+							<v-col cols="12" sm="4" md="4" lg="4" xl="4">
+								<div class="text-center">
+									<div class="my-4">
+										<!--Llamamos al componente de crear riesgo-->
+										<modal-create-activity
+											v-on:alertexito="alertExito"
+										></modal-create-activity>
+									</div>
+								</div>
+							</v-col>
+							<v-col cols="12" sm="8" md="8" lg="8" xl="8">
+								<v-text-field
+									v-model="search"
+									append-icon="mdi-magnify"
+									label="Buscar por nombre"
+									single-line
+									hide-details
+									dark
+									class="header-table"
+								></v-text-field>
+							</v-col>
+						</v-card-title>
 				<v-data-table
 					:headers="headers"
 					:items="actividades"
@@ -51,9 +62,10 @@
 									<v-icon color="yellow" title="Editar parte"
 										>mdi-notebook-edit</v-icon
 									>
-									<v-icon color="red" title="Eliminar parte"
-										>mdi-delete-forever</v-icon
-									>
+									<modal-confirm-delete
+										:id="row.item.id"
+										v-on:alertexito="alertExito"
+									></modal-confirm-delete>
 								</v-row>
 							</td>
 						</tr>
@@ -70,7 +82,9 @@
 <script lang="ts">
 import Vue from 'vue'
 
-import AlertaExito from '../components/Genericos/AlertSuccess.vue'
+import ModalCreateActivity from '../components/ActividadesOrganizacion/ModalCreateActivity.vue'
+import ModalConfirmDelete from '../components/ActividadesOrganizacion/ModalConfirmDelete.vue'
+import AlertExito from '../components/Genericos/AlertSuccess.vue'
 
 interface Actividad {
 	id: number
@@ -85,8 +99,9 @@ export default Vue.extend({
 	//name: 'ActividadesNegocio',
 
 	components: {
-		AlertaExito,
-		//ModalCrearParte,
+		AlertExito,
+		ModalCreateActivity,
+		ModalConfirmDelete,
 	},
 	data: () => ({
 		search: '',

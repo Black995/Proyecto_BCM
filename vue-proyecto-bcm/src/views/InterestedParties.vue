@@ -1,25 +1,36 @@
 <template>
 	<v-container>
-		<alerta-exito
+		<alert-success
 			v-if="alertaExito"
 			:mensaje="mensajeExito"
 			v-on:dismissexito="dismissExito"
-		></alerta-exito>
+		></alert-success>
 
 		<v-row no-gutters style="height: 150px" align="center" justify="center">
 			<v-card>
 				<v-card-title class="header-table">
-					Partes interesadas
-					<v-spacer></v-spacer>
-					<v-text-field
-						v-model="search"
-						append-icon="mdi-magnify"
-						label="Buscar por nombre o tipo"
-						single-line
-						hide-details
-						dark
-						class="header-table"
-					></v-text-field>
+							<v-spacer></v-spacer>
+							<v-col cols="12" sm="4" md="4" lg="4" xl="4">
+								<div class="text-center">
+									<div class="my-4">
+										<!--Llamamos al componente de crear riesgo-->
+										<modal-create-parties
+											v-on:alertexito="alertExito"
+										></modal-create-parties>
+									</div>
+								</div>
+							</v-col>
+							<v-col cols="12" sm="8" md="8" lg="8" xl="8">
+								<v-text-field
+									v-model="search"
+									append-icon="mdi-magnify"
+									label="Buscar por nombre"
+									single-line
+									hide-details
+									dark
+									class="header-table"
+								></v-text-field>
+							</v-col>
 				</v-card-title>
 				<v-data-table
 					:headers="headers"
@@ -42,9 +53,10 @@
 									<v-icon color="yellow" title="Editar parte"
 										>mdi-notebook-edit</v-icon
 									>
-									<v-icon color="red" title="Eliminar parte"
-										>mdi-delete-forever</v-icon
-									>
+									<modal-confirm-delete
+										:id="row.item.id"
+										v-on:alertexito="alertExito"
+									></modal-confirm-delete>
 								</v-row>
 							</td>
 						</tr>
@@ -59,8 +71,9 @@
 <script lang="ts">
 import Vue from 'vue'
 
-//import ModalCrearParte from '../components/PartesInteresadas/ModalCrearParte.vue'
-import AlertaExito from '../components/Genericos/AlertSuccess.vue'
+import ModalCreateParties from '../components/PartesInteresadas/ModalCreateParties.vue'
+import ModalConfirmDelete from '../components/PartesInteresadas/ModalConfirmDelete.vue'
+import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
 
 interface parteInteresada {
 	id: number
@@ -73,8 +86,9 @@ export default Vue.extend({
 	//name: 'PartesInteresadas',
 
 	components: {
-		AlertaExito,
-		//ModalCrearParte,
+		AlertSuccess,
+		ModalCreateParties,
+		ModalConfirmDelete,
 	},
 
 	data: () => ({
@@ -134,7 +148,7 @@ export default Vue.extend({
 		mensajeExito: '',
 		alertaExito: false,
 	}),
-	/*methods: {
+	methods: {
 		alertExito(mensaje: string) {
 			this.alertaExito = true
 			this.mensajeExito = mensaje
@@ -142,9 +156,9 @@ export default Vue.extend({
 		},
 		dismissExito() {
 			console.log('Cerrar alerta exito padre')
-			this.alertaExito = !this.alertaExito
+			this.alertaExito = !this.alertaExito 
 		},
-	},*/
+	},
 })
 </script>
 

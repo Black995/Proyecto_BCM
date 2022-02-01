@@ -8,7 +8,7 @@
 				v-bind="attrs"
 				v-on="on"
 			>
-				Agregar una nueva parte interesada
+				Agregar parte interesada
 			</v-btn>
 		</template>
 
@@ -74,11 +74,11 @@
 					</v-btn>
 				</v-card-actions>
 
-				<alerta-error
+				<alert-error
 					:mensaje="mensajeError"
 					:snackbar="snackbar"
-					v-on:alertfin="alertaFin"
-				></alerta-error>
+					v-on:alertEnd="alertEnd"
+				></alert-error>
 			</v-form>
 		</v-card>
 	</v-dialog>
@@ -86,7 +86,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import AlertaError from '../Genericos/AlertaError.vue'
+import AlertError from '../Genericos/AlertError.vue'
 
 interface ParteInteresada {
 	nombre: string
@@ -99,7 +99,7 @@ interface ParteInteresada {
 
 export default Vue.extend({
 	components: {
-		AlertaError,
+		AlertError,
 	},
 
 	/*
@@ -184,7 +184,7 @@ export default Vue.extend({
 			this.snackbar = true
 			*/
 		},
-		alertaFin() {
+		alertEnd() {
 			this.snackbar = false
 		},
 	},

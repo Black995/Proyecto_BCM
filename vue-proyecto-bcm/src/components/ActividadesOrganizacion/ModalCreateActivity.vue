@@ -101,11 +101,11 @@
 					</v-btn>
 				</v-card-actions>
 
-				<alerta-error
+				<alert-error
 					:mensaje="mensajeError"
 					:snackbar="snackbar"
-					v-on:alertfin="alertaFin"
-				></alerta-error>
+					v-on:alertEnd="alertEnd"
+				></alert-error>
 			</v-form>
 		</v-card>
 	</v-dialog>
@@ -114,7 +114,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import AlertaError from '../Genericos/AlertaError.vue'
+import AlertError from '../Genericos/AlertError.vue'
 
 interface Actividad {
 	nombre: string,
@@ -130,7 +130,7 @@ interface Actividad {
 
 export default Vue.extend({
 	components: {
-		AlertaError,
+		AlertError,
 	},
 
 	/*
@@ -165,8 +165,8 @@ export default Vue.extend({
 			
 
 			//Para el manejo del mensaje
-			mensajeError: '',
-			snackbar: false,
+			mensajeError: '' as string,
+			snackbar: false as boolean,
 		}
 	},
 	computed: {
@@ -200,7 +200,7 @@ export default Vue.extend({
 			this.actividad =  {
 				nombre: '',
 				descripcion: '',
-				costo: 0,
+				costo: 0, 
                 frecuencia: '',
                 criticidad: '',
                 tiempo_recuperacion: ''
@@ -221,7 +221,7 @@ export default Vue.extend({
 			this.snackbar = true
 			*/
 		},
-		alertaFin() {
+		alertEnd() {
 			this.snackbar = false
 		},
 	},
