@@ -21,6 +21,7 @@
     "vue-router": "^3.2.0",
     "vuelidate": "^0.7.7",
     "vuetify": "^2.4.0",
+    "vuetify-numeric": "^0.2.0",
     "vuex": "^3.4.0"
   },
   "devDependencies": {

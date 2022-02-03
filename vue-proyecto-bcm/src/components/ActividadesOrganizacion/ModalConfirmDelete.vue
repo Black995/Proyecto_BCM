@@ -36,29 +36,27 @@
 </template>
 
 <script lang="ts">
-
 import Vue from 'vue'
 import AlertError from '../Genericos/AlertError.vue'
 
-
 export default Vue.extend({
-    components:{
-        AlertError,
-    },
-    data() {
-        return {
-            dialog: false,
+	components: {
+		AlertError,
+	},
+	props: ['id'],
+	data() {
+		return {
+			dialog: false,
 
-            //Para el manejo del mensaje de error
+			//Para el manejo del mensaje de error
 			mensajeError: '',
 			snackbar: false,
-        }
-    },
-    methods:{
-        alertaFin(){
-            this.snackbar = false;
-        }
-    }
-
+		}
+	},
+	methods: {
+		alertaFin() {
+			this.snackbar = false
+		},
+	},
 })
 </script>

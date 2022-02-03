@@ -10,17 +10,16 @@
 			<v-card>
 				<v-card-title class="header-table">
 					<v-spacer></v-spacer>
-					<v-col cols="12" sm="4" md="4" lg="4" xl="4">
+					<v-col cols="12" sm="6" md="6" lg="6" xl="6">
 						<div class="text-center">
 							<div class="my-4">
-								<!--Llamamos al componente de crear riesgo-->
-								<modal-create-risk
+								<modal-create-service-offered
 									v-on:alertexito="alertExito"
-								></modal-create-risk>
+								></modal-create-service-offered>
 							</div>
 						</div>
 					</v-col>
-					<v-col cols="12" sm="8" md="8" lg="8" xl="8">
+					<v-col cols="12" sm="6" md="6" lg="6" xl="6">
 						<v-text-field
 							v-model="search"
 							append-icon="mdi-magnify"
@@ -33,15 +32,19 @@
 					</v-col>
 				</v-card-title>
 				<v-data-table
-					:headers="headersRisk"
-					:items="risks"
+					:headers="headersServices"
+					:items="services"
 					:search="search"
 					:items-per-page="5"
 				>
 					<template v-slot:item="row">
 						<tr>
 							<td>{{ row.item.name }}</td>
-							<td>{{ row.item.description }}</td>
+							<td>{{ row.item.type_name }}</td>
+							<td>{{ row.item.profit }}</td>
+							<td>{{ row.item.recovery_time }}</td>
+							<td>{{ row.item.criticality }}</td>
+							<td>{{ row.item.area_name }}</td>
 							<td style="width: 100px">
 								<v-row justify="center">
 									<!--v-icon
@@ -74,21 +77,21 @@ import Vue from 'vue'
 import axios from 'axios'
 import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
-import ModalCreateRisk from '../components/EvaluacionRiesgos/ModalCreateRisk.vue'
+import ModalCreateServiceOffered from '../components/ServiciosOfrecidos/ModalCreateServiceOffered.vue'
 import ModalUpdateRisk from '../components/EvaluacionRiesgos/ModalUpdateRisk.vue'
 import ModalConfirmDeleteRisk from '../components/EvaluacionRiesgos/ModalConfirmDeleteRisk.vue'
 import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
 
-interface Risk {
+interface ServiceOffered {
 	id: number
 	name: string
-	description: string
-}
-
-interface CrisisScenario {
-	id: number
-	name: string
-	description: string
+	type: number
+	type_name: string
+	profit: number
+	recovery_time: string
+	criticality: number
+	area: number
+	area_name: string
 }
 
 export default Vue.extend({
@@ -96,14 +99,14 @@ export default Vue.extend({
 
 	components: {
 		AlertSuccess,
-		ModalCreateRisk,
+		ModalCreateServiceOffered,
 		ModalUpdateRisk,
 		ModalConfirmDeleteRisk,
 	},
 
 	data: () => ({
 		search: '',
-		headersRisk: [
+		headersServices: [
 			{
 				text: 'Nombre',
 				align: 'start',
@@ -113,8 +116,32 @@ export default Vue.extend({
 				filterable: true,
 			},
 			{
-				text: 'Descripción',
-				value: 'descripcion',
+				text: 'Tipo',
+				value: 'type_name',
+				class: 'header-table',
+				filterable: true,
+			},
+			{
+				text: 'Ganancia',
+				value: 'profit',
+				class: 'header-table',
+				filterable: true,
+			},
+			{
+				text: 'Tiempo de recuperación (estimado)',
+				value: 'recovery_time',
+				class: 'header-table',
+				filterable: true,
+			},
+			{
+				text: 'Criticidad',
+				value: 'criticality',
+				class: 'header-table',
+				filterable: true,
+			},
+			{
+				text: 'Area',
+				value: 'area_name',
 				class: 'header-table',
 				filterable: true,
 			},
@@ -127,8 +154,8 @@ export default Vue.extend({
 				disableFiltering: true,
 			},
 		],
-		risks: [] as Risk[],
-		deleteRiskId: 0 as number,
+		services: [] as ServiceOffered[],
+		deleteServiceId: 0 as number,
 
 		//Para el manejo del mensaje de éxito
 		mensajeExito: '',
@@ -139,20 +166,23 @@ export default Vue.extend({
 		snackbar: false as boolean,
 	}),
 	mounted() {
-		this.getRisks()
+		this.getServicesOffered()
 	},
 	methods: {
-		async getRisks() {
-			this.risks = []
+		async getServicesOffered() {
+			this.services = []
 			axios
-				.get<Risk[]>(`${SERVER_ADDRESS}/api/phase1/risks/`, {
-					withCredentials: true,
-					headers: {
-						Authorization: TOKEN,
-					},
-				})
+				.get<ServiceOffered[]>(
+					`${SERVER_ADDRESS}/api/phase2/services/offered/`,
+					{
+						withCredentials: true,
+						headers: {
+							Authorization: TOKEN,
+						},
+					}
+				)
 				.then((res) => {
-					this.risks = res.data
+					this.services = res.data
 				})
 				.catch((err) => {
 					try {
@@ -178,7 +208,7 @@ export default Vue.extend({
 		alertExito(mensaje: string) {
 			this.alertaExito = true
 			this.mensajeExito = mensaje
-			this.getRisks()
+			this.getServicesOffered()
 		},
 		dismissSuccess() {
 			this.alertaExito = !this.alertaExito
