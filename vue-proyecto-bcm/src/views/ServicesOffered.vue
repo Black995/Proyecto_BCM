@@ -14,6 +14,10 @@
 						<div class="text-center">
 							<div class="my-4">
 								<modal-create-service-offered
+									:scale_id="scaleView.id"
+									:minValue="scaleView.scale_min_value"
+									:maxValue="scaleView.scale_max_value"
+									:scaleName="scaleView.scale_name"
 									v-on:alertexito="alertExito"
 								></modal-create-service-offered>
 							</div>
@@ -43,7 +47,14 @@
 							<td>{{ row.item.type_name }}</td>
 							<td>{{ row.item.profit }}</td>
 							<td>{{ row.item.recovery_time }}</td>
-							<td>{{ row.item.criticality }}</td>
+							<td v-if="!row.item.scale_max_value">
+								{{ row.item.criticality }}
+							</td>
+							<td v-if="row.item.scale_max_value">
+								{{ row.item.criticality }}/{{
+									row.item.scale_max_value
+								}}
+							</td>
 							<td>{{ row.item.area_name }}</td>
 							<td style="width: 100px">
 								<v-row justify="center">
@@ -56,10 +67,11 @@
 										:id="row.item.id"
 										v-on:alertexito="alertExito"
 									></modal-update-risk>
-									<modal-confirm-delete-risk
+									<modal-confirm-delete-service-offered
 										:id="row.item.id"
+										:type="row.item.type_name"
 										v-on:alertexito="alertExito"
-									></modal-confirm-delete-risk>
+									></modal-confirm-delete-service-offered>
 								</v-row>
 							</td>
 						</tr>
@@ -79,7 +91,7 @@ import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
 import ModalCreateServiceOffered from '../components/ServiciosOfrecidos/ModalCreateServiceOffered.vue'
 import ModalUpdateRisk from '../components/EvaluacionRiesgos/ModalUpdateRisk.vue'
-import ModalConfirmDeleteRisk from '../components/EvaluacionRiesgos/ModalConfirmDeleteRisk.vue'
+import ModalConfirmDeleteServiceOffered from '../components/ServiciosOfrecidos/ModalConfirmDeleteServiceOffered.vue'
 import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
 
 interface ServiceOffered {
@@ -90,8 +102,17 @@ interface ServiceOffered {
 	profit: number
 	recovery_time: string
 	criticality: number
-	area: number
 	area_name: string
+	scale_max_value: number
+}
+
+interface ScaleView {
+	id: number
+	name: string
+	scale: number
+	scale_name: string
+	scale_min_value: number
+	scale_max_value: number
 }
 
 export default Vue.extend({
@@ -101,7 +122,7 @@ export default Vue.extend({
 		AlertSuccess,
 		ModalCreateServiceOffered,
 		ModalUpdateRisk,
-		ModalConfirmDeleteRisk,
+		ModalConfirmDeleteServiceOffered,
 	},
 
 	data: () => ({
@@ -155,6 +176,14 @@ export default Vue.extend({
 			},
 		],
 		services: [] as ServiceOffered[],
+		scaleView: {
+			id: 0,
+			name: '',
+			scale: 0,
+			scale_name: '',
+			scale_min_value: 0,
+			scale_max_value: 0,
+		} as ScaleView,
 		deleteServiceId: 0 as number,
 
 		//Para el manejo del mensaje de éxito
@@ -166,6 +195,7 @@ export default Vue.extend({
 		snackbar: false as boolean,
 	}),
 	mounted() {
+		this.getScaleView()
 		this.getServicesOffered()
 	},
 	methods: {
@@ -183,6 +213,39 @@ export default Vue.extend({
 				)
 				.then((res) => {
 					this.services = res.data
+				})
+				.catch((err) => {
+					try {
+						// Error 400 por unicidad o 500 generico
+						if (err.response.status == 400) {
+							this.mensajeError = err.response.data
+							this.snackbar = true
+						} else {
+							// Servidor no disponible
+							this.mensajeError =
+								'Ups! Ha ocurrido un error en el servidor'
+							this.snackbar = true
+						}
+					} catch {
+						// Servidor no disponible
+						this.mensajeError =
+							'Ups! Ha ocurrido un error en el servidor'
+						this.snackbar = true
+					}
+				})
+		},
+		async getScaleView() {
+			this.services = []
+			axios
+				.get<ScaleView[]>(`${SERVER_ADDRESS}/api/config/scales/view/`, {
+					params: { name: 'Servicios Ofrecidos' },
+					withCredentials: true,
+					headers: {
+						Authorization: TOKEN,
+					},
+				})
+				.then((res) => {
+					this.scaleView = res.data[0]
 				})
 				.catch((err) => {
 					try {

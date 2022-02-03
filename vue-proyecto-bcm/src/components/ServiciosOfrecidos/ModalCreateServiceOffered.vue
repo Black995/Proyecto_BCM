@@ -65,11 +65,15 @@
 									ticks="always"
 									thumb-label="always"
 									tick-size="3"
-									min="0"
-									max="9"
+									:min="$props.minValue"
+									:max="$props.maxValue"
 								></v-slider>
 							</v-card-text>
 						</v-row>
+						<p class="font-weight-regular">
+							<strong>Escala a utilizar:</strong>
+							{{ $props.scaleName }}
+						</p>
 						<v-row align="center">
 							<v-col cols="12" sm="6" md="6" lg="6" xl="6">
 								<v-select
@@ -161,6 +165,7 @@ interface ServiceOffered {
 	recovery_time: string
 	criticality: number
 	area: number
+	scale: number
 }
 
 interface TypeOption {
@@ -193,7 +198,7 @@ function getRecoveryTime(duration: Duration) {
 	if (duration.minutes <= 9) minute = '0' + duration.minutes.toString()
 	else minute = duration.minutes.toString()
 
-	return day + ':' + hour + ':' + minute
+	return day + ' ' + hour + ':' + minute + ':00'
 }
 
 export default Vue.extend({
@@ -201,7 +206,7 @@ export default Vue.extend({
 		AlertError,
 		ModalConfirmCreateServiceOffered,
 	},
-
+	props: ['scale_id', 'minValue', 'maxValue', 'scaleName'],
 	data() {
 		return {
 			loading: true,
@@ -215,6 +220,7 @@ export default Vue.extend({
 				recovery_time: '',
 				criticality: 0,
 				area: 0,
+				scale: 0,
 			} as ServiceOffered,
 			duration: {
 				days: 0,
@@ -278,6 +284,7 @@ export default Vue.extend({
 				return
 
 			this.service.recovery_time = getRecoveryTime(this.duration)
+			this.service.scale = this.$props.scale_id
 
 			axios
 				.post(
@@ -306,6 +313,7 @@ export default Vue.extend({
 						recovery_time: '',
 						criticality: 0,
 						area: 0,
+						scale: 0,
 					}
 					this.duration = {
 						days: 0,
@@ -372,6 +380,7 @@ export default Vue.extend({
 					}
 				})
 		},
+
 		alertEnd() {
 			this.snackbar = false
 		},

@@ -23,7 +23,6 @@ class InterestedParty(models.Model):
         Organization, related_name='organization_interested_party', on_delete=models.CASCADE)
 
 
-
 class ServiceOffered(models.Model):
 
     PRODUCT = 1
@@ -42,8 +41,8 @@ class ServiceOffered(models.Model):
 
     area = models.ForeignKey(Area, related_name='area_service_offered', null=True,
                              on_delete=models.SET_NULL)
-    scale = models.OneToOneField(
-        Scale, null=True, related_name='scale_service_offered', on_delete=models.SET_NULL)
+    scale = models.ForeignKey(Scale, null=True, related_name='scale_service_offered',
+                              on_delete=models.SET_NULL)
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_service_offered')
 
@@ -57,7 +56,7 @@ class ServiceUsed(models.Model):
 
     services_offered = models.ManyToManyField(
         ServiceOffered, related_name='service_offered_service_offered')
-    scale = models.OneToOneField(
+    scale = models.ForeignKey(
         Scale, null=True, related_name='scale_service_used', on_delete=models.SET_NULL)
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_service_used')
@@ -73,8 +72,7 @@ class OrganizationActivity(models.Model):
 
     services_offered = models.ManyToManyField(
         ServiceOffered, related_name='service_offered_organizacion_activity')
-    scale = models.OneToOneField(
+    scale = models.ForeignKey(
         Scale, null=True, related_name='scale_organization_activity', on_delete=models.SET_NULL)
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_organization_activity')
-

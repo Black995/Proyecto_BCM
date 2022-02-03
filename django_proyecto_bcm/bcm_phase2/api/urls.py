@@ -1,10 +1,10 @@
 from django.urls import path
 
-from .views import (ServiceOfferedViewSet)
+from .views import (ServiceOfferedListViewSet, ServiceOfferedViewSet)
 
 
 urlpatterns = [
-    path('services/offered/', ServiceOfferedViewSet.as_view({
+    path('services/offered/', ServiceOfferedListViewSet.as_view({
         'get': 'list',
         'post': 'create'}), name='service_offered_list'),
     path('service/offered/<int:pk>/', ServiceOfferedViewSet.as_view({

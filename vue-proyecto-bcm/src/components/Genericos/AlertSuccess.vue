@@ -19,7 +19,6 @@ export default Vue.extend({
 	},
 	methods: {
 		dismissAlert() {
-			console.log('Cerrar alerta exito hijo')
 			this.$emit('dismisssuccess')
 		},
 	},
