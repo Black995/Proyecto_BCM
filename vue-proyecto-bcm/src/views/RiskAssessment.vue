@@ -1,6 +1,6 @@
 <template>
 	<v-container>
-		<v-app-bar color="#002060" dark>
+		<v-app-bar color="#000000" dark>
 			<v-tabs align-with-title fixed-tabs>
 				<v-tab @click="cambiarVistaRiesgo">Evaluación de riesgos</v-tab>
 				<v-tab @click="cambiarVistaEscenario"
@@ -61,7 +61,7 @@
 								<tr>
 									<td>{{ row.item.name }}</td>
 									<td>{{ row.item.description }}</td>
-									<td style="width: 100px">
+									<td style="width: 125px">
 										<v-row justify="center">
 											<!--v-icon
 												color="yellow"

@@ -1,14 +1,19 @@
 <template>
 	<v-dialog v-model="dialog" id="modal-crear">
 		<template v-slot:activator="{ on, attrs }">
-			<v-icon
+			<v-btn
+				class="mx-2"
+				fab
+				dark
+				small
 				color="yellow"
 				title="Editar riesgo"
 				v-bind="attrs"
 				v-on="on"
 				v-on:click="getDetail"
-				>mdi-notebook-edit
-			</v-icon>
+			>
+				<v-icon color="black">mdi-notebook-edit </v-icon>
+			</v-btn>
 		</template>
 
 		<v-card>

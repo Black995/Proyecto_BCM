@@ -1,14 +1,18 @@
 <template>
 	<v-dialog v-model="dialog" id="modal-crear">
 		<template v-slot:activator="{ on, attrs }">
-			<v-icon
+			<v-btn
+				class="mx-2"
+				fab
+				dark
+				small
 				color="yellow"
 				title="Editar escenario crítico"
-				v-bind="attrs"
-				v-on="on"
-				v-on:click="getDetail"
-				>mdi-notebook-edit
-			</v-icon>
+			>
+				<v-icon v-bind="attrs" v-on="on" v-on:click="getDetail"
+					>mdi-notebook-edit
+				</v-icon>
+			</v-btn>
 		</template>
 
 		<v-card>

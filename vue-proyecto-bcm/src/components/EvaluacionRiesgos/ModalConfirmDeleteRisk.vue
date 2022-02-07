@@ -1,15 +1,18 @@
 <template>
 	<v-dialog v-model="dialog" persistent max-width="350">
 		<template v-slot:activator="{ on, attrs }">
-			<v-icon
+			<v-btn
+				class="mx-2"
+				fab
+				dark
+				small
 				color="red"
-				style="color: black"
 				title="Eliminar riesgo"
 				v-bind="attrs"
 				v-on="on"
 			>
-				mdi-delete-forever
-			</v-icon>
+				<v-icon> mdi-delete-forever </v-icon>
+			</v-btn>
 		</template>
 
 		<v-card>

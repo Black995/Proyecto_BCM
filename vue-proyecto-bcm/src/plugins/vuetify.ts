@@ -13,7 +13,7 @@ export default new Vuetify({
 			//Modo light del fondo de pantalla
 			light: {
 				primary: '#00b050',
-				secondary: '#35B39C',
+				secondary: '#26964b',
 			},
 			//Modo dark del fondo de pantalla
 			dark: {},

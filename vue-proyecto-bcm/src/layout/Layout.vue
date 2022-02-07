@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-app-bar color="#002060" dark>
+		<v-app-bar color="#000000" dark>
 			<v-app-bar-nav-icon
 				@click.stop="drawer = !drawer"
 			></v-app-bar-nav-icon>
@@ -41,7 +41,7 @@
 			</v-menu>
 		</v-app-bar>
 
-		<v-navigation-drawer v-model="drawer" absolute temporary>
+		<v-navigation-drawer v-model="drawer" color="black" absolute temporary>
 			<v-list-item>
 				<v-list-item-avatar>
 					<v-img
@@ -50,7 +50,9 @@
 				</v-list-item-avatar>
 
 				<v-list-item-content>
-					<v-list-item-title>Alan Sosa</v-list-item-title>
+					<v-list-item-title style="color: #ffffff"
+						>Alan Sosa</v-list-item-title
+					>
 				</v-list-item-content>
 			</v-list-item>
 
@@ -59,13 +61,17 @@
 			<v-list nav dense>
 				<v-list-item-group>
 					<v-list-item
+						class="list-navbar"
+						active-class="list-navbar-active"
 						v-for="(opt, i) in opcionesMenu"
 						:key="i"
 						:to="{ name: opt.toDato }"
 						exact-path
 					>
-						<v-list-item-icon>
-							<v-icon>{{ opt.icono }}</v-icon>
+						<v-list-item-icon class="list-navbar">
+							<v-icon style="color: #ffffff">{{
+								opt.icono
+							}}</v-icon>
 						</v-list-item-icon>
 						<v-list-item-title>{{ opt.opcion }}</v-list-item-title>
 					</v-list-item>
@@ -151,14 +157,27 @@ export default Vue.extend({
 </script>
 
 
-<style>
+<style lang="scss">
 .header-table {
-	background: #002060;
-	color: #ffffff !important;
+	background: #000000;
+	color: #ffffff;
 }
 
 .main-background {
 	background: #f1f1f1;
 	background-size: 100%;
+}
+
+.list-navbar {
+	color: #ffffff !important;
+	&:hover {
+		background-color: #505050;
+		color: #fff;
+	}
+}
+
+.list-navbar-active {
+	background-color: #818181;
+	color: #ffffff;
 }
 </style>
