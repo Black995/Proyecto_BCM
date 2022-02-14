@@ -61,7 +61,7 @@
 								<tr>
 									<td>{{ row.item.name }}</td>
 									<td>{{ row.item.description }}</td>
-									<td style="width: 125px">
+									<td style="width: 110px">
 										<v-row justify="center">
 											<!--v-icon
 												color="yellow"
@@ -129,7 +129,7 @@
 								<tr>
 									<td>{{ row.item.name }}</td>
 									<td>{{ row.item.description }}</td>
-									<td style="width: 120px">
+									<td style="width: 200px">
 										<v-row style="display: inline-block">
 											<modal-detail-crisis
 												:id="row.item.id"

@@ -1,14 +1,19 @@
 <template>
 	<v-dialog v-model="dialog">
 		<template v-slot:activator="{ on, attrs }">
-			<v-icon
+			<v-btn
+				class="mx-1"
+				fab
+				dark
+				small
 				color="blue"
 				title="Asociar riesgos"
 				v-bind="attrs"
 				v-on="on"
 				v-on:click="getCrisis"
-				>mdi-clipboard-text</v-icon
 			>
+				<v-icon>mdi-clipboard-text </v-icon>
+			</v-btn>
 		</template>
 
 		<v-card>

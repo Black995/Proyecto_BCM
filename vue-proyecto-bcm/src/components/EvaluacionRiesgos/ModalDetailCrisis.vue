@@ -1,15 +1,19 @@
 <template>
 	<v-dialog v-model="dialog">
 		<template v-slot:activator="{ on, attrs }">
-			<v-icon
+			<v-btn
+				class="mx-1"
+				fab
+				dark
+				small
 				color="secondary"
-				style="color: black"
-				title="Detalle del riesgo"
+				title="Detalle del escenario crítico"
 				v-bind="attrs"
 				v-on="on"
 				v-on:click="getDetail"
-				>mdi-magnify
-			</v-icon>
+			>
+				<v-icon color="black">mdi-magnify</v-icon>
+			</v-btn>
 		</template>
 
 		<v-card>

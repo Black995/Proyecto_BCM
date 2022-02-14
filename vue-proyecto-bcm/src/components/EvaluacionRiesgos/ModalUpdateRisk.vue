@@ -2,7 +2,7 @@
 	<v-dialog v-model="dialog" id="modal-crear">
 		<template v-slot:activator="{ on, attrs }">
 			<v-btn
-				class="mx-2"
+				class="mx-1"
 				fab
 				dark
 				small
@@ -61,9 +61,6 @@
 				<v-btn color="primary darken-1" @click="dialog = false" text>
 					Cerrar
 				</v-btn>
-				<!--v-btn color="primary" v-on:click="crear">
-						Crear riesgo
-					</v-btn-->
 				<modal-confirm-update-crisis
 					:disabled="validForm"
 					v-on:editar="Editar"

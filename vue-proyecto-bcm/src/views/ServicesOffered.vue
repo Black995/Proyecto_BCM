@@ -56,17 +56,16 @@
 								}}
 							</td>
 							<td>{{ row.item.area_name }}</td>
-							<td style="width: 100px">
+							<td style="width: 110px">
 								<v-row justify="center">
-									<!--v-icon
-												color="yellow"
-												title="Editar riesgo"
-												>mdi-notebook-edit</v-icon
-											-->
-									<modal-update-risk
+									<modal-update-service-offered
 										:id="row.item.id"
+										:scale_id="scaleView.id"
+										:minValue="scaleView.scale_min_value"
+										:maxValue="scaleView.scale_max_value"
+										:scaleName="scaleView.scale_name"
 										v-on:alertexito="alertExito"
-									></modal-update-risk>
+									></modal-update-service-offered>
 									<modal-confirm-delete-service-offered
 										:id="row.item.id"
 										:type="row.item.type_name"
@@ -89,10 +88,12 @@ import Vue from 'vue'
 import axios from 'axios'
 import { SERVER_ADDRESS, TOKEN } from '../../config/config'
 
-import ModalCreateServiceOffered from '../components/ServiciosOfrecidos/ModalCreateServiceOffered.vue'
-import ModalUpdateRisk from '../components/EvaluacionRiesgos/ModalUpdateRisk.vue'
-import ModalConfirmDeleteServiceOffered from '../components/ServiciosOfrecidos/ModalConfirmDeleteServiceOffered.vue'
+import ModalCreateServiceOffered from '../components/ServicesOffered/ModalCreateServiceOffered.vue'
+import ModalUpdateServiceOffered from '../components/ServicesOffered/ModalUpdateServiceOffered.vue'
+import ModalConfirmDeleteServiceOffered from '../components/ServicesOffered/ModalConfirmDeleteServiceOffered.vue'
 import AlertSuccess from '../components/Genericos/AlertSuccess.vue'
+
+import { getRecoveryTimeText } from '../helpers/helpers'
 
 interface ServiceOffered {
 	id: number
@@ -121,7 +122,7 @@ export default Vue.extend({
 	components: {
 		AlertSuccess,
 		ModalCreateServiceOffered,
-		ModalUpdateRisk,
+		ModalUpdateServiceOffered,
 		ModalConfirmDeleteServiceOffered,
 	},
 
@@ -130,10 +131,8 @@ export default Vue.extend({
 		headersServices: [
 			{
 				text: 'Nombre',
-				align: 'start',
 				value: 'nombre',
 				class: 'header-table',
-				sortable: true,
 				filterable: true,
 			},
 			{
@@ -184,7 +183,6 @@ export default Vue.extend({
 			scale_min_value: 0,
 			scale_max_value: 0,
 		} as ScaleView,
-		deleteServiceId: 0 as number,
 
 		//Para el manejo del mensaje de éxito
 		mensajeExito: '',
@@ -212,7 +210,14 @@ export default Vue.extend({
 					}
 				)
 				.then((res) => {
-					this.services = res.data
+					for (var i = 0; i < res.data.length; i++) {
+						//Convertimos en texto la duración
+						res.data[i].recovery_time = getRecoveryTimeText(
+							res.data[i].recovery_time
+						)
+
+						this.services.push(res.data[i])
+					}
 				})
 				.catch((err) => {
 					try {

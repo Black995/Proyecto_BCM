@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-app-bar color="#000000" dark>
+		<v-app-bar dark>
 			<v-app-bar-nav-icon
 				@click.stop="drawer = !drawer"
 			></v-app-bar-nav-icon>
@@ -58,7 +58,108 @@
 
 			<v-divider></v-divider>
 
+			<!--v-menu
+				:close-on-content-click="false"
+				open-on-hover
+				bottom
+				offset-y
+			>
+				<template v-slot:activator="{ on }">
+					<v-btn color="primary" dark v-on="on"> Dropdown </v-btn>
+				</template>
+				<v-list>
+					<v-list-group
+						v-for="item in items"
+						:key="item.title"
+						v-model="item.active"
+						:prepend-icon="item.action"
+						no-action
+					>
+						<template v-slot:activator>
+							<v-list-tile>
+								<v-list-tile-content>
+									<v-list-tile-title>{{
+										item.title
+									}}</v-list-tile-title>
+								</v-list-tile-content>
+							</v-list-tile>
+						</template>
+
+						<v-list-tile
+							v-for="subItem in item.items"
+							:key="subItem.title"
+						>
+							<v-list-tile-content>
+								<v-list-tile-title>{{
+									subItem.title
+								}}</v-list-tile-title>
+							</v-list-tile-content>
+
+							<v-list-tile-action>
+								<v-icon>{{ subItem.action }}</v-icon>
+							</v-list-tile-action>
+						</v-list-tile>
+					</v-list-group>
+				</v-list>
+			</v-menu-->
+
+			<!--
+				Pruebas sidebar
+			-->
 			<v-list nav dense>
+				<v-list-group
+					color="white"
+					class="class-group"
+					v-for="item in menuOptions"
+					:key="item.title"
+					v-model="item.active"
+					no-action
+				>
+					<template v-slot:activator>
+						<v-list-item-content
+							>{{ item.title }}
+						</v-list-item-content>
+					</template>
+
+					<v-list-item-group>
+						<v-list-item
+							class="list-navbar"
+							active-class="list-navbar-active"
+							v-for="(opt, i) in item.items"
+							:key="i"
+							:to="{ name: opt.toDato }"
+							exact-path
+							sub-group
+						>
+							<v-list-item-icon class="list-navbar">
+								<v-icon style="color: #ffffff">{{
+									opt.icono
+								}}</v-icon>
+							</v-list-item-icon>
+							<v-list-item-title>{{
+								opt.opcion
+							}}</v-list-item-title>
+
+							<!--v-list-tile-content>
+							<v-list-tile-title>{{
+								opt.option
+							}}</v-list-tile-title>
+						</v-list-tile-content>
+
+						<v-list-tile-action>
+							<v-icon style="color: #ffffff">{{
+								opt.icono
+							}}</v-icon>
+						</v-list-tile-action-->
+						</v-list-item>
+					</v-list-item-group>
+				</v-list-group>
+			</v-list>
+			<!--
+				Pruebas sidebar
+			-->
+
+			<!--v-list nav dense>
 				<v-list-item-group>
 					<v-list-item
 						class="list-navbar"
@@ -76,7 +177,7 @@
 						<v-list-item-title>{{ opt.opcion }}</v-list-item-title>
 					</v-list-item>
 				</v-list-item-group>
-			</v-list>
+			</v-list-->
 
 			<template v-slot:append>
 				<div class="pa-2" style="height: 75px; position: relative">
@@ -101,41 +202,75 @@ export default Vue.extend({
 		drawer: false,
 		group: null,
 		nombreEmpresa: '',
-		opcionesMenu: [
+		menuOptions: [
 			{
-				opcion: 'Evaluación de Riesgos',
-				icono: 'mdi-alert-circle-check',
-				toDato: 'Evaluación de Riesgos',
+				title: 'Fase 1',
+				active: true,
+				items: [
+					{
+						opcion: 'Evaluación de Riesgos',
+						icono: 'mdi-alert-circle-check',
+						toDato: 'Evaluación de Riesgos',
+					},
+				],
 			},
 			{
-				opcion: 'Partes Interesadas',
-				icono: 'mdi-account-group',
-				toDato: 'Partes Interesadas',
+				title: 'Fase 2',
+				active: false,
+				items: [
+					{
+						opcion: 'Partes Interesadas',
+						icono: 'mdi-account-group',
+						toDato: 'Partes Interesadas',
+					},
+					{
+						opcion: 'Actividades del Negocio',
+						icono: 'mdi-sitemap',
+						toDato: 'Actividades del Negocio',
+					},
+					{
+						opcion: 'Servicios Ofrecidos',
+						icono: 'mdi-face-agent',
+						toDato: 'Servicios Ofrecidos',
+					},
+					{
+						opcion: 'Servicios Usados',
+						icono: 'mdi-toolbox',
+						toDato: 'Servicios Usados',
+					},
+					{
+						opcion: 'Empleados',
+						icono: 'mdi-account-hard-hat',
+						toDato: 'Empleados',
+					},
+				],
 			},
 			{
-				opcion: 'Actividades del Negocio',
-				icono: 'mdi-sitemap',
-				toDato: 'Actividades del Negocio',
+				title: 'Fase 3',
+				active: false,
+				items: [
+					{
+						opcion: 'Incidentes',
+						icono: 'mdi-alert',
+						toDato: 'Incidentes',
+					},
+				],
 			},
 			{
-				opcion: 'Servicios Ofrecidos',
-				icono: 'mdi-face-agent',
-				toDato: 'Servicios Ofrecidos',
-			},
-			{
-				opcion: 'Servicios Usados',
-				icono: 'mdi-toolbox',
-				toDato: 'Servicios Usados',
-			},
-			{
-				opcion: 'Personal de la organización',
-				icono: 'mdi-account-hard-hat',
-				toDato: 'Personal de la organización',
-			},
-			{
-				opcion: 'Incidentes',
-				icono: 'mdi-alert',
-				toDato: 'Incidentes',
+				title: 'Configuración',
+				active: false,
+				items: [
+					{
+						opcion: 'Areas',
+						icono: 'mdi-lan',
+						toDato: 'Areas',
+					},
+					{
+						opcion: 'Escalas',
+						icono: 'mdi-scale-balance',
+						toDato: 'Escalas',
+					},
+				],
 			},
 		],
 	}),
@@ -160,7 +295,7 @@ export default Vue.extend({
 <style lang="scss">
 .header-table {
 	background: #000000;
-	color: #ffffff;
+	color: #ffffff !important;
 }
 
 .main-background {
@@ -177,7 +312,12 @@ export default Vue.extend({
 }
 
 .list-navbar-active {
+	background-color: #646464;
+	color: #ffffff !important;
+}
+
+.class-group {
+	color: #ffffff !important;
 	background-color: #818181;
-	color: #ffffff;
 }
 </style>

@@ -157,6 +157,7 @@ import { SERVER_ADDRESS, TOKEN } from '../../../config/config'
 
 import ModalConfirmCreateServiceOffered from './ModalConfirmCreateServiceOffered.vue'
 import AlertError from '../Genericos/AlertError.vue'
+import { setRecoveryTime } from '../../helpers/helpers'
 
 interface ServiceOffered {
 	name: string
@@ -182,23 +183,6 @@ interface Duration {
 	days: number
 	hours: number
 	minutes: number
-}
-
-function getRecoveryTime(duration: Duration) {
-	let day = ''
-	let hour = ''
-	let minute = ''
-
-	if (duration.days <= 9) day = '0' + duration.days.toString()
-	else day = duration.days.toString()
-
-	if (duration.hours <= 9) hour = '0' + duration.hours.toString()
-	else hour = duration.hours.toString()
-
-	if (duration.minutes <= 9) minute = '0' + duration.minutes.toString()
-	else minute = duration.minutes.toString()
-
-	return day + ' ' + hour + ':' + minute + ':00'
 }
 
 export default Vue.extend({
@@ -283,7 +267,7 @@ export default Vue.extend({
 			)
 				return
 
-			this.service.recovery_time = getRecoveryTime(this.duration)
+			this.service.recovery_time = setRecoveryTime(this.duration)
 			this.service.scale = this.$props.scale_id
 
 			axios
