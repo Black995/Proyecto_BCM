@@ -1,0 +1,311 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center table-responsive">
+          <p-table #dt1 [columns]="selected_columns" [value]="documents"
+            styleClass="p-datatable-striped p-datatable-lg p-datatable-gridlines" [paginator]="true" [rows]="10"
+            [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [resizableColumns]="true"
+            [autoLayout]="true" [responsive]="true" selectionMode="multiple" exportFilename="documents"
+            [reorderableColumns]="true" [lazy]="lazy">
+            <ng-template pTemplate="caption">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <button class="btn-success btn mr-3" (click)="open_modal_create()"><i
+                      class="fas fa-plus"></i></button>
+                  <span class="p-input-icon-left ml-auto mr-3">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="apply_filter($event, 'contains')" placeholder="Buscar..." />
+                  </span>
+                  <p-multiSelect [options]="table_cols" [(ngModel)]="selected_columns" optionLabel="header"
+                    selectedItemsLabel="{0} columnas seleccionadas" [style]="{minWidth: '200px'}"
+                    placeholder="Seleccione las Columnas"></p-multiSelect>
+                </div>
+                <div>
+                  <button pButton label="Clear" class="p-button-outlined mr-2" icon="pi pi-filter-slash"
+                    (click)="clear(dt1)"></button>
+                  <button type="button" pButton pRipple icon="pi pi-file-o" (click)="dt.exportCSV()" class="mr-2"
+                    pTooltip="CSV" tooltipPosition="bottom"></button>
+                  <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="export_excel()"
+                    class="p-button-success mr-2" pTooltip="XLS" tooltipPosition="bottom"></button>
+                  <button type="button" pButton pRipple icon="pi pi-file-pdf" (click)="export_pdf()"
+                    class="p-button-danger mr-2" pTooltip="PDF" tooltipPosition="bottom"></button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <th class="bg-navy" pReorderableColumn pResizableColumn pSortableColumn="{{col.field}}"
+                  *ngFor="let col of columns">
+                  <div class="d-flex justify-content-between align-items-center">
+                    {{col.header}}
+                    <div>
+                      <p-sortIcon field="{{col.field}}"></p-sortIcon>
+                      <p-columnFilter type="text" field="{{col.field}}" display="menu" class="align-right">
+                      </p-columnFilter>
+                    </div>
+                  </div>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-document let-columns="columns">
+              <tr>
+                <td *ngFor="let col of columns">
+                  <a *ngIf="col.field == 'link' && document['link'] != ''" href="{{document[col.field]}}">{{document[col.field]}}</a>
+                  <a *ngIf="col.field == 'link' && document['link'] == ''" class="font-italic">No existe vinculo de acceso</a>
+                  <a *ngIf="col.field != 'link'">
+                    {{document[col.field]}}
+                  </a>
+                  <div *ngIf="col.field == 'actions'" class="text-center" >
+                    <button class="btn btn-success mr-2 rounded-circle" (click)="download_file(document)" [disabled]="!document['has_file']">
+                      <i class="fas fa-cloud-download-alt"></i>
+                    </button>
+                    <button class="btn btn-warning mr-2 rounded-circle"(click)="open_modal_update(find_index(document))">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class=" btn btn-success rounded-circle" (click)="open_modal_delete(find_index(document))"*ngIf="document.status">
+                      <i class="fas fa-toggle-on"></i>
+                    </button>
+                    <button [class]="set_delete_button_class(document)" (click)="open_modal_delete(find_index(document))">
+                      <i [class]="set_delete_image_class(document)"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7">No customers found.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </div>
+    <!-- /.col -->
+  </div>
+  <!-- /.row -->
+</div>
+
+<!-- Modal Actualizar -->
+<ng-template #modal_update let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Modificar Documento Oficial</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="close_modal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="document_form" (ngSubmit)="confirm_update()"> 
+      <div class="form-group">
+        <label><b>Documento Oficial:</b></label>
+        <input class="form-control input-lg" type="text" formControlName="name">
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['name'].invalid && 
+        (document_form.controls['name'].dirty || document_form.controls['name'].touched)">
+          <div *ngIf="document_form.controls['name'].errors?.required">
+            El campo "Documento Oficial" no puede estar vacío.
+          </div>
+          <div *ngIf="document_form.controls['name'].errors?.name_error">
+            {{document_form.controls['name'].errors?.message}}
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><b>Clasificación:</b></label>
+        <select class="form-control" formControlName="classification">
+          <option value="{{undefined}}" selected="true" disabled="disabled">Seleccione un valor...</option>
+          <option [ngValue]="1" [selected]="selected_document?.classification == 1">Gaceta Oficial</option>
+          <option [ngValue]="2" [selected]="selected_document?.classification == 2">Ley</option>
+          <option [ngValue]="3" [selected]="selected_document?.classification == 3">Circular</option>
+          <option [ngValue]="4" [selected]="selected_document?.classification == 4">Resolución</option>
+        </select>
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['classification'].invalid && 
+        (document_form.controls['classification'].dirty || document_form.controls['classification'].touched)">
+          <div *ngIf="document_form.controls['classification'].errors?.required">
+            El campo "Clasificación" no puede estar vacío.
+          </div>
+          <div *ngIf="document_form.controls['classification'].errors?.classification_error">
+            {{document_form.controls['classification'].errors?.message}}
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><b>Área:</b></label>
+        <select formControlName="area" [class]="validate_control('area')">
+          <option value="{{undefined}}" selected="true" disabled="disabled">Seleccione un valor...</option>
+          <option *ngFor="let item of areas" [ngValue]="item.id" [selected]="item?.id == selected_document?.area">{{item.name}}</option>
+        </select>
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['area'].invalid && 
+        (document_form.controls['area'].dirty || document_form.controls['area'].touched)">
+          <div *ngIf="document_form.controls['area'].errors?.required">
+            El campo "Área" no puede estar vacío.
+          </div>
+          <div *ngIf="document_form.controls['area'].errors?.area_error">
+            {{document_form.controls['area'].errors?.message}}
+          </div>
+        </div>
+      </div>
+      <hr>
+      <h4><strong>Carga de documento</strong></h4>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="radios" id="exampleRadios1" value="link" [checked]="set_update_radio('link')" (change)="file_radio_change($event)">
+        <label class="form-check-label" for="exampleRadios1">
+          Vinculo de acceso
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="radios" id="exampleRadios2" value="file" [checked]="set_update_radio('file')" (change)="file_radio_change($event)">
+        <label class="form-check-label" for="exampleRadios2">
+          Carga de archivo
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="radios" id="exampleRadios3" value="both" [checked]="set_update_radio('both')" (change)="file_radio_change($event)">
+        <label class="form-check-label" for="exampleRadios3">
+          Ambos
+        </label>
+      </div>
+      <br>
+      <hr>
+      <div class="form-group" *ngIf="document_form.get('link')">
+        <label><b>Vínculo de acceso:</b></label>
+        <input class="form-control input-lg" formControlName="link" type="text" placeholder="Ingrese el vínculo de acceso...">
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['link'].invalid && 
+        (document_form.controls['link'].dirty || document_form.controls['link'].touched)">
+          <div *ngIf="document_form.controls['link'].errors?.required">
+            El campo "Vínculo de acceso" no puede estar vacío.
+          </div>
+          <div *ngIf="document_form.controls['link'].errors?.link_error">
+            {{document_form.controls['link'].errors?.message}}
+          </div>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="document_form.get('file')">
+        <label><b>Carga de Archivo (formato PDF):</b></label>
+        <div class="input-group mb-3">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="inputGroupFile02" (change)="handle_file_input($event)">
+            <label class="custom-file-label" for="inputGroupFile02" aria-describedby="inputGroupFileAddon02" *ngIf="file_to_upload != null">{{file_to_upload?.name}}</label>
+            <label class="custom-file-label" for="inputGroupFile02" aria-describedby="inputGroupFileAddon02" *ngIf="file_to_upload == null">Seleccionar archivo...</label>
+          </div>
+        </div>
+        <div *ngIf="file_error != null" class="text-danger mt-3">
+          {{this.file_error}}
+        </div>
+      </div>
+      <hr *ngIf="document_form.get('link') || document_form.get('file')">
+      <div class="form-group text-right mt-3">
+        <button type="submit" class="btn btn-success mr-3">Guardar Cambios</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="close_modal()">Cerrar</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<!-- Fin Modal Actualizar -->
+
+<!-- Modal Crear -->
+<ng-template #modal_create let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Crear Documento Oficial</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="close_modal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="document_form" (ngSubmit)="confirm_create()">
+      <div class="form-group">
+        <label><b>Documento Oficial:</b></label>
+        <input formControlName="name" [class]="validate_control('name')" type="text" placeholder="Ingrese el nombre del documento...">
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['name'].invalid && 
+        (document_form.controls['name'].dirty || document_form.controls['name'].touched)">
+          <div *ngIf="document_form.controls['name'].errors?.required">
+            El campo "Documento Oficial" no puede estar vacío.
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><b>Clasificación:</b></label>
+        <select formControlName="classification" [class]="validate_control('classification')">
+          <option value="{{undefined}}" selected="true" disabled="disabled">Seleccione un valor...</option>
+          <option [ngValue]="1">Gaceta Oficial</option>
+          <option [ngValue]="2">Ley</option>
+          <option [ngValue]="3">Circular</option>
+          <option [ngValue]="4">Resolución</option>
+        </select>
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['classification'].invalid && 
+        (document_form.controls['classification'].dirty || document_form.controls['classification'].touched)">
+          <div *ngIf="document_form.controls['classification'].errors?.required">
+            El campo "Clasificación" no puede estar vacío.
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><b>Área:</b></label>
+        <select formControlName="area" [class]="validate_control('area')">
+          <option value="{{undefined}}" selected="true" disabled="disabled">Seleccione un valor...</option>
+          <option *ngFor="let item of areas" [ngValue]="item.id">{{item.name}}</option>
+        </select>
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['area'].invalid && 
+        (document_form.controls['area'].dirty || document_form.controls['area'].touched)">
+          <div *ngIf="document_form.controls['area'].errors?.required">
+            El campo "Área" no puede estar vacío.
+          </div>
+        </div>
+      </div>
+      <hr>
+      <h4><strong>Carga de documento</strong></h4>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="radios" id="exampleRadios1" value="link" (change)="file_radio_change($event)">
+        <label class="form-check-label" for="exampleRadios1">
+          Vinculo de acceso
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="radios" id="exampleRadios2" value="file" (change)="file_radio_change($event)">
+        <label class="form-check-label" for="exampleRadios2">
+          Carga de archivo
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="radios" id="exampleRadios3" value="both" checked (change)="file_radio_change($event)">
+        <label class="form-check-label" for="exampleRadios3">
+          Ambos
+        </label>
+      </div>
+      <br>
+      <hr>
+      <div class="form-group" *ngIf="document_form.get('link')">
+        <label><b>Vínculo de acceso:</b></label>
+        <input class="form-control input-lg" formControlName="link" type="text" placeholder="Ingrese el vínculo de acceso...">
+        <div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['link'].invalid && 
+        (document_form.controls['link'].dirty || document_form.controls['link'].touched)">
+          <div *ngIf="document_form.controls['link'].errors?.required">
+            El campo "Vínculo de acceso" no puede estar vacío.
+          </div>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="document_form.get('file')">
+        <label><b>Carga de Archivo (formato PDF):</b></label>
+        <div class="input-group mb-3">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="inputGroupFile02" (change)="handle_file_input($event)">
+            <label class="custom-file-label" for="inputGroupFile02" aria-describedby="inputGroupFileAddon02" *ngIf="file_to_upload != null">{{file_to_upload?.name}}</label>
+            <label class="custom-file-label" for="inputGroupFile02" aria-describedby="inputGroupFileAddon02" *ngIf="file_to_upload == null">Seleccionar archivo...</label>
+          </div>
+        </div>
+        <div *ngIf="file_error != null" class="text-danger mt-3">
+          {{this.file_error}}
+        </div>
+      </div>
+      <hr *ngIf="document_form.get('link') || document_form.get('file')">
+      <div class="form-group text-right mt-3">
+        <button type="submit" class="btn btn-md btn-success mr-3">Crear</button>
+        <button type="button" class="btn btn-md btn-danger" data-dismiss="modal" (click)="close_modal()">Cerrar</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<!-- Fin Modal Crear -->

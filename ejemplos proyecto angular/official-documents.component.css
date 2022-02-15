@@ -1,0 +1,17 @@
+.highlight{
+    background-color: yellow;
+}
+
+.dotActivo {
+    height: 23px;
+    width: 23px;
+    border-radius: 50%;
+    display: inline-block;
+}
+  
+.dotInactivo {
+    height: 23px;
+    width: 23px;
+    border-radius: 50%;
+    display: inline-block;
+}
