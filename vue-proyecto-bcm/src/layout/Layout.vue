@@ -204,7 +204,7 @@ export default Vue.extend({
 		nombreEmpresa: '',
 		menuOptions: [
 			{
-				title: 'Fase 1',
+				title: 'Módulo 1',
 				active: true,
 				items: [
 					{
@@ -215,7 +215,7 @@ export default Vue.extend({
 				],
 			},
 			{
-				title: 'Fase 2',
+				title: 'Módulo 2',
 				active: false,
 				items: [
 					{
@@ -246,7 +246,7 @@ export default Vue.extend({
 				],
 			},
 			{
-				title: 'Fase 3',
+				title: 'Módulo 3',
 				active: false,
 				items: [
 					{

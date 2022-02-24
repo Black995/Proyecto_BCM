@@ -21,20 +21,20 @@ const routes: Array<RouteConfig> = [
 			 */
 
 			//Módulo del perfil
-			/*
+			
 			{
 				path: '/perfil',
 				name: 'Perfil',
 				component: () => import('../views/Profile.vue'),
 			},
-			*/
+			
 			//Módulo de la fase 1
 			{
 				path: '/riesgos',
 				name: 'Evaluación de Riesgos',
-				component: () => import('../views/Risks.vue'),
+				component: () => import('../views/RiskAssessment.vue'),
 			},
-			/*
+			
 			//Módulo de la fase 2
 			{
 				path: '/partes-interesadas',
@@ -80,7 +80,7 @@ const routes: Array<RouteConfig> = [
 				name: 'Escalas',
 				component: () => import('../views/Scales.vue'),
 			},
-			*/
+			
 		],
 	},
 ]

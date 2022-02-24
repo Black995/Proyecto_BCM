@@ -3,13 +3,13 @@ import App from './App.vue'
 window.$ = window.jQuery = require("jquery");
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import {dom, library} from '@fortawesome/fontawesome-svg-core';
+import { dom, library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
-import {faLock, faEnvelope} from '@fortawesome/free-solid-svg-icons';
-import {faFacebook, faGooglePlus} from '@fortawesome/free-brands-svg-icons';
-
+import { faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faFacebook, faGooglePlus } from '@fortawesome/free-brands-svg-icons';
+import router from './router'
 
 //import adminlte scripts
 import "../node_modules/admin-lte/dist/js/adminlte.min.js"
@@ -50,4 +50,4 @@ import "../node_modules/admin-lte/plugins/dropzone/min/dropzone.min.css"
 library.add(fas, fab, far, faLock, faEnvelope, faFacebook, faGooglePlus);
 dom.watch()
 
-createApp(App).component("font-awesome-icon", FontAwesomeIcon).mount('#app')
+createApp(App).use(router).component("font-awesome-icon", FontAwesomeIcon).mount('#app')
