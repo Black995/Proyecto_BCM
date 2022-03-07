@@ -5,88 +5,88 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
     {
         path: '/',
-        name: 'ExampleForm',
-        component: () => import('../dashboard/Dashboard.vue'),
-    },
-
-    /*
-    {
-        path: '/',
         name: 'Login',
-        component: () => import('../views/Login.vue'),
+        component: () => import('../login/Login.vue'),
     },
     {
-        path: '/layout',
-        name: 'Layout',
+        path: '/dashboard',
+        name: 'Dashboard',
 
-        component: () => import('../layout/Layout.vue'),
+        component: () => import('../dashboard/Dashboard.vue'),
         children: [
             /**
              * Vistas internas de la app
              */
 
-    //Módulo del perfil
-    /*
-    {
-        path: '/perfil',
-        name: 'Perfil',
-        component: () => import('../views/Profile.vue'),
-    },
-    //Módulo de la fase 1
-    {
-        path: '/riesgos',
-        name: 'Evaluación de Riesgos',
-        component: () => import('../views/RiskAssessment.vue'),
-    },
+            //Módulo del perfil
+            /*
+            {
+                path: '/perfil',
+                name: 'Perfil',
+                component: () => import('../views/Profile.vue'),
+            },
+            */
 
-        //Módulo de la fase 2
-        {
-            path: '/partes-interesadas',
-            name: 'Partes Interesadas',
-            component: () => import('../views/InterestedParties.vue'),
-        },
-        {
-            path: '/actividades',
-            name: 'Actividades del Negocio',
-            component: () => import('../views/BusinessActivity.vue'),
-        },
-        {
-            path: '/servicios-ofrecidos',
-            name: 'Servicios Ofrecidos',
-            component: () => import('../views/ServicesOffered.vue'),
-        },
-        {
-            path: '/servicios-usadoss',
-            name: 'Servicios Usados',
-            component: () => import('../views/ServicesUsed.vue'),
-        },
-        {
-            path: '/empleados',
-            name: 'Empleados',
-            component: () => import('../views/Employees.vue'),
-        },
- 
-        //Módulo de la fase 3
-        {
-            path: '/incidentes',
-            name: 'Incidentes',
-            component: () => import('../views/Incidents.vue'),
-        },
-    	
-        //Módulo de configuración
-        {
-            path: '/areas',
-            name: 'Areas',
-            component: () => import('../views/Areas.vue'),
-        },
-        {
-            path: '/escalas',
-            name: 'Escalas',
-            component: () => import('../views/Scales.vue'),
-        },
-],
-},
-    */
+            //Módulo de la fase 1
+            {
+                path: '/riesgos',
+                name: 'Risks',
+                component: () => import('../dashboard/Risks.vue'),
+            },
+            {
+                path: '/escenarios-criticos',
+                name: 'CrisisScenarios',
+                component: () => import('../dashboard/CrisisScenarios.vue'),
+            },
+            /*
+                //Módulo de la fase 2
+                {
+                    path: '/partes-interesadas',
+                    name: 'Partes Interesadas',
+                    component: () => import('../views/InterestedParties.vue'),
+                },
+                {
+                    path: '/actividades',
+                    name: 'Actividades del Negocio',
+                    component: () => import('../views/BusinessActivity.vue'),
+                },
+                {
+                    path: '/servicios-ofrecidos',
+                    name: 'Servicios Ofrecidos',
+                    component: () => import('../views/ServicesOffered.vue'),
+                },
+                {
+                    path: '/servicios-usadoss',
+                    name: 'Servicios Usados',
+                    component: () => import('../views/ServicesUsed.vue'),
+                },
+                {
+                    path: '/empleados',
+                    name: 'Empleados',
+                    component: () => import('../views/Employees.vue'),
+                },
+         
+                //Módulo de la fase 3
+                {
+                    path: '/incidentes',
+                    name: 'Incidentes',
+                    component: () => import('../views/Incidents.vue'),
+                },
+            	
+                //Módulo de configuración
+                {
+                    path: '/areas',
+                    name: 'Areas',
+                    component: () => import('../views/Areas.vue'),
+                },
+                {
+                    path: '/escalas',
+                    name: 'Escalas',
+                    component: () => import('../views/Scales.vue'),
+                },
+                */
+        ],
+    },
 ]
 
 /*

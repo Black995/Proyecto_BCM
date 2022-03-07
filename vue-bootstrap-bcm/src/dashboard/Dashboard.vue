@@ -9,12 +9,13 @@
 
                 <section class="content">
                     <div class="container-fluid">
-                        <ExampleForm></ExampleForm>
+                        <!--ExampleForm></ExampleForm-->
+                        <router-view />
                     </div>
                 </section>
             </div>
 
-            <Footer></Footer>
+            <!--Footer></Footer-->
             <ControlSidebar></ControlSidebar>
         </div>
     </body>
@@ -26,20 +27,20 @@ import "../../node_modules/admin-lte/plugins/select2-bootstrap4-theme/select2-bo
 import "../../node_modules/admin-lte/plugins/select2/css/select2.min.css";
 
 import ContentHeader from "./ContentHeader.vue";
-import ExampleForm from "../components/ExampleForm.vue";
+//import ExampleForm from "../components/ExampleForm.vue";
 import Navbar from "./Navbar.vue";
 import Sidebar from "./Sidebar.vue";
-import Footer from "./Footer.vue";
+//import Footer from "./Footer.vue";
 import ControlSidebar from "./ControlSidebar.vue";
 
 export default {
-    name: "App",
+    name: "Dashboard",
     components: {
         ContentHeader,
-        ExampleForm,
+        //ExampleForm,
         Navbar,
         Sidebar,
-        Footer,
+        //Footer,
         ControlSidebar,
     },
     methods: {

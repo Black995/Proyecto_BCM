@@ -46,8 +46,25 @@ import "../node_modules/admin-lte/plugins/bootstrap4-duallistbox/bootstrap-duall
 import "../node_modules/admin-lte/plugins/bs-stepper/css/bs-stepper.min.css"
 import "../node_modules/admin-lte/plugins/dropzone/min/dropzone.min.css"
 
+import 'primevue/resources/themes/saga-blue/theme.css'       //theme
+import 'primevue/resources/primevue.min.css'                 //core css
+import 'primeicons/primeicons.css'                           //icons
+
+import PrimeVue from 'primevue/config';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 
 library.add(fas, fab, far, faLock, faEnvelope, faFacebook, faGooglePlus);
 dom.watch()
 
-createApp(App).use(router).component("font-awesome-icon", FontAwesomeIcon).mount('#app')
+const app = createApp(App).use(router, PrimeVue)
+app.component("font-awesome-icon", FontAwesomeIcon)
+app.component("DataTable", DataTable)
+app.component("Column", Column)
+app.component("ColumnGroup", ColumnGroup)
+app.component("InputText", InputText)
+app.component("Button", Button)
+app.mount('#app')

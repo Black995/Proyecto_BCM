@@ -15,15 +15,13 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <!-- Sidebar Menu -->
-            <nav class="mt-2">
+            <!--nav class="mt-2">
                 <ul
                     class="nav nav-pills nav-sidebar flex-column"
                     data-widget="treeview"
                     role="menu"
                     data-accordion="false"
                 >
-                    <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
                     <li class="nav-item has-treeview">
                         <a
                             href="#"
@@ -99,51 +97,50 @@
                             </li>
                         </ul>
                     </li>
-                    <!--
-        Insert more sidebars here
-      -->
+                    
+                </ul>
+            </nav-->
+
+            <nav class="mt-2">
+                <ul
+                    class="nav nav-pills nav-sidebar flex-column"
+                    data-widget="treeview"
+                    role="menu"
+                    data-accordion="false"
+                    v-for="item in menuOptions"
+                    :key="item.title"
+                >
+                    <li class="nav-item has-treeview">
+                        <a
+                            href="#"
+                            routerLinkActive="{ item.active }"
+                            class="nav-link pl-0"
+                        >
+                            <i class="nav-icon fas fa-landmark"></i>
+                            <p>
+                                {{ item.title }}
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li
+                                class="nav-item"
+                                v-for="(opt, i) in item.items"
+                                :key="i"
+                            >
+                                <router-link
+                                    :to="{ name: opt.toDato }"
+                                    active-class="active"
+                                    class="nav-link"
+                                >
+                                    <i class="far fa-id-badge nav-icon"></i>
+                                    <p>{{ opt.opcion }}</p>
+                                </router-link>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
-
-            <ul
-                class="nav nav-pills nav-sidebar flex-column"
-                data-widget="treeview"
-                role="menu"
-                data-accordion="false"
-                v-for="item in menuOptions"
-                :key="item.title"
-            >
-                <li class="nav-item has-treeview">
-                    <a
-                        href="#"
-                        routerLinkActive="{ item.active }"
-                        class="nav-link pl-0"
-                    >
-                        <i class="nav-icon fas fa-landmark"></i>
-                        <p>
-                            {{ item.title }}
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li
-                            class="nav-item"
-                            v-for="(opt, i) in item.items"
-                            :key="i"
-                        >
-                            <a
-                                :to="{ name: opt.toDato }"
-                                routerLinkActive="active"
-                                class="nav-link"
-                            >
-                                <i class="far fa-id-badge nav-icon"></i>
-                                <p>{{ opt.opcion }}</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-
             <!-- /.sidebar-menu -->
         </div>
         <!-- /.sidebar -->
@@ -163,12 +160,18 @@ export default {
                 active: true,
                 items: [
                     {
-                        opcion: "Evaluación de Riesgos",
+                        opcion: "Riesgos",
                         icono: "mdi-alert-circle-check",
-                        toDato: "Evaluación de Riesgos",
+                        toDato: "Risks",
+                    },
+                    {
+                        opcion: "Escenarios Críticos",
+                        icono: "mdi-alert-circle-check",
+                        toDato: "CrisisScenarios",
                     },
                 ],
             },
+            /*
             {
                 title: "Módulo 2",
                 active: false,
@@ -227,6 +230,7 @@ export default {
                     },
                 ],
             },
+            */
         ],
     }),
 };
