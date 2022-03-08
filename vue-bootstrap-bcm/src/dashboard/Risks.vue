@@ -24,6 +24,12 @@
                         >
                             <template #header>
                                 <div class="flex justify-content-between">
+                                    <button
+                                        class="btn-success btn mr-3"
+                                        @click="open_modal_create()"
+                                    >
+                                        <i class="fas fa-plus"></i>
+                                    </button>
                                     <span class="p-input-icon-left">
                                         <i class="pi pi-search" />
                                         <InputText
@@ -109,6 +115,7 @@ export default {
                     }
                 });
         },
+        open_modal_create() {},
 
         clearFilter1() {
             this.initFilters1();

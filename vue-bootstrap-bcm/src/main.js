@@ -61,10 +61,12 @@ library.add(fas, fab, far, faLock, faEnvelope, faFacebook, faGooglePlus);
 dom.watch()
 
 const app = createApp(App).use(router, PrimeVue)
+//Componentes de Prime Vue
 app.component("font-awesome-icon", FontAwesomeIcon)
 app.component("DataTable", DataTable)
 app.component("Column", Column)
 app.component("ColumnGroup", ColumnGroup)
 app.component("InputText", InputText)
 app.component("Button", Button)
+//Iniciando la app
 app.mount('#app')
