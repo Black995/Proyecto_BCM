@@ -20,7 +20,6 @@
                             :loading="loading"
                             filterDisplay="row"
                             :globalFilterFields="['name', 'description']"
-                            v-model="filters1"
                         >
                             <template #header>
                                 <div class="flex justify-content-between">

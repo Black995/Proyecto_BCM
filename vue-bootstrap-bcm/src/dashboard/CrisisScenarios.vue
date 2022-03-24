@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Crisis Scenarios</h1>
+        <h1>Escenarios críticos</h1>
     </div>
 </template>
 

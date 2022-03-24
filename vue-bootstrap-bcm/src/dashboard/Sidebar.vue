@@ -171,7 +171,6 @@ export default {
                     },
                 ],
             },
-            /*
             {
                 title: "Módulo 2",
                 active: false,
@@ -196,13 +195,16 @@ export default {
                         icono: "mdi-toolbox",
                         toDato: "Servicios Usados",
                     },
+                    /*
                     {
                         opcion: "Empleados",
                         icono: "mdi-account-hard-hat",
                         toDato: "Empleados",
                     },
+                    */
                 ],
             },
+            /*
             {
                 title: "Módulo 3",
                 active: false,

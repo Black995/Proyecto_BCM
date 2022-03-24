@@ -38,53 +38,53 @@ const routes = [
                 name: 'CrisisScenarios',
                 component: () => import('../dashboard/CrisisScenarios.vue'),
             },
+            //Módulo de la fase 2
+            {
+                path: '/partes-interesadas',
+                name: 'Partes Interesadas',
+                component: () => import('../dashboard/InterestedParties.vue'),
+            },
+            {
+                path: '/actividades',
+                name: 'Actividades del Negocio',
+                component: () => import('../dashboard/BusinessActivity.vue'),
+            },
+            {
+                path: '/servicios-ofrecidos',
+                name: 'Servicios Ofrecidos',
+                component: () => import('../dashboard/ServicesOffered.vue'),
+            },
+            {
+                path: '/servicios-usadoss',
+                name: 'Servicios Usados',
+                component: () => import('../dashboard/ServicesUsed.vue'),
+            },
             /*
-                //Módulo de la fase 2
-                {
-                    path: '/partes-interesadas',
-                    name: 'Partes Interesadas',
-                    component: () => import('../views/InterestedParties.vue'),
-                },
-                {
-                    path: '/actividades',
-                    name: 'Actividades del Negocio',
-                    component: () => import('../views/BusinessActivity.vue'),
-                },
-                {
-                    path: '/servicios-ofrecidos',
-                    name: 'Servicios Ofrecidos',
-                    component: () => import('../views/ServicesOffered.vue'),
-                },
-                {
-                    path: '/servicios-usadoss',
-                    name: 'Servicios Usados',
-                    component: () => import('../views/ServicesUsed.vue'),
-                },
-                {
-                    path: '/empleados',
-                    name: 'Empleados',
-                    component: () => import('../views/Employees.vue'),
-                },
-         
-                //Módulo de la fase 3
-                {
-                    path: '/incidentes',
-                    name: 'Incidentes',
-                    component: () => import('../views/Incidents.vue'),
-                },
-            	
-                //Módulo de configuración
-                {
-                    path: '/areas',
-                    name: 'Areas',
-                    component: () => import('../views/Areas.vue'),
-                },
-                {
-                    path: '/escalas',
-                    name: 'Escalas',
-                    component: () => import('../views/Scales.vue'),
-                },
-                */
+            {
+                path: '/empleados',
+                name: 'Empleados',
+                component: () => import('../views/Employees.vue'),
+            },
+     
+            //Módulo de la fase 3
+            {
+                path: '/incidentes',
+                name: 'Incidentes',
+                component: () => import('../views/Incidents.vue'),
+            },
+        	
+            //Módulo de configuración
+            {
+                path: '/areas',
+                name: 'Areas',
+                component: () => import('../views/Areas.vue'),
+            },
+            {
+                path: '/escalas',
+                name: 'Escalas',
+                component: () => import('../views/Scales.vue'),
+            },
+            */
         ],
     },
 ]

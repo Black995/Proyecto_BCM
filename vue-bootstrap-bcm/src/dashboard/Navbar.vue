@@ -20,7 +20,7 @@
 
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
-            <button class="btn btn-success">Logout</button>
+            <!--button class="btn btn-success">Logout</button-->
             <a class="text-white mt-2"> correo@gmail.com </a>
             <!--a class="text-white mt-2">{{ logged_user?.email }} </a-->
 
