@@ -1,6 +1,12 @@
 <template>
     <div class="container-fluid">
         <div class="row">
+            <!--b-button v-b-modal.modal-1>Launch demo modal</b-button>
+
+            <b-modal id="modal-1" title="BootstrapVue">
+                <p class="my-4">Hello from modal!</p>
+            </b-modal-->
+
             <div class="col-12">
                 <div class="card">
                     <div class="card-body table-responsive">
@@ -61,6 +67,7 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../config/config";
 import { FilterMatchMode } from "primevue/api";
+//import ModalCreateRisk from "../components/Risks/ModalCreateRisk.vue";
 
 export default {
     name: "Risks",

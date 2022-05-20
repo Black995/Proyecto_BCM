@@ -1,13 +1,12 @@
 <template>
     <div>
         <div class="modal-header">
-            <h4 class="modal-title">Crear Crisis</h4>
+            <h4 class="modal-title">Crear Riesgo</h4>
             <button
                 type="button"
                 class="close"
                 data-dismiss="modal"
                 aria-label="Close"
-                @click="dialog = false"
             >
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -18,7 +17,6 @@
                     <label><b>Nombre:</b></label>
                     <input
                         formControlName="name"
-                        [class]="validate_control('name')"
                         type="text"
                         placeholder="Ingrese el nombre del documento..."
                     />
@@ -33,9 +31,8 @@
                     <label><b>Descripción:</b></label>
                     <input
                         formControlName="name"
-                        [class]="validate_control('name')"
                         type="text"
-                        placeholder="Ingrese el nombre del documento..."
+                        placeholder="Ingrese la descripción..."
                     />
                     <!--div class="mt-1 mb-2 text-danger" *ngIf="document_form.controls['name'].invalid && 
         (document_form.controls['name'].dirty || document_form.controls['name'].touched)">
@@ -45,9 +42,6 @@
         </div-->
                 </div>
 
-                <hr
-                    *ngIf="document_form.get('link') || document_form.get('file')"
-                />
                 <div class="form-group text-right mt-3">
                     <button
                         type="submit"
@@ -145,14 +139,16 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 
-import ModalConfirmCreateRisk from "./ModalConfirmCreateRisk.vue";
-import AlertError from "../Genericos/AlertError.vue";
+//import ModalConfirmCreateRisk from "./ModalConfirmCreateRisk.vue";
+//import AlertError from "../Genericos/AlertError.vue";
 
 export default {
+    /*
     components: {
         AlertError,
         ModalConfirmCreateRisk,
     },
+    */
 
     data() {
         return {

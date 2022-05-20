@@ -57,10 +57,24 @@ import ColumnGroup from 'primevue/columngroup';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 
+
+//import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+
+// Import Bootstrap and BootstrapVue CSS files (order is important)
+//import 'bootstrap/dist/css/bootstrap.css'
+//import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+// Make BootstrapVue available throughout your project
+// Vue.use(BootstrapVue)
+// Optionally install the BootstrapVue icon components plugin
+// Vue.use(IconsPlugin)
+
+
 library.add(fas, fab, far, faLock, faEnvelope, faFacebook, faGooglePlus);
 dom.watch()
 
 const app = createApp(App).use(router, PrimeVue)
+//const app = createApp(App).use(router, PrimeVue, BootstrapVue, IconsPlugin)
 //Componentes de Prime Vue
 app.component("font-awesome-icon", FontAwesomeIcon)
 app.component("DataTable", DataTable)
