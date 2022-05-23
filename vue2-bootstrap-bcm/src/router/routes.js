@@ -2,8 +2,10 @@ import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 // GeneralViews
 import NotFound from "@/pages/NotFoundPage.vue";
 
+// Login
+import Login from "@/pages/Login/Login.vue";
 // Admin pages
-import Dashboard from "@/pages/Dashboard.vue";
+import Risks from "@/pages/Risks.vue";
 import UserProfile from "@/pages/UserProfile.vue";
 import Notifications from "@/pages/Notifications.vue";
 import Icons from "@/pages/Icons.vue";
@@ -13,14 +15,19 @@ import TableList from "@/pages/TableList.vue";
 
 const routes = [
   {
+    path: '/',
+    name: 'Login',
+    component: Login,
+  },
+  {
     path: "/",
     component: DashboardLayout,
     redirect: "/dashboard",
     children: [
       {
-        path: "dashboard",
-        name: "dashboard",
-        component: Dashboard
+        path: "riesgos",
+        name: "Risks",
+        component: Risks
       },
       {
         path: "stats",

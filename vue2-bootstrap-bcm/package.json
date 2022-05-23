@@ -11,10 +11,16 @@
     "dev": "npm run serve"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/vue-fontawesome": "^2.0.6",
+    "axios": "^0.27.2",
     "bootstrap": "^4.6.1",
     "bootstrap-vue": "^2.22.0",
     "chartist": "^0.11.0",
     "es6-promise": "^4.2.4",
+    "primeicons": "^5.0.0",
+    "primevue": "^2.9.2",
     "vue": "^2.6.14",
     "vue-clickaway": "^2.1.0",
     "vue-notifyjs": "^0.3.0",

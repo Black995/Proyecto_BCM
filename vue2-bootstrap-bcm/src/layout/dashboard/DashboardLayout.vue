@@ -2,11 +2,7 @@
     <div class="wrapper">
         <side-bar>
             <template slot="links">
-                <sidebar-link
-                    to="/dashboard"
-                    name="Dashboard"
-                    icon="ti-panel"
-                />
+                <sidebar-link to="/riesgos" name="Risks" icon="ti-panel" />
                 <sidebar-link to="/stats" name="User Profile" icon="ti-user" />
                 <sidebar-link
                     to="/table-list"
@@ -59,8 +55,6 @@
 
             <dashboard-content @click.native="toggleSidebar">
             </dashboard-content>
-
-            <content-footer></content-footer>
         </div>
     </div>
 </template>
@@ -68,13 +62,11 @@
 </style>
 <script>
 import TopNavbar from "./TopNavbar.vue";
-import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
 export default {
     components: {
         TopNavbar,
-        ContentFooter,
         DashboardContent,
         MobileMenu,
     },
