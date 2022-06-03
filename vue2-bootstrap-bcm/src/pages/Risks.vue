@@ -11,40 +11,71 @@
                             :paginator="true"
                             :rows="10"
                             :rowsPerPageOptions="[10, 20]"
-                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
                             :resizableColumns="true"
                             :autoLayout="true"
                             :responsive="true"
                             :reorderableColumns="true"
-                            :lazy="true"
                             :loading="loading"
-                            filterDisplay="row"
                             :globalFilterFields="['name', 'description']"
                         >
                             <template #header>
-                                <div class="flex justify-content-between">
-                                    <button
-                                        class="btn-success btn mr-3"
-                                        @click="open_modal_create()"
-                                    >
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                    <span class="p-input-icon-left">
-                                        <i class="pi pi-search" />
-                                        <InputText
-                                            v-model="filterGlobal"
-                                            placeholder="Buscar..."
-                                        />
-                                    </span>
-                                </div>
+                                <b-row class="justify-content-between">
+                                    <b-col sm="4">
+                                        <b-button
+                                            variant="success"
+                                            @click="show_modal_create = true"
+                                        >
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-plus"
+                                            />
+                                        </b-button>
+                                    </b-col>
+                                    <b-col sm="4">
+                                        <span class="p-input-icon-left">
+                                            <i class="pi pi-search" />
+                                            <InputText
+                                                v-model="filterGlobal"
+                                                placeholder="Buscar..."
+                                            />
+                                        </span>
+                                    </b-col>
+                                </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
                             <Column
                                 field="description"
                                 header="Descripción"
                             ></Column>
+                            <Column field="id" header="Opciones">
+                                <template #body="slotProps">
+                                    <b-button
+                                        pill
+                                        variant="warning"
+                                        @click="
+                                            show_modal_update(slotProps.data.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-pen-to-square"
+                                        />
+                                    </b-button>
+                                    <b-button
+                                        pill
+                                        variant="danger"
+                                        @click="
+                                            show_modal_delete(slotProps.data.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-trash"
+                                        />
+                                    </b-button>
+                                </template>
+                            </Column>
 
-                            <template #empty> No customers found. </template>
+                            <template #empty>
+                                No hay riesgos encontrados.
+                            </template>
                         </DataTable>
                     </div>
                     <!-- /.card-body -->
@@ -53,6 +84,80 @@
             </div>
             <!-- /.col -->
         </div>
+
+        <!--
+            Modal de crear  
+        -->
+        <b-modal
+            v-model="show_modal_create"
+            id="modal-create"
+            title="Crear riesgo"
+            ref="modal"
+            size="lg"
+            centered
+            @show="resetModal"
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmit">
+                <b-form-group
+                    label="Ingrese el título del riesgo"
+                    label-for="name-input-create"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="riskState.name"
+                >
+                    <b-form-input
+                        id="name-input"
+                        v-model="risk.name"
+                        :state="riskState.name"
+                        required
+                    ></b-form-input>
+                </b-form-group>
+                <b-form-group
+                    label="Ingrese la descripción del riesgo"
+                    label-for="description-input-create"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="riskState.description"
+                >
+                    <b-form-textarea
+                        id="name-input"
+                        v-model="risk.description"
+                        :state="riskState.description"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+            </form>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="handleSubmit"
+                    >
+                        Crear riesgo
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal
+            id="modal-confirm-create"
+            title="Confirmar crear riesgo"
+            centered
+        >
+            <h4>¿Está seguro de crear este riesgo?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="createRisk"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
 
         <!--Stats cards-->
         <!--div class="row">
@@ -86,6 +191,9 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../config/config";
 import { FilterMatchMode } from "primevue/api";
+
+import NotificationTemplate from "./Notifications/NotificationTemplate";
+
 export default {
     name: "Risks",
 
@@ -93,13 +201,45 @@ export default {
         loading: false,
         filterGlobal: null,
 
+        // Variable para maanejar el modal
+        show_modal_create: false,
+
         risks: [],
         deleteRiskId: 0,
+
+        risk: {
+            name: "",
+            description: "",
+        },
+        riskState: {
+            name: null,
+            description: null,
+        },
     }),
     mounted() {
         this.getRisks();
     },
     methods: {
+        successMessage(successText) {
+            this.$notify({
+                component: NotificationTemplate,
+                title: successText,
+                icon: "ti-check",
+                horizontalAlign: "right",
+                verticalAlign: "top",
+                type: "success",
+            });
+        },
+        errorMessage(errorText) {
+            this.$notify({
+                component: NotificationTemplate,
+                title: errorText,
+                icon: "ti-check",
+                horizontalAlign: "right",
+                verticalAlign: "top",
+                type: "danger",
+            });
+        },
         async getRisks() {
             this.loading = true;
             this.risks = [];
@@ -113,33 +253,28 @@ export default {
                 })
                 .then((res) => {
                     this.risks = res.data;
+                    console.log(this.risks);
                     this.loading = false;
                 })
                 .catch((err) => {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            console.log(err.response.data);
-                            //this.mensajeError = err.response.data;
-                            //this.snackbar = true;
+                            this.errorMessage(err.response.data);
                         } else {
-                            console.log(
+                            // Servidor no disponible
+                            this.errorMessage(
                                 "Ups! Ha ocurrido un error en el servidor"
                             );
-                            // Servidor no disponible
-                            //this.mensajeError = "Ups! Ha ocurrido un error en el servidor";
-                            //this.snackbar = true;
                         }
                     } catch {
                         // Servidor no disponible
-                        console.log("Ups! Ha ocurrido un error en el servidor");
-                        //this.mensajeError = "Ups! Ha ocurrido un error en el servidor";
-                        //this.snackbar = true;
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
                     }
                 });
         },
-        open_modal_create() {},
-
         clearFilter1() {
             this.initFilters1();
         },
@@ -148,6 +283,96 @@ export default {
                 value: null,
                 matchMode: FilterMatchMode.CONTAINS,
             };
+        },
+
+        checkFormValidity() {
+            /*
+            const valid = this.$refs.form.checkValidity();
+            this.riskState.name = valid;
+            this.riskState.description = valid;
+            return valid;
+            */
+            let valid = true;
+            if (!this.risk.name) {
+                this.riskState.name = false;
+                valid = false;
+            }
+            if (!this.risk.description) {
+                this.riskState.description = false;
+                valid = false;
+            }
+            return valid;
+        },
+        resetModal() {
+            this.risk.name = "";
+            this.riskState.name = null;
+            this.risk.description = "";
+            this.riskState.description = null;
+        },
+        handleSubmit() {
+            // Inicializamos variables de estados
+            this.riskState.name = null;
+            this.riskState.description = null;
+
+            // Exit when the form isn't valid
+            if (!this.checkFormValidity()) {
+                return;
+            }
+
+            // Mostrar modal de confirmar
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-create");
+            });
+        },
+        async createRisk() {
+            axios
+                .post(`${SERVER_ADDRESS}/api/phase1/risks/`, this.risk, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "El riesgo ha sido creado exitosamente"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-create");
+                        this.$bvModal.hide("modal-create");
+                    });
+
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getRisks();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        show_modal_update(id) {
+            console.log("ID a imprimir para actualizar");
+            console.log(id);
+        },
+        show_modal_delete(id) {
+            console.log("ID a imprimir para eliminar");
+            console.log(id);
         },
     },
 
@@ -199,5 +424,9 @@ export default {
       */
 };
 </script>
-<style>
+<style lang="scss">
+.header-table {
+    background-color: rgb(17, 17, 17);
+    color: rgb(255, 255, 255);
+}
 </style>

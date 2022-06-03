@@ -20,35 +20,50 @@ import router from "./router/index";
 import PaperDashboard from "./plugins/paperDashboard";
 import "vue-notifyjs/themes/default.css";
 
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import PrimeVue from 'primevue/config';
-
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+// Import Prime Vue style libraries
+import 'primevue/resources/themes/saga-blue/theme.css'       //theme
+import 'primevue/resources/primevue.min.css'                 //core css
+import 'primeicons/primeicons.css'                           //icons
+
 
 Vue.use(PaperDashboard);
-// Make BootstrapVue available throughout your project
-Vue.use(BootstrapVue)
+
+/**
+ * Bootstrap Vue
+ */
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import { BButton } from 'bootstrap-vue'
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
-// Prime Vue
-Vue.use(PrimeVue)
+Vue.use(BootstrapVue)
+Vue.component('b-button', BButton)
 
+
+/**
+ * Font Awesome
+ */
 // Ejemplo para usar iconos de font awesome
-// import { library } from '@fortawesome/fontawesome-svg-core'
-// import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
-// library.add(faUserSecret)
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 Vue.component('font-awesome-icon', FontAwesomeIcon);
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faPlus, faTrash, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+library.add(faPlus, faTrash, faPenToSquare)
 
+/**
+ * Prime Vue
+ */
+import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 // Componentes de Prime Vue
+Vue.use(PrimeVue)
 Vue.component("DataTable", DataTable)
 Vue.component("Column", Column)
 Vue.component("ColumnGroup", ColumnGroup)

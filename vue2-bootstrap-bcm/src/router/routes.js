@@ -26,7 +26,7 @@ const routes = [
     children: [
       {
         path: "riesgos",
-        name: "Risks",
+        name: "Riesgos",
         component: Risks
       },
       {

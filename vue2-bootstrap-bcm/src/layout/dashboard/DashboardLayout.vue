@@ -2,7 +2,7 @@
     <div class="wrapper">
         <side-bar>
             <template slot="links">
-                <sidebar-link to="/riesgos" name="Risks" icon="ti-panel" />
+                <sidebar-link to="/riesgos" name="Riesgos" icon="ti-panel" />
                 <sidebar-link to="/stats" name="User Profile" icon="ti-user" />
                 <sidebar-link
                     to="/table-list"
