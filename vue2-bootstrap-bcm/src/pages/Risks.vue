@@ -97,7 +97,7 @@
             centered
             @show="resetModal"
         >
-            <form ref="form" @submit.stop.prevent="handleSubmit">
+            <form ref="form" @submit.stop.prevent="handleSubmitCreate">
                 <b-form-group
                     label="Ingrese el título del riesgo"
                     label-for="name-input-create"
@@ -132,7 +132,7 @@
                     <b-button
                         variant="success"
                         class="float-right"
-                        @click="handleSubmit"
+                        @click="handleSubmitCreate"
                     >
                         Crear riesgo
                     </b-button>
@@ -140,6 +140,9 @@
             </template>
         </b-modal>
 
+        <!--
+            Modal de confirmar crear  
+        -->
         <b-modal
             id="modal-confirm-create"
             title="Confirmar crear riesgo"
@@ -152,6 +155,104 @@
                         variant="success"
                         class="float-right"
                         @click="createRisk"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de actualizar  
+        -->
+        <b-modal
+            id="modal-update"
+            title="Editar riesgo"
+            ref="modal"
+            size="lg"
+            centered
+            @show="resetModal"
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
+                <b-form-group
+                    label="Ingrese el título del riesgo"
+                    label-for="name-input-update"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="riskState.name"
+                >
+                    <b-form-input
+                        id="name-input"
+                        v-model="risk.name"
+                        :state="riskState.name"
+                        required
+                    ></b-form-input>
+                </b-form-group>
+                <b-form-group
+                    label="Ingrese la descripción del riesgo"
+                    label-for="description-input-update"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="riskState.description"
+                >
+                    <b-form-textarea
+                        id="name-input"
+                        v-model="risk.description"
+                        :state="riskState.description"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+            </form>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="handleSubmitUpdate"
+                    >
+                        Editar riesgo
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar actualizar  
+        -->
+        <b-modal
+            id="modal-confirm-update"
+            title="Confirmar actualizar riesgo"
+            centered
+        >
+            <h4>¿Está seguro de actualizar este riesgo?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="updateRisk"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar eliminar  
+        -->
+        <b-modal
+            id="modal-confirm-delete"
+            title="Confirmar eliminar riesgo"
+            centered
+        >
+            <h4>¿Está seguro de eliminar este riesgo?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="danger"
+                        class="float-right"
+                        @click="deleteRisk"
                     >
                         Confirmar
                     </b-button>
@@ -201,11 +302,11 @@ export default {
         loading: false,
         filterGlobal: null,
 
-        // Variable para maanejar el modal
+        // Variables para maanejar los modales
         show_modal_create: false,
 
         risks: [],
-        deleteRiskId: 0,
+        riskId: 0,
 
         risk: {
             name: "",
@@ -253,7 +354,6 @@ export default {
                 })
                 .then((res) => {
                     this.risks = res.data;
-                    console.log(this.risks);
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -275,6 +375,9 @@ export default {
                     }
                 });
         },
+        /**
+         * Filtros que se manejan en Prime Vue
+         */
         clearFilter1() {
             this.initFilters1();
         },
@@ -285,6 +388,9 @@ export default {
             };
         },
 
+        /**
+         * Validar formularios
+         */
         checkFormValidity() {
             /*
             const valid = this.$refs.form.checkValidity();
@@ -309,7 +415,10 @@ export default {
             this.risk.description = "";
             this.riskState.description = null;
         },
-        handleSubmit() {
+        /**
+         * Create
+         */
+        handleSubmitCreate() {
             // Inicializamos variables de estados
             this.riskState.name = null;
             this.riskState.description = null;
@@ -366,13 +475,159 @@ export default {
                     }
                 });
         },
-        show_modal_update(id) {
-            console.log("ID a imprimir para actualizar");
-            console.log(id);
+        /**
+         * Update
+         */
+        handleSubmitUpdate() {
+            // Inicializamos variables de estados
+            this.riskState.name = null;
+            this.riskState.description = null;
+
+            // Exit when the form isn't valid
+            if (!this.checkFormValidity()) {
+                return;
+            }
+
+            // Mostrar modal de confirmar
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-update");
+            });
         },
-        show_modal_delete(id) {
-            console.log("ID a imprimir para eliminar");
+        async show_modal_update(id) {
+            this.riskId = id;
+
+            console.log("id actualizar");
             console.log(id);
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase1/risk/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.risk = res.data;
+                    console.log(res);
+                    console.log(res.data);
+                    console.log(this.risk);
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-update");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async updateRisk() {
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase1/risk/${this.riskId}/`,
+                    this.risk,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "El riesgo ha sido actualizado exitosamente"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-update");
+                        this.$bvModal.hide("modal-update");
+                    });
+
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getRisks();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        /**
+         * Delete
+         */
+        show_modal_delete(id) {
+            this.riskId = id;
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-delete");
+            });
+        },
+        async deleteRisk() {
+            axios
+                .delete(`${SERVER_ADDRESS}/api/phase1/risk/${this.riskId}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "El riesgo ha sido eliminado exitosamente"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-delete");
+                    });
+
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getRisks();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
         },
     },
 
