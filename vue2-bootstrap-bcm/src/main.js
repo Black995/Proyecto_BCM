@@ -50,8 +50,8 @@ Vue.component('b-button', BButton)
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faPlus, faTrash, faPenToSquare, faClipboardList } from '@fortawesome/free-solid-svg-icons'
-library.add(faPlus, faTrash, faPenToSquare, faClipboardList)
+import { faPlus, faTrash, faPenToSquare, faClipboardList, faSearch } from '@fortawesome/free-solid-svg-icons'
+library.add(faPlus, faTrash, faPenToSquare, faClipboardList, faSearch)
 
 /**
  * Prime Vue

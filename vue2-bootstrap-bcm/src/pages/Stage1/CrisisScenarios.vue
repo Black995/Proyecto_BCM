@@ -50,6 +50,17 @@
                                 <template #body="slotProps">
                                     <b-button
                                         pill
+                                        variant="info"
+                                        @click="
+                                            show_modal_detail(slotProps.data.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-search"
+                                        />
+                                    </b-button>
+                                    <b-button
+                                        pill
                                         variant="warning"
                                         @click="
                                             show_modal_update(slotProps.data.id)
@@ -75,7 +86,8 @@
                                         variant="primary"
                                         @click="
                                             show_modal_association(
-                                                slotProps.data.id
+                                                slotProps.data.id,
+                                                slotProps.data.name
                                             )
                                         "
                                     >
@@ -97,6 +109,49 @@
             </div>
             <!-- /.col -->
         </div>
+
+        <!--
+            Modal del detalle  
+        -->
+        <b-modal
+            id="modal-detail"
+            title="Detalle del escenario crítico"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <b-card :title="crisisScenarioDetail.name" class="mb-2">
+                <b-card-text>
+                    {{ crisisScenarioDetail.description }}
+                </b-card-text>
+
+                <h4 class="mt-3 text-center">Riesgos del escenario crítico</h4>
+
+                <b-list-group-item
+                    class="mt-2 flex-column align-items-start"
+                    v-for="item in crisisScenarioDetail._risks"
+                    :key="item.key"
+                >
+                    <h5 class="mb-1">{{ item.name }}</h5>
+
+                    <p class="mb-1">
+                        {{ item.description }}
+                    </p>
+                </b-list-group-item>
+            </b-card>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="info"
+                        class="float-right"
+                        @click="$bvModal.hide('modal-detail')"
+                    >
+                        Cerrar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
 
         <!--
             Modal de crear  
@@ -282,14 +337,42 @@
             size="lg"
             centered
         >
-            <h3>a</h3>
+            <multiselect
+                v-model="selectedRisks"
+                placeholder="Buscar riesgo"
+                label="name"
+                track-by="id"
+                :options="risks"
+                :multiple="true"
+            ></multiselect>
+
+            <b-list-group v-if="selectedRisks.length" class="mt-3">
+                <b-list-group-item
+                    href="#"
+                    class="flex-column align-items-start"
+                    v-for="item in selectedRisks"
+                    :key="item.key"
+                >
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ item.name }}</h5>
+                        <!--small class="text-muted">3 days ago</small-->
+                    </div>
+                    <p class="mb-1">
+                        {{ item.description }}
+                    </p>
+                </b-list-group-item>
+            </b-list-group>
+
+            <h3 class="mt-3 text-center" v-if="!selectedRisks.length">
+                No existen riesgos asociados a este escenario crítico
+            </h3>
 
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="primary"
                         class="float-right"
-                        @click="handleSubmitUpdate"
+                        @click="show_modal_confirm_association"
                     >
                         Asociar riesgos
                     </b-button>
@@ -297,8 +380,33 @@
             </template>
         </b-modal>
 
+        <!--
+            Modal de confirmar asociar riesgos  
+        -->
+        <b-modal
+            id="modal-confirm-associate-risks"
+            title="Confirmar asociar riesgos"
+            centered
+        >
+            <h4>
+                ¿Está seguro de asociar estos riesgos al escenario crítico
+                <strong>{{ crisisName }}</strong
+                >?
+            </h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        class="float-right"
+                        @click="associateRisks"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
         <div class="row"></div>
-        <!-- /.row -->
     </div>
 </template>
 <script>
@@ -306,11 +414,14 @@ import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
 
+import Multiselect from "vue-multiselect";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 
 export default {
     name: "CrisisScenarios",
-
+    components: {
+        Multiselect,
+    },
     data: () => ({
         loading: false,
         filterGlobal: null,
@@ -319,7 +430,13 @@ export default {
         show_modal_create: false,
 
         crisisScenarios: [],
+        crisisScenarioDetail: {
+            name: "",
+            description: "",
+            _risks: [],
+        },
         crisisId: 0,
+        crisisName: "",
 
         crisisScenario: {
             name: "",
@@ -329,6 +446,10 @@ export default {
             name: null,
             description: null,
         },
+
+        // Listas de riesgos para realizar la asociación
+        risks: [],
+        selectedRisks: [],
     }),
     mounted() {
         this.getCrisisScenarios();
@@ -368,6 +489,9 @@ export default {
                 .then((res) => {
                     this.crisisScenarios = res.data;
                     this.loading = false;
+
+                    // Mientras tanto vamos cargando la lista de riesgos
+                    this.getRisks();
                 })
                 .catch((err) => {
                     try {
@@ -423,6 +547,49 @@ export default {
             this.crisisState.description = null;
         },
         /**
+         * Detail
+         */
+        async show_modal_detail(id) {
+            this.crisisScenarioDetail = {
+                name: "",
+                description: "",
+                _risks: [],
+            };
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.crisisScenarioDetail = res.data;
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-detail");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        /**
          * Create
          */
         handleSubmitCreate() {
@@ -455,7 +622,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El escenario crítico ha sido creado exitosamente"
+                        "¡El escenario crítico ha sido creado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -554,7 +721,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El escenario crítico ha sido actualizado exitosamente"
+                        "¡El escenario crítico ha sido actualizado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -608,7 +775,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El escenario crítico ha sido eliminado exitosamente"
+                        "¡El escenario crítico ha sido eliminado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -641,11 +808,133 @@ export default {
         /**
          * Associate risks with the crisis scenario
          */
-        show_modal_association(id) {
+        async getRisks() {
+            this.risks = [];
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase1/risks/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.risks = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async show_modal_association(id, name) {
             this.crisisId = id;
+            this.crisisName = name;
+            this.selectedRisks = [];
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    for (let i = 0; i < res.data._risks.length; i++) {
+                        this.selectedRisks.push(res.data._risks[i]);
+                    }
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-associate-risks");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        show_modal_confirm_association() {
             this.$nextTick(() => {
-                this.$bvModal.show("modal-associate-risks");
+                this.$bvModal.show("modal-confirm-associate-risks");
             });
+        },
+        async associateRisks() {
+            let scenarioRiskIds = [];
+            for (let i = 0; i < this.selectedRisks.length; i++) {
+                scenarioRiskIds.push(this.selectedRisks[i].id);
+            }
+            //Es necesario que el array de IDs tenga este nombre
+            let ids = {
+                risks: scenarioRiskIds,
+            };
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.crisisId}/`,
+                    ids,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡Los riesgos fueron asociados al escenario crítico exitosamente!"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-associate-risks");
+                        this.$bvModal.hide("modal-associate-risks");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
         },
     },
 };

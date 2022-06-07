@@ -443,7 +443,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El riesgo ha sido creado exitosamente"
+                        "¡El riesgo ha sido creado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -542,7 +542,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El riesgo ha sido actualizado exitosamente"
+                        "¡El riesgo ha sido actualizado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -593,7 +593,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El riesgo ha sido eliminado exitosamente"
+                        "¡El riesgo ha sido eliminado exitosamente!"
                     );
 
                     //Ocultamos los modales
