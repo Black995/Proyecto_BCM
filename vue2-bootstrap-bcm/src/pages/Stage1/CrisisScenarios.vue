@@ -6,7 +6,7 @@
                     <div class="card-body table-responsive">
                         <DataTable
                             class="header-table"
-                            :value="risks"
+                            :value="crisisScenarios"
                             responsiveLayout="scroll"
                             :paginator="true"
                             :rows="10"
@@ -70,11 +70,24 @@
                                             icon="fa-solid fa-trash"
                                         />
                                     </b-button>
+                                    <b-button
+                                        pill
+                                        variant="primary"
+                                        @click="
+                                            show_modal_association(
+                                                slotProps.data.id
+                                            )
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-clipboard-list"
+                                        />
+                                    </b-button>
                                 </template>
                             </Column>
 
                             <template #empty>
-                                No hay riesgos encontrados.
+                                No hay escenarios críticos encontrados.
                             </template>
                         </DataTable>
                     </div>
@@ -91,7 +104,7 @@
         <b-modal
             v-model="show_modal_create"
             id="modal-create"
-            title="Crear riesgo"
+            title="Crear escenario crítico"
             ref="modal"
             size="lg"
             centered
@@ -99,28 +112,28 @@
         >
             <form ref="form" @submit.stop.prevent="handleSubmitCreate">
                 <b-form-group
-                    label="Ingrese el título del riesgo"
+                    label="Ingrese el título del escenario crítico"
                     label-for="name-input-create"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.name"
+                    :state="crisisState.name"
                 >
                     <b-form-input
                         id="name-input"
-                        v-model="risk.name"
-                        :state="riskState.name"
+                        v-model="crisisScenario.name"
+                        :state="crisisState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
                 <b-form-group
-                    label="Ingrese la descripción del riesgo"
+                    label="Ingrese la descripción del escenario crítico"
                     label-for="description-input-create"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.description"
+                    :state="crisisState.description"
                 >
                     <b-form-textarea
                         id="name-input"
-                        v-model="risk.description"
-                        :state="riskState.description"
+                        v-model="crisisScenario.description"
+                        :state="crisisState.description"
                         required
                         rows="3"
                     ></b-form-textarea>
@@ -134,7 +147,7 @@
                         class="float-right"
                         @click="handleSubmitCreate"
                     >
-                        Crear riesgo
+                        Crear escenario crítico
                     </b-button>
                 </div>
             </template>
@@ -145,16 +158,16 @@
         -->
         <b-modal
             id="modal-confirm-create"
-            title="Confirmar crear riesgo"
+            title="Confirmar crear escenario crítico"
             centered
         >
-            <h4>¿Está seguro de crear este riesgo?</h4>
+            <h4>¿Está seguro de crear este escenario crítico?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="success"
                         class="float-right"
-                        @click="createRisk"
+                        @click="createCrisisScenario"
                     >
                         Confirmar
                     </b-button>
@@ -167,36 +180,35 @@
         -->
         <b-modal
             id="modal-update"
-            title="Editar riesgo"
+            title="Editar escenario crítico"
             ref="modal"
             size="lg"
             centered
-            @show="resetModal"
         >
             <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
                 <b-form-group
-                    label="Ingrese el título del riesgo"
+                    label="Ingrese el título del escenario crítico"
                     label-for="name-input-update"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.name"
+                    :state="crisisState.name"
                 >
                     <b-form-input
                         id="name-input"
-                        v-model="risk.name"
-                        :state="riskState.name"
+                        v-model="crisisScenario.name"
+                        :state="crisisState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
                 <b-form-group
-                    label="Ingrese la descripción del riesgo"
+                    label="Ingrese la descripción del escenario crítico"
                     label-for="description-input-update"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.description"
+                    :state="crisisState.description"
                 >
                     <b-form-textarea
                         id="name-input"
-                        v-model="risk.description"
-                        :state="riskState.description"
+                        v-model="crisisScenario.description"
+                        :state="crisisState.description"
                         required
                         rows="3"
                     ></b-form-textarea>
@@ -210,7 +222,7 @@
                         class="float-right"
                         @click="handleSubmitUpdate"
                     >
-                        Editar riesgo
+                        Editar escenario crítico
                     </b-button>
                 </div>
             </template>
@@ -221,16 +233,16 @@
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar actualizar riesgo"
+            title="Confirmar actualizar escenario crítico"
             centered
         >
-            <h4>¿Está seguro de actualizar este riesgo?</h4>
+            <h4>¿Está seguro de actualizar este escenario crítico?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="warning"
                         class="float-right"
-                        @click="updateRisk"
+                        @click="updateCrisisScenario"
                     >
                         Confirmar
                     </b-button>
@@ -243,16 +255,16 @@
         -->
         <b-modal
             id="modal-confirm-delete"
-            title="Confirmar eliminar riesgo"
+            title="Confirmar eliminar escenario crítico"
             centered
         >
-            <h4>¿Está seguro de eliminar este riesgo?</h4>
+            <h4>¿Está seguro de eliminar este escenario crítico?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="danger"
                         class="float-right"
-                        @click="deleteRisk"
+                        @click="deleteCrisisScenario"
                     >
                         Confirmar
                     </b-button>
@@ -260,43 +272,44 @@
             </template>
         </b-modal>
 
-        <!--Stats cards-->
-        <!--div class="row">
-          <div class="col-md-6 col-xl-3" v-for="stats in statsCards" :key="stats.title">
-            <stats-card>
-              <div class="icon-big text-center" :class="`icon-${stats.type}`" slot="header">
-                <i :class="stats.icon"></i>
-              </div>
-              <div class="numbers" slot="content">
-                <p>{{stats.title}}</p>
-                {{stats.value}}
-              </div>
-              <div class="stats" slot="footer">
-                <i :class="stats.footerIcon"></i> {{stats.footerText}}
-              </div>
-            </stats-card>
-          </div>
-        </div-->
-        <!--Charts-->
+        <!--
+            Modal de asociar riesgos con escenario crítico  
+        -->
+        <b-modal
+            id="modal-associate-risks"
+            title="Asociar riesgos al escenario crítico"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <h3>a</h3>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        class="float-right"
+                        @click="handleSubmitUpdate"
+                    >
+                        Asociar riesgos
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
         <div class="row"></div>
         <!-- /.row -->
     </div>
 </template>
 <script>
-//import { StatsCard } from "@/components/index";
-/**
- * El ejemplo de Stats Cards puede servir para futuras versiones del sistema
- */
-// import Chartist from 'chartist';
-
 import axios from "axios";
-import { SERVER_ADDRESS, TOKEN } from "../../config/config";
+import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
 
-import NotificationTemplate from "./Notifications/NotificationTemplate";
+import NotificationTemplate from "../Notifications/NotificationTemplate";
 
 export default {
-    name: "Risks",
+    name: "CrisisScenarios",
 
     data: () => ({
         loading: false,
@@ -305,20 +318,20 @@ export default {
         // Variables para maanejar los modales
         show_modal_create: false,
 
-        risks: [],
-        riskId: 0,
+        crisisScenarios: [],
+        crisisId: 0,
 
-        risk: {
+        crisisScenario: {
             name: "",
             description: "",
         },
-        riskState: {
+        crisisState: {
             name: null,
             description: null,
         },
     }),
     mounted() {
-        this.getRisks();
+        this.getCrisisScenarios();
     },
     methods: {
         successMessage(successText) {
@@ -341,19 +354,19 @@ export default {
                 type: "danger",
             });
         },
-        async getRisks() {
+        async getCrisisScenarios() {
             this.loading = true;
-            this.risks = [];
+            this.crisisScenarios = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/risks/`, {
+                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenarios_list/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.risks = res.data;
+                    this.crisisScenarios = res.data;
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -392,36 +405,30 @@ export default {
          * Validar formularios
          */
         checkFormValidity() {
-            /*
-            const valid = this.$refs.form.checkValidity();
-            this.riskState.name = valid;
-            this.riskState.description = valid;
-            return valid;
-            */
             let valid = true;
-            if (!this.risk.name) {
-                this.riskState.name = false;
+            if (!this.crisisScenario.name) {
+                this.crisisState.name = false;
                 valid = false;
             }
-            if (!this.risk.description) {
-                this.riskState.description = false;
+            if (!this.crisisScenario.description) {
+                this.crisisState.description = false;
                 valid = false;
             }
             return valid;
         },
         resetModal() {
-            this.risk.name = "";
-            this.riskState.name = null;
-            this.risk.description = "";
-            this.riskState.description = null;
+            this.crisisScenario.name = "";
+            this.crisisState.name = null;
+            this.crisisScenario.description = "";
+            this.crisisState.description = null;
         },
         /**
          * Create
          */
         handleSubmitCreate() {
             // Inicializamos variables de estados
-            this.riskState.name = null;
-            this.riskState.description = null;
+            this.crisisState.name = null;
+            this.crisisState.description = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -433,18 +440,22 @@ export default {
                 this.$bvModal.show("modal-confirm-create");
             });
         },
-        async createRisk() {
+        async createCrisisScenario() {
             axios
-                .post(`${SERVER_ADDRESS}/api/phase1/risks/`, this.risk, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
+                .post(
+                    `${SERVER_ADDRESS}/api/phase1/crisis_scenarios/`,
+                    this.crisisScenario,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El riesgo ha sido creado exitosamente"
+                        "El escenario crítico ha sido creado exitosamente"
                     );
 
                     //Ocultamos los modales
@@ -453,8 +464,8 @@ export default {
                         this.$bvModal.hide("modal-create");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getRisks();
+                    // Cargamos de nuevo la tabla de escenarios críticos
+                    this.getCrisisScenarios();
                 })
                 .catch((err) => {
                     try {
@@ -480,8 +491,8 @@ export default {
          */
         handleSubmitUpdate() {
             // Inicializamos variables de estados
-            this.riskState.name = null;
-            this.riskState.description = null;
+            this.crisisState.name = null;
+            this.crisisState.description = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -494,22 +505,17 @@ export default {
             });
         },
         async show_modal_update(id) {
-            this.riskId = id;
+            this.crisisId = id;
 
-            console.log("id actualizar");
-            console.log(id);
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/risk/${id}/`, {
+                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${id}/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.risk = res.data;
-                    console.log(res);
-                    console.log(res.data);
-                    console.log(this.risk);
+                    this.crisisScenario = res.data;
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -533,11 +539,11 @@ export default {
                     }
                 });
         },
-        async updateRisk() {
+        async updateCrisisScenario() {
             axios
                 .patch(
-                    `${SERVER_ADDRESS}/api/phase1/risk/${this.riskId}/`,
-                    this.risk,
+                    `${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.crisisId}/`,
+                    this.crisisScenario,
                     {
                         withCredentials: true,
                         headers: {
@@ -548,7 +554,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El riesgo ha sido actualizado exitosamente"
+                        "El escenario crítico ha sido actualizado exitosamente"
                     );
 
                     //Ocultamos los modales
@@ -557,8 +563,8 @@ export default {
                         this.$bvModal.hide("modal-update");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getRisks();
+                    // Cargamos de nuevo la tabla de escenario crítico
+                    this.getCrisisScenarios();
                 })
                 .catch((err) => {
                     try {
@@ -583,23 +589,26 @@ export default {
          * Delete
          */
         show_modal_delete(id) {
-            this.riskId = id;
+            this.crisisId = id;
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-delete");
             });
         },
-        async deleteRisk() {
+        async deleteCrisisScenario() {
             axios
-                .delete(`${SERVER_ADDRESS}/api/phase1/risk/${this.riskId}/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
+                .delete(
+                    `${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.crisisId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "El riesgo ha sido eliminado exitosamente"
+                        "El escenario crítico ha sido eliminado exitosamente"
                     );
 
                     //Ocultamos los modales
@@ -607,8 +616,8 @@ export default {
                         this.$bvModal.hide("modal-confirm-delete");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getRisks();
+                    // Cargamos de nuevo la tabla de escenarios críticos
+                    this.getCrisisScenarios();
                 })
                 .catch((err) => {
                     try {
@@ -629,54 +638,16 @@ export default {
                     }
                 });
         },
-    },
-
-    /**
-     * Ejemplo con data para las tarjetas del comienzo
-     */
-    /*
-    components: {
-        StatsCard,
-    },
-    data() {
-        return {
-      statsCards: [
-        {
-          type: "warning",
-          icon: "ti-server",
-          title: "Capacity",
-          value: "105GB",
-          footerText: "Updated now",
-          footerIcon: "ti-reload"
+        /**
+         * Associate risks with the crisis scenario
+         */
+        show_modal_association(id) {
+            this.crisisId = id;
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-associate-risks");
+            });
         },
-        {
-          type: "success",
-          icon: "ti-wallet",
-          title: "Revenue",
-          value: "$1,345",
-          footerText: "Last day",
-          footerIcon: "ti-calendar"
-        },
-        {
-          type: "danger",
-          icon: "ti-pulse",
-          title: "Errors",
-          value: "23",
-          footerText: "In the last hour",
-          footerIcon: "ti-timer"
-        },
-        {
-          type: "info",
-          icon: "ti-twitter-alt",
-          title: "Followers",
-          value: "+45",
-          footerText: "Updated now",
-          footerIcon: "ti-reload"
-        }
-      ],
-      };
     },
-      */
 };
 </script>
 <style lang="scss">
