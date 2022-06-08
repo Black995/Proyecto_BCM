@@ -49,6 +49,7 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        title="Detalle del escenario crítico"
                                         pill
                                         variant="info"
                                         @click="
@@ -60,6 +61,7 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        title="Actualizar escenario crítico"
                                         pill
                                         variant="warning"
                                         @click="
@@ -72,6 +74,7 @@
                                     </b-button>
                                     <b-button
                                         pill
+                                        title="Eliminar escenario crítico"
                                         variant="danger"
                                         @click="
                                             show_modal_delete(slotProps.data.id)
@@ -83,6 +86,7 @@
                                     </b-button>
                                     <b-button
                                         pill
+                                        title="Asociar riesgos"
                                         variant="primary"
                                         @click="
                                             show_modal_association(
@@ -120,25 +124,31 @@
             size="lg"
             centered
         >
-            <b-card :title="crisisScenarioDetail.name" class="mb-2">
-                <b-card-text>
-                    {{ crisisScenarioDetail.description }}
-                </b-card-text>
+            <h3 class="text-center font-weight-bold">
+                {{ crisisScenarioDetail.name }}
+            </h3>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Descripción: </strong
+                    >{{ crisisScenarioDetail.description }}
+                </li>
+            </ul>
 
-                <h4 class="mt-3 text-center">Riesgos del escenario crítico</h4>
+            <h4 class="mt-3 text-center font-weight-bold">
+                Riesgos del escenario crítico
+            </h4>
 
-                <b-list-group-item
-                    class="mt-2 flex-column align-items-start"
-                    v-for="item in crisisScenarioDetail._risks"
-                    :key="item.key"
-                >
-                    <h5 class="mb-1">{{ item.name }}</h5>
+            <b-list-group-item
+                class="mt-2 flex-column align-items-start"
+                v-for="item in crisisScenarioDetail._risks"
+                :key="item.key"
+            >
+                <h5 class="mb-1">{{ item.name }}</h5>
 
-                    <p class="mb-1">
-                        {{ item.description }}
-                    </p>
-                </b-list-group-item>
-            </b-card>
+                <p class="mb-1">
+                    {{ item.description }}
+                </p>
+            </b-list-group-item>
 
             <template #modal-footer>
                 <div class="w-100">
@@ -940,8 +950,4 @@ export default {
 };
 </script>
 <style lang="scss">
-.header-table {
-    background-color: rgb(17, 17, 17);
-    color: rgb(255, 255, 255);
-}
 </style>

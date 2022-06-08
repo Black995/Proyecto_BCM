@@ -1,19 +1,49 @@
 <template>
-    <div :class="{ 'nav-open': $sidebar.showSidebar }">
+    <!--
+        Se coloca la clase 'login' cuando la vista actual sea el Login, con el fin de poder colocar 
+        el fondo de pantalla del login
+    -->
+    <div
+        :class="{
+            'nav-open': $sidebar.showSidebar,
+            login: $route.name == 'Login',
+        }"
+    >
         <notifications></notifications>
         <router-view></router-view>
     </div>
 </template>
 
+
 <script>
-export default {};
+export default {
+    name: "App",
+
+    data: () => ({
+        loginActive: false,
+    }),
+
+    mounted() {
+        console.log("ruta actual");
+        console.log(this.$route.name);
+    },
+    methods: {},
+};
 </script>
 
-<!-- New step!
-     Add Multiselect CSS. Can be added as a static asset or inside a component. -->
+<!-- Librería para el multiselect -->
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style lang="scss">
+.login {
+    background-image: url("./assets/img/business_image.jpg");
+    background-repeat: no-repeat;
+    /* Full height */
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+}
+
 .vue-notifyjs.notifications {
     .alert {
         z-index: 10000;

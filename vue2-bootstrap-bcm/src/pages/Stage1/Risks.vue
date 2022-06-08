@@ -674,8 +674,4 @@ export default {
 };
 </script>
 <style lang="scss">
-.header-table {
-    background-color: rgb(17, 17, 17);
-    color: rgb(255, 255, 255);
-}
 </style>

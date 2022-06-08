@@ -2,27 +2,39 @@
     <div class="wrapper">
         <side-bar>
             <template slot="links">
-                <sidebar-link to="/riesgos" name="Riesgos" icon="ti-panel" />
                 <sidebar-link
-                    to="/escenarios-criticos"
+                    to="/layout/riesgos"
+                    name="Riesgos"
+                    icon="ti-stats-down"
+                />
+                <sidebar-link
+                    to="/layout/escenarios-criticos"
                     name="Escenarios Críticos"
                     icon="ti-panel"
                 />
-                <sidebar-link to="/stats" name="User Profile" icon="ti-user" />
                 <sidebar-link
-                    to="/table-list"
+                    to="/layout/stats"
+                    name="User Profile"
+                    icon="ti-user"
+                />
+                <sidebar-link
+                    to="/layout/table-list"
                     name="Table List"
                     icon="ti-view-list-alt"
                 />
                 <sidebar-link
-                    to="/typography"
+                    to="/layout/typography"
                     name="Typography"
                     icon="ti-text"
                 />
-                <sidebar-link to="/icons" name="Icons" icon="ti-pencil-alt2" />
-                <sidebar-link to="/maps" name="Map" icon="ti-map" />
                 <sidebar-link
-                    to="/notifications"
+                    to="/layout/icons"
+                    name="Icons"
+                    icon="ti-pencil-alt2"
+                />
+                <sidebar-link to="/layout/maps" name="Map" icon="ti-map" />
+                <sidebar-link
+                    to="/layout/notifications"
                     name="Notifications"
                     icon="ti-bell"
                 />

@@ -35,12 +35,16 @@
                             >Another notification</a
                         >
                     </drop-down>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="ti-settings"></i>
-                            <p>Settings</p>
-                        </a>
-                    </li>
+                    <drop-down
+                        class="nav-item"
+                        title="Configuraciones"
+                        title-classes="nav-link"
+                        icon="ti-settings"
+                    >
+                        <a class="dropdown-item" href="#" @click="logout"
+                            >Cerrar sesión</a
+                        >
+                    </drop-down>
                 </ul>
             </div>
         </div>
@@ -74,6 +78,13 @@ export default {
         },
         hideSidebar() {
             this.$sidebar.displaySidebar(false);
+        },
+
+        logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("isLoggedin");
+
+            this.$router.push("/");
         },
     },
 };
