@@ -17,6 +17,8 @@ import TableList from "@/pages/TableList.vue";
 // Stage 1
 import Risks from "@/pages/Stage1/Risks.vue";
 import CrisisScenarios from "@/pages/Stage1/CrisisScenarios.vue";
+import ServicesOffered from "@/pages/Stage2/ServicesOffered.vue";
+import ServicesUsed from "@/pages/Stage2/ServicesUsed.vue";
 
 
 const routes = [
@@ -39,6 +41,16 @@ const routes = [
         path: "escenarios-criticos",
         name: "Escenarios Críticos",
         component: CrisisScenarios
+      },
+      {
+        path: "servicios-ofrecidos",
+        name: "Servicios Ofrecidos",
+        component: ServicesOffered
+      },
+      {
+        path: "servicios-usados",
+        name: "Servicios Usados",
+        component: ServicesUsed
       },
       {
         path: "stats",

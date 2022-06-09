@@ -17,6 +17,7 @@
                             :reorderableColumns="true"
                             :loading="loading"
                             :globalFilterFields="['name', 'description']"
+                            :filters="filterGlobal"
                         >
                             <template #header>
                                 <b-row class="justify-content-between">
@@ -34,7 +35,9 @@
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
                                             <InputText
-                                                v-model="filterGlobal"
+                                                v-model="
+                                                    filterGlobal['global'].value
+                                                "
                                                 placeholder="Buscar..."
                                             />
                                         </span>
@@ -84,6 +87,7 @@
             </div>
             <!-- /.col -->
         </div>
+        <div class="row"></div>
 
         <!--
             Modal de crear  
@@ -277,8 +281,6 @@
           </div>
         </div-->
         <!--Charts-->
-        <div class="row"></div>
-        <!-- /.row -->
     </div>
 </template>
 <script>
@@ -291,7 +293,6 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
-
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 
 export default {
@@ -299,9 +300,11 @@ export default {
 
     data: () => ({
         loading: false,
-        filterGlobal: null,
+        filterGlobal: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        },
 
-        // Variables para maanejar los modales
+        // Variables para manejar los modales
         show_modal_create: false,
 
         risks: [],

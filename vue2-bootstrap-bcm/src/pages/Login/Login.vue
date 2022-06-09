@@ -94,12 +94,13 @@ export default {
                         /**
                          * Se guarda el token en local storage (provisionalmente)
                          */
+                        localStorage.clear();
+
                         localStorage.setItem("token", res.data.access);
                         localStorage.setItem("isLoggedin", true);
 
-                        setTimeout(() => {
-                            this.$router.push("/layout/riesgos");
-                        }, 2000);
+                        this.$router.push("/layout/riesgos");
+                        location.reload();
                     }
                 })
                 .catch((err) => {

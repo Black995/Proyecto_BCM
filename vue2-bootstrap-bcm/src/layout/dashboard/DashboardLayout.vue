@@ -13,6 +13,16 @@
                     icon="ti-panel"
                 />
                 <sidebar-link
+                    to="/layout/servicios-usados"
+                    name="Servicios Usados"
+                    icon="ti-dropbox"
+                />
+                <sidebar-link
+                    to="/layout/servicios-ofrecidos"
+                    name="Servicios Ofrecidos"
+                    icon="ti-desktop"
+                />
+                <sidebar-link
                     to="/layout/stats"
                     name="User Profile"
                     icon="ti-user"

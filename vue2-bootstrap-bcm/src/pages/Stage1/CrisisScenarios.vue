@@ -17,6 +17,7 @@
                             :reorderableColumns="true"
                             :loading="loading"
                             :globalFilterFields="['name', 'description']"
+                            :filters="filterGlobal"
                         >
                             <template #header>
                                 <b-row class="justify-content-between">
@@ -34,7 +35,9 @@
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
                                             <InputText
-                                                v-model="filterGlobal"
+                                                v-model="
+                                                    filterGlobal['global'].value
+                                                "
                                                 placeholder="Buscar..."
                                             />
                                         </span>
@@ -113,6 +116,7 @@
             </div>
             <!-- /.col -->
         </div>
+        <div class="row"></div>
 
         <!--
             Modal del detalle  
@@ -415,8 +419,6 @@
                 </div>
             </template>
         </b-modal>
-
-        <div class="row"></div>
     </div>
 </template>
 <script>
@@ -434,7 +436,9 @@ export default {
     },
     data: () => ({
         loading: false,
-        filterGlobal: null,
+        filterGlobal: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        },
 
         // Variables para maanejar los modales
         show_modal_create: false,
@@ -530,8 +534,7 @@ export default {
         },
         initFilters1() {
             this.filterGlobal = {
-                value: null,
-                matchMode: FilterMatchMode.CONTAINS,
+                global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             };
         },
 

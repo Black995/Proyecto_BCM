@@ -22,12 +22,6 @@ export default {
     data: () => ({
         loginActive: false,
     }),
-
-    mounted() {
-        console.log("ruta actual");
-        console.log(this.$route.name);
-    },
-    methods: {},
 };
 </script>
 
