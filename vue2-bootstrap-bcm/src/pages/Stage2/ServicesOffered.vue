@@ -81,7 +81,10 @@
                                         pill
                                         variant="warning"
                                         @click="
-                                            show_modal_update(slotProps.data.id)
+                                            show_modal_update(
+                                                slotProps.data.id,
+                                                slotProps.data.type_name
+                                            )
                                         "
                                     >
                                         <font-awesome-icon
@@ -106,7 +109,7 @@
                             </Column>
 
                             <template #empty>
-                                No hay riesgos encontrados.
+                                No hay productos / servicios encontrados.
                             </template>
                         </DataTable>
                     </div>
@@ -281,6 +284,166 @@
         </b-modal>
 
         <!--
+            Modal de actualizar  
+        -->
+        <b-modal
+            id="modal-update"
+            title="Editar producto / servicio ofrecido"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
+                <b-form-group
+                    label="Ingrese el título del producto / servicio"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="serviceState.name"
+                >
+                    <b-form-input
+                        v-model="service.name"
+                        :state="serviceState.name"
+                        required
+                    ></b-form-input>
+                </b-form-group>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Seleccione el tipo"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.type"
+                        >
+                            <b-form-select
+                                v-model="service.type"
+                                :options="types"
+                                value-field="value"
+                                text-field="name"
+                                :state="serviceState.type"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese la ganacia (en dólares)"
+                            invalid-feedback="La ganancia no puede ser negativa ni cero"
+                            :state="serviceState.profit"
+                        >
+                            <b-form-input
+                                type="number"
+                                v-model.number="service.profit"
+                                :state="serviceState.profit"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            label="Tiempo de recuperación"
+                            invalid-feedback="Este campo es obligatorio"
+                        >
+                            <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
+                                <b-col>
+                                    <b-form-group label="Días">
+                                        <b-form-input
+                                            type="number"
+                                            v-model.number="duration.days"
+                                        ></b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group label="Horas">
+                                        <b-form-select
+                                            v-model="duration.hours"
+                                            :options="hours"
+                                            label="Horas"
+                                        ></b-form-select>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group label="Minutos">
+                                        <b-form-select
+                                            v-model="duration.minutes"
+                                            :options="minutes"
+                                            label="Minutos"
+                                        ></b-form-select>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Seleccione el área asociada a este producto / servicio"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.area"
+                        >
+                            <b-form-select
+                                v-model="service.area"
+                                :options="areas"
+                                value-field="id"
+                                text-field="name"
+                                :state="serviceState.area"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-form-group label="Ingrese la criticidad">
+                    <b-form-spinbutton
+                        v-model.number="service.criticality"
+                        :min="scaleView.scale_min_value"
+                        :max="scaleView.scale_max_value"
+                    ></b-form-spinbutton>
+                </b-form-group>
+                <b-row>
+                    <b-col>
+                        <p class="mb-1">
+                            <strong
+                                >Escala a utilizar para la criticidad: </strong
+                            >{{ scaleView.scale_name }}
+                        </p>
+                    </b-col>
+                </b-row>
+            </form>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="handleSubmitUpdate"
+                    >
+                        Editar producto / servicio ofrecido
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar actualizar  
+        -->
+        <b-modal
+            id="modal-confirm-update"
+            title="Confirmar actualizar producto / servicio"
+            centered
+        >
+            <h4>¿Está seguro de actualizar este {{ type }} ofrecido?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="updateService"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
             Modal de confirmar eliminar  
         -->
         <b-modal
@@ -310,7 +473,11 @@ import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
 import Multiselect from "vue-multiselect";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
-import { getRecoveryTimeText, setRecoveryTime } from "../../helpers/helpers";
+import {
+    getRecoveryTimeText,
+    getRecoveryTime,
+    setRecoveryTime,
+} from "../../helpers/helpers";
 
 export default {
     name: "ServicesOffered",
@@ -450,7 +617,6 @@ export default {
                     this.scaleView.scale_max_value = parseInt(
                         this.scaleView.scale_max_value
                     );
-                    console.log(this.scaleView);
                     this.service.criticality = res.data[0].scale_min_value;
                 })
                 .catch((err) => {
@@ -578,8 +744,6 @@ export default {
                 return;
             }
 
-            console.log(this.service);
-
             if (this.service.type == 1) this.type = "producto";
             else this.type = "servicio";
 
@@ -623,7 +787,6 @@ export default {
                     this.getServicesOffered();
                 })
                 .catch((err) => {
-                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
@@ -646,14 +809,128 @@ export default {
         /**
          * Update
          */
-        show_modal_update(id) {},
+        handleSubmitUpdate() {
+            // Inicializamos variables de estados
+            this.serviceState.name = null;
+            this.serviceState.type = null;
+            this.serviceState.profit = null;
+            this.serviceState.area = null;
+
+            // Exit when the form isn't valid
+            if (!this.checkFormValidity()) {
+                return;
+            }
+
+            if (this.service.type == 1) this.type = "producto";
+            else this.type = "servicio";
+
+            // Mostrar modal de confirmar
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-update");
+            });
+        },
+        show_modal_update(id, type_name) {
+            this.serviceId = id;
+            this.type = type_name;
+
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/service/offered/${this.serviceId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    this.service = res.data;
+                    this.duration = getRecoveryTime(res.data.recovery_time);
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-update");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async updateService() {
+            this.service.recovery_time = setRecoveryTime(this.duration);
+            this.service.scale = this.scaleView.id;
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase2/service/offered/${this.serviceId}/`,
+                    this.service,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    let successType = "";
+                    if (this.service.type == 1) successType = "producto";
+                    else successType = "servicio";
+
+                    this.successMessage(
+                        "¡El " +
+                            successType +
+                            " ha sido actualizado exitosamente!"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-update");
+                        this.$bvModal.hide("modal-update");
+                    });
+
+                    // Cargamos de nuevo la tabla de escenario crítico
+                    this.getServicesOffered();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
         /**
          * Delete
          */
         show_modal_delete(id, type_name) {
             this.serviceId = id;
             this.type = type_name;
-            console.log(this.serviceId);
+
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-delete");
             });
@@ -683,21 +960,17 @@ export default {
                     });
                 })
                 .catch((err) => {
-                    console.log(err);
                     try {
-                        console.log("try");
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
                             this.errorMessage(err.response.data);
                         } else {
-                            console.log("else");
                             // Servidor no disponible
                             this.errorMessage(
                                 "Ups! Ha ocurrido un error en el servidor"
                             );
                         }
                     } catch {
-                        console.log("catch");
                         // Servidor no disponible
                         this.errorMessage(
                             "Ups! Ha ocurrido un error en el servidor"

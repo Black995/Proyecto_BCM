@@ -1,4 +1,4 @@
-from bcm_phase2.models import ServiceOffered
+from bcm_phase2.models import ServiceOffered, ServiceUsed
 from rest_framework import serializers
 from django.db.models import F, Q
 
@@ -53,3 +53,41 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
 
     def get_type_name(self, obj):
         return dict(ServiceOffered.TYPE).get(obj.type)
+
+
+class ServiceUsedListSerializer(serializers.ModelSerializer):
+    scale_max_value = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = ServiceUsed
+        fields = [
+            'id',
+            'name',
+            'spending',
+            'recovery_time',
+            'criticality',
+            'scale_max_value',
+        ]
+
+
+class ServiceUsedSerializer(serializers.ModelSerializer):
+    scale_name = serializers.CharField(read_only=True)
+    scale_min_value = serializers.CharField(read_only=True)
+    scale_max_value = serializers.CharField(read_only=True)
+    # Serializer aninado
+    _services_offered = ServiceOfferedSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ServiceUsed
+        fields = [
+            'id',
+            'name',
+            'spending',
+            'recovery_time',
+            'criticality',
+            'scale',
+            'scale_name',
+            'scale_min_value',
+            'scale_max_value',
+            '_services_offered'
+        ]
