@@ -19,6 +19,7 @@ import Risks from "@/pages/Stage1/Risks.vue";
 import CrisisScenarios from "@/pages/Stage1/CrisisScenarios.vue";
 import ServicesOffered from "@/pages/Stage2/ServicesOffered.vue";
 import ServicesUsed from "@/pages/Stage2/ServicesUsed.vue";
+import Areas from "@/pages/Configuration/Areas.vue";
 
 
 const routes = [
@@ -32,6 +33,9 @@ const routes = [
     component: DashboardLayout,
     redirect: "/dashboard",
     children: [
+      /**
+       * Phase 1
+       */
       {
         path: "riesgos",
         name: "Riesgos",
@@ -42,6 +46,9 @@ const routes = [
         name: "Escenarios Críticos",
         component: CrisisScenarios
       },
+      /**
+       * Phase 2
+       */
       {
         path: "servicios-ofrecidos",
         name: "Servicios Ofrecidos",
@@ -52,6 +59,17 @@ const routes = [
         name: "Servicios Usados",
         component: ServicesUsed
       },
+      /**
+       * Configuration
+       */
+      {
+        path: "areas",
+        name: "Areas de la Organización",
+        component: Areas
+      },
+      /**
+       * Additional
+       */
       {
         path: "stats",
         name: "stats",

@@ -23,6 +23,11 @@
                     icon="ti-desktop"
                 />
                 <sidebar-link
+                    to="/layout/areas"
+                    name="Areas de la Organización"
+                    icon="ti-menu-alt"
+                />
+                <!--sidebar-link
                     to="/layout/stats"
                     name="User Profile"
                     icon="ti-user"
@@ -47,7 +52,7 @@
                     to="/layout/notifications"
                     name="Notifications"
                     icon="ti-bell"
-                />
+                /-->
             </template>
             <mobile-menu>
                 <li class="nav-item">
