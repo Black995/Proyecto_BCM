@@ -1,16 +1,11 @@
 from django.db import models
 from configuration.models import Staff, Headquarter
-from bcm_phase2.models import ServiceUsed, OrganizationActivity
 
 
 class Risk(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=200)
 
-    services_offered = models.ManyToManyField(
-        ServiceUsed, related_name='service_used_risk')
-    organizacion_activities = models.ManyToManyField(
-        OrganizationActivity, related_name='organizacion_activity_risk')
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_risk')
     staffs = models.ManyToManyField(
@@ -25,7 +20,7 @@ class CrisisScenario(models.Model):
         Headquarter, related_name='headquarter_crisis_scenario')
     _risks = models.ManyToManyField(
         Risk, related_name='crisis_scenario_risk', db_column='risks')
-    
+
     @property
     def risks(self):
         return self._risks.values_list(flat=True)
@@ -40,4 +35,3 @@ class CrisisScenario(models.Model):
                 risk = Risk.objects.filter(id=risk_id).first()
                 if(risk is not None):
                     self._risks.add(risk)
-

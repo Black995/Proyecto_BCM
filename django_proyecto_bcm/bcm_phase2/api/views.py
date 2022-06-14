@@ -9,7 +9,7 @@ from django.db.models import Q, F
 class ServiceOfferedListViewSet(viewsets.ModelViewSet):
     model = ServiceOffered
     queryset = ServiceOffered.objects.annotate(area_name=F(
-        'area__name'), scale_max_value=F('scale__max_value'))
+        'area__name'), scale_max_value=F('scale__max_value')).order_by('name')
     serializer_class = ServiceOfferedListSerializer
 
 
@@ -23,7 +23,7 @@ class ServiceOfferedViewSet(viewsets.ModelViewSet):
 class ServiceUsedListViewSet(viewsets.ModelViewSet):
     model = ServiceUsed
     queryset = ServiceUsed.objects.annotate(
-        scale_max_value=F('scale__max_value'))
+        scale_max_value=F('scale__max_value')).order_by('name')
     serializer_class = ServiceUsedListSerializer
 
 

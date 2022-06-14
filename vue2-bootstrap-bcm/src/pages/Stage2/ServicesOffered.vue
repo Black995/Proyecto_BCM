@@ -30,6 +30,7 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            title="Crear producto / servicio"
                                             variant="success"
                                             @click="show_modal_create = true"
                                         >
@@ -78,6 +79,7 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        title="Editar producto / servicio"
                                         pill
                                         variant="warning"
                                         @click="
@@ -92,6 +94,7 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        title="Eliminar producto / servicio"
                                         pill
                                         variant="danger"
                                         @click="
@@ -127,7 +130,7 @@
         <b-modal
             v-model="show_modal_create"
             id="modal-create"
-            title="Crear producto / servicio ofrecido"
+            title="Crear producto / servicio"
             ref="modal"
             size="lg"
             centered
@@ -255,7 +258,7 @@
                         class="float-right"
                         @click="handleSubmitCreate"
                     >
-                        Crear producto / servicio ofrecido
+                        Crear producto / servicio
                     </b-button>
                 </div>
             </template>
@@ -284,11 +287,12 @@
         </b-modal>
 
         <!--
-            Modal de actualizar  
+            Modal de editar  
         -->
+
         <b-modal
             id="modal-update"
-            title="Editar producto / servicio ofrecido"
+            title="Editar producto / servicio"
             ref="modal"
             size="lg"
             centered
@@ -415,21 +419,21 @@
                         class="float-right"
                         @click="handleSubmitUpdate"
                     >
-                        Editar producto / servicio ofrecido
+                        Editar servicio
                     </b-button>
                 </div>
             </template>
         </b-modal>
 
         <!--
-            Modal de confirmar actualizar  
+            Modal de confirmar editar  
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar actualizar producto / servicio"
+            title="Confirmar editar producto / servicio"
             centered
         >
-            <h4>¿Está seguro de actualizar este {{ type }} ofrecido?</h4>
+            <h4>¿Está seguro de editar este {{ type }} ofrecido?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -448,7 +452,7 @@
         -->
         <b-modal
             id="modal-confirm-delete"
-            title="Confirmar eliminar riesgo"
+            title="Confirmar eliminar producto / servicio"
             centered
         >
             <h4>¿Está seguro de eliminar este {{ type }} ofrecido?</h4>
@@ -754,7 +758,7 @@ export default {
         },
         async createService() {
             this.service.recovery_time = setRecoveryTime(this.duration);
-            this.service.scale = this.scaleView.id;
+            this.service.scale = this.scaleView.scale;
 
             axios
                 .post(
@@ -783,7 +787,6 @@ export default {
                         this.$bvModal.hide("modal-create");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
                     this.getServicesOffered();
                 })
                 .catch((err) => {
@@ -871,7 +874,7 @@ export default {
         },
         async updateService() {
             this.service.recovery_time = setRecoveryTime(this.duration);
-            this.service.scale = this.scaleView.id;
+            this.service.scale = this.scaleView.scale;
 
             axios
                 .patch(
