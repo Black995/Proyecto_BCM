@@ -24,8 +24,13 @@
                 />
                 <sidebar-link
                     to="/layout/areas"
-                    name="Areas de la Organización"
+                    name="Areas de la Org."
                     icon="ti-menu-alt"
+                />
+                <sidebar-link
+                    to="/layout/escalas"
+                    name="Escalas"
+                    icon="ti-ruler-alt"
                 />
                 <!--sidebar-link
                     to="/layout/stats"

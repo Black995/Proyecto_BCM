@@ -23,6 +23,7 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            title="Crear área"
                                             variant="success"
                                             @click="show_modal_create = true"
                                         >
@@ -49,6 +50,7 @@
                             <Column field="id_2" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        title="Editar área"
                                         pill
                                         variant="warning"
                                         @click="
@@ -60,6 +62,7 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        title="Eliminar área"
                                         pill
                                         variant="danger"
                                         @click="
@@ -150,7 +153,7 @@
         </b-modal>
 
         <!--
-            Modal de actualizar  
+            Modal de editar  
         -->
         <b-modal
             id="modal-update"
@@ -189,14 +192,14 @@
         </b-modal>
 
         <!--
-            Modal de confirmar actualizar  
+            Modal de confirmar editar  
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar actualizar área"
+            title="Confirmar editar área"
             centered
         >
-            <h4>¿Está seguro de actualizar esta área de la organización?</h4>
+            <h4>¿Está seguro de editar esta área de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
