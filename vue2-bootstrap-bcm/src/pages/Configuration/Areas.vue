@@ -196,7 +196,7 @@
             title="Confirmar actualizar área"
             centered
         >
-            <h4>¿Está seguro de actualizar este área de la organización?</h4>
+            <h4>¿Está seguro de actualizar esta área de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
