@@ -18,11 +18,19 @@
                     icon="ti-desktop"
                 />
                 <sidebar-link
+<<<<<<< HEAD
                     to="/layout/servicios-usados"
                     name="Servicios Usados"
                     icon="ti-dropbox"
                 />
                 <sidebar-link
+=======
+                    to="/layout/areas"
+                    name="Areas de la Organización"
+                    icon="ti-menu-alt"
+                />
+                <!--sidebar-link
+>>>>>>> develop
                     to="/layout/stats"
                     name="User Profile"
                     icon="ti-user"
@@ -47,7 +55,7 @@
                     to="/layout/notifications"
                     name="Notifications"
                     icon="ti-bell"
-                />
+                /-->
             </template>
             <mobile-menu>
                 <li class="nav-item">
