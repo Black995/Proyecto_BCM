@@ -23,6 +23,13 @@ class CrisisScenarioListViewSet(viewsets.ModelViewSet):
     queryset = CrisisScenario.objects.all().order_by('name')
     serializer_class = CrisisScenarioListSerializer
 
+class CrisisScenarioListRisksViewSet(viewsets.ModelViewSet):
+    model = CrisisScenario
+    queryset = CrisisScenario.objects.all()
+    serializer_class = CrisisScenarioSerializer
+
+
+
 
 # Ejemplo de ViewSet (no de ModelViewSet)
 """

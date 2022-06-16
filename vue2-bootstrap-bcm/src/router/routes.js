@@ -20,6 +20,7 @@ import CrisisScenarios from "@/pages/Stage1/CrisisScenarios.vue";
 // Stage 2
 import ServicesOffered from "@/pages/Stage2/ServicesOffered.vue";
 import ServicesUsed from "@/pages/Stage2/ServicesUsed.vue";
+import Staffs from "@/pages/Stage2/Staffs.vue";
 // Stage 3
 
 // Configuration
@@ -63,6 +64,11 @@ const routes = [
         path: "servicios-usados",
         name: "Servicios Usados",
         component: ServicesUsed
+      },
+      {
+        path: "personal",
+        name: "Personal de la Organización",
+        component: Staffs
       },
       /**
        * Configuration

@@ -112,15 +112,12 @@
                                     </b-button>
                                 </template>
                             </Column>
-                            <Column
-                                field="id_2"
-                                header="Asociar productos / servicios"
-                            >
+                            <Column field="id_2" header="Asociar servicios">
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
                                             pill
-                                            title="Asociar productos / servicios ofrecidos"
+                                            title="Asociar servicios de la organización"
                                             variant="primary"
                                             @click="
                                                 show_modal_association_services(
@@ -206,7 +203,7 @@
                 </li>
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
-                Productos / servicios del servicio ofrecido
+                Servicios de la organización usados por el servicio contratado
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -227,9 +224,16 @@
                     </div>
                 </div>
             </b-list-group-item>
+            <h3
+                class="mt-3 text-center"
+                v-if="!serviceDetail._services_offered.length"
+            >
+                No existen servicios de la organización asociados a este
+                servicio contratado
+            </h3>
 
             <h4 class="mt-5 text-center font-weight-bold">
-                Riesgos del servicio ofrecido
+                Riesgos del servicios de la organización
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -239,6 +243,12 @@
                 <h5 class="mb-1">{{ item.name }}</h5>
                 <p class="mb-1">Descripción: {{ item.description }}</p>
             </b-list-group-item>
+            <h3
+                class="mt-3 text-center"
+                v-if="!serviceDetail._services_offered.length"
+            >
+                No existen riesgos asociados a este servicio contratado
+            </h3>
 
             <template #modal-footer>
                 <div class="w-100">
@@ -529,18 +539,18 @@
         </b-modal>
 
         <!--
-            Modal de asociar servicios ofrecidos con servicios usados  
+            Modal de asociar servicios de la organización con servicios contratado  
         -->
         <b-modal
             id="modal-associate-services"
-            title="Asociar productos / servicios ofrecidos con servicios usados"
+            title="Asociar servicios de la organización con servicios contratados"
             ref="modal"
             size="lg"
             centered
         >
             <multiselect
                 v-model="selectedServicesOffered"
-                placeholder="Buscar productos / servicios"
+                placeholder="Buscar servicios de la organización"
                 label="name"
                 track-by="id"
                 :options="servicesOffered"
@@ -574,7 +584,8 @@
             </b-list-group>
 
             <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
-                No existen servicios ofrecidos asociados a este servicio usado
+                No existen servicios de la organización asociados a este
+                servicio contratado
             </h3>
 
             <template #modal-footer>
@@ -584,7 +595,7 @@
                         class="float-right"
                         @click="show_modal_confirm_association_services"
                     >
-                        Asociar productos / servicios
+                        Asociar servicios de la organización
                     </b-button>
                 </div>
             </template>
@@ -595,11 +606,12 @@
         -->
         <b-modal
             id="modal-confirm-associate-services"
-            title="Confirmar asociar productos / servicios"
+            title="Confirmar asociar servicios de la organización"
             centered
         >
             <h4>
-                ¿Está seguro de asociar estos productos / servicios al servicio
+                ¿Está seguro de asociar estos servicios de la organización al
+                servicio
                 <strong>{{ serviceName }}</strong
                 >?
             </h4>
@@ -617,22 +629,33 @@
         </b-modal>
 
         <!--
-            Modal de asociar servicios ofrecidos con servicios usados  
+            Modal de asociar riesgos con servicios contratados
         -->
         <b-modal
             id="modal-associate-risks"
-            title="Asociar riesgos con servicios usados"
+            title="Asociar riesgos con servicios contratados"
             ref="modal"
             size="lg"
             centered
         >
-            <multiselect
+            <!--multiselect
                 v-model="selectedRisks"
                 placeholder="Buscar riesgos"
                 label="name"
                 track-by="id"
                 :options="risks"
                 :multiple="true"
+            ></multiselect-->
+            <multiselect
+                v-model="selectedRisks"
+                placeholder="Buscar riesgos"
+                label="name"
+                track-by="id"
+                :options="crisisScenarioRisks"
+                :multiple="true"
+                group-label="name"
+                group-values="_risks"
+                :group-select="true"
             ></multiselect>
 
             <b-list-group v-if="selectedRisks.length" class="mt-3">
@@ -648,7 +671,7 @@
             </b-list-group>
 
             <h3 class="mt-3 text-center" v-if="!selectedRisks.length">
-                No existen riesgos asociados a este servicio usado
+                No existen riesgos asociados a este servicio contratado
             </h3>
 
             <template #modal-footer>
@@ -763,12 +786,13 @@ export default {
             scale_max_value: 0,
         },
 
-        // Lista de servicios ofrecidos para realizar la asociación
+        // Lista de servicios de la organización para realizar la asociación
         servicesOffered: [],
         selectedServicesOffered: [],
         // Lista de riesgos para realizar la asociación
         risks: [],
         selectedRisks: [],
+        crisisScenarioRisks: [],
     }),
     mounted() {
         this.getServicesUsed();
@@ -798,7 +822,7 @@ export default {
         async getScaleView() {
             axios
                 .get(`${SERVER_ADDRESS}/api/config/scales/view/`, {
-                    params: { name: "Servicios Usados" },
+                    params: { name: "Servicios Contratados" },
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
@@ -855,9 +879,10 @@ export default {
                     }
                     this.loading = false;
 
-                    // Mientras tanto vamos cargando la lista de servicios ofrecidos y riesgos
+                    // Mientras tanto vamos cargando la lista de servicios de la organización y riesgos
                     this.getServicesOffered();
                     this.getRisks();
+                    this.getCrisisScenarioRisks();
                 })
                 .catch((err) => {
                     try {
@@ -1320,7 +1345,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡Los productos / servicios ofrecidos fueron asociados al servicio usado exitosamente!"
+                        "¡Los servicios de la organización fueron asociados al servicio contratado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -1360,6 +1385,45 @@ export default {
                 })
                 .then((res) => {
                     this.risks = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getCrisisScenarioRisks() {
+            this.crisisScenarioRisks = [];
+
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase1/crisis_scenarios_list_risks/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    for (let i = 0; i < res.data.length; i++) {
+                        res.data[i].name =
+                            "Escenario crítico: " + res.data[i].name;
+                        this.crisisScenarioRisks.push(res.data[i]);
+                    }
                 })
                 .catch((err) => {
                     try {
@@ -1421,6 +1485,8 @@ export default {
                 });
         },
         show_modal_confirm_association_risks() {
+            console.log("riesgos seleccionados");
+            console.log(this.selectedRisks);
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-risks");
             });
@@ -1449,7 +1515,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡Los riesgos fueron asociados al servicio usado exitosamente!"
+                        "¡Los riesgos fueron asociados al servicio contratado exitosamente!"
                     );
 
                     //Ocultamos los modales

@@ -88,21 +88,27 @@
                                             icon="fa-solid fa-trash"
                                         />
                                     </b-button>
-                                    <b-button
-                                        pill
-                                        title="Asociar riesgos"
-                                        variant="primary"
-                                        @click="
-                                            show_modal_association(
-                                                slotProps.data.id,
-                                                slotProps.data.name
-                                            )
-                                        "
-                                    >
-                                        <font-awesome-icon
-                                            icon="fa-solid fa-clipboard-list"
-                                        />
-                                    </b-button>
+                                </template>
+                            </Column>
+                            <Column field="id_2" header="Asociar riesgos">
+                                <template #body="slotProps">
+                                    <div class="text-center">
+                                        <b-button
+                                            pill
+                                            title="Asociar riesgos"
+                                            variant="primary"
+                                            @click="
+                                                show_modal_association(
+                                                    slotProps.data.id,
+                                                    slotProps.data.name
+                                                )
+                                            "
+                                        >
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-clipboard-list"
+                                            />
+                                        </b-button>
+                                    </div>
                                 </template>
                             </Column>
 

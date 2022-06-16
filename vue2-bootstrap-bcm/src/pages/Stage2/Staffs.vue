@@ -6,7 +6,7 @@
                     <div class="card-body table-responsive">
                         <DataTable
                             class="header-table"
-                            :value="services"
+                            :value="staffs"
                             responsiveLayout="scroll"
                             :paginator="true"
                             :rows="10"
@@ -17,12 +17,12 @@
                             :reorderableColumns="true"
                             :loading="loading"
                             :globalFilterFields="[
-                                'name',
-                                'type_name',
-                                'recovery_time',
-                                'profit',
-                                'criticality',
+                                'staff_number',
+                                'names',
+                                'surnames',
+                                'earnings',
                                 'area_name',
+                                'position_name',
                             ]"
                             :filters="filterGlobal"
                         >
@@ -30,7 +30,7 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
-                                            title="Crear servicio de la organización"
+                                            title="Crear personal"
                                             variant="success"
                                             @click="show_modal_create = true"
                                         >
@@ -52,41 +52,33 @@
                                     </b-col>
                                 </b-row>
                             </template>
-                            <Column field="name" header="Nombre"></Column>
-                            <Column field="type_name" header="Tipo"></Column>
                             <Column
-                                field="recovery_time"
-                                header="Tiempo de recuperación"
+                                field="staff_number"
+                                header="Número de Staff"
                             ></Column>
-                            <Column field="profit" header="Ganancia">
+                            <Column field="names" header="Nombres"></Column>
+                            <Column
+                                field="surnames"
+                                header="Apellidos"
+                            ></Column>
+                            <Column field="earnings" header="Ingreso promedio">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.profit }}$
-                                </template>
-                            </Column>
-                            <Column field="criticality" header="Criticidad">
-                                <template #body="slotProps">
-                                    <div v-if="!slotProps.data.scale_max_value">
-                                        {{ slotProps.data.criticality }}
-                                    </div>
-                                    <div v-if="slotProps.data.scale_max_value">
-                                        {{ slotProps.data.criticality }}/{{
-                                            slotProps.data.scale_max_value
-                                        }}
-                                    </div>
+                                    {{ slotProps.data.earnings }}$
                                 </template>
                             </Column>
                             <Column field="area_name" header="Area"></Column>
+                            <Column
+                                field="position_name"
+                                header="Cargo"
+                            ></Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
-                                        title="Editar servicio de la organización"
+                                        title="Editar personal"
                                         pill
                                         variant="warning"
                                         @click="
-                                            show_modal_update(
-                                                slotProps.data.id,
-                                                slotProps.data.type_name
-                                            )
+                                            show_modal_update(slotProps.data.id)
                                         "
                                     >
                                         <font-awesome-icon
@@ -94,14 +86,11 @@
                                         />
                                     </b-button>
                                     <b-button
-                                        title="Eliminar servicio de la organización"
+                                        title="Eliminar personal"
                                         pill
                                         variant="danger"
                                         @click="
-                                            show_modal_delete(
-                                                slotProps.data.id,
-                                                slotProps.data.type_name
-                                            )
+                                            show_modal_delete(slotProps.data.id)
                                         "
                                     >
                                         <font-awesome-icon
@@ -112,7 +101,7 @@
                             </Column>
 
                             <template #empty>
-                                No hay servicios encontrados.
+                                No hay personal encontrado.
                             </template>
                         </DataTable>
                     </div>
@@ -130,123 +119,105 @@
         <b-modal
             v-model="show_modal_create"
             id="modal-create"
-            title="Crear servicio de la organización"
+            title="Crear personal"
             ref="modal"
             size="lg"
             centered
             @show="resetModal"
         >
             <form ref="form" @submit.stop.prevent="handleSubmitCreate">
-                <b-form-group
-                    label="Ingrese el título del servicio de la organización"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="serviceState.name"
-                >
-                    <b-form-input
-                        v-model="service.name"
-                        :state="serviceState.name"
-                        required
-                    ></b-form-input>
-                </b-form-group>
                 <b-row>
                     <b-col>
                         <b-form-group
-                            label="Seleccione el tipo"
+                            label="Ingrese los nombres del personal"
                             invalid-feedback="Este campo es obligatorio"
-                            :state="serviceState.type"
+                            :state="staffState.names"
                         >
-                            <b-form-select
-                                v-model="service.type"
-                                :options="types"
-                                value-field="value"
-                                text-field="name"
-                                :state="serviceState.type"
+                            <b-form-input
+                                id="name-input"
+                                v-model="staff.names"
+                                :state="staffState.names"
                                 required
-                            ></b-form-select>
+                            ></b-form-input>
                         </b-form-group>
                     </b-col>
                     <b-col>
                         <b-form-group
-                            label="Ingrese la ganacia (en dólares)"
-                            invalid-feedback="La ganancia no puede ser negativa ni cero"
-                            :state="serviceState.profit"
+                            label="Ingrese los apellidos del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.surnames"
                         >
                             <b-form-input
-                                type="number"
-                                v-model.number="service.profit"
-                                :state="serviceState.profit"
+                                id="name-input"
+                                v-model="staff.surnames"
+                                :state="staffState.surnames"
                                 required
                             ></b-form-input>
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <b-row align-v="center">
+                <b-row>
                     <b-col>
                         <b-form-group
-                            label="Tiempo de recuperación"
+                            label="Ingrese el número de staff del personal"
                             invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.staff_number"
                         >
-                            <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
-                                <b-col>
-                                    <b-form-group label="Días">
-                                        <b-form-input
-                                            type="number"
-                                            v-model.number="duration.days"
-                                        ></b-form-input>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Horas">
-                                        <b-form-select
-                                            v-model="duration.hours"
-                                            :options="hours"
-                                            label="Horas"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Minutos">
-                                        <b-form-select
-                                            v-model="duration.minutes"
-                                            :options="minutes"
-                                            label="Minutos"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                            </b-row>
+                            <b-form-input
+                                id="name-input"
+                                v-model="staff.staff_number"
+                                :state="staffState.staff_number"
+                                required
+                            ></b-form-input>
                         </b-form-group>
                     </b-col>
                     <b-col>
                         <b-form-group
-                            label="Seleccione el área asociada a este servicio de la organización"
+                            label="Seleccione el área a la que pertenece este personal"
                             invalid-feedback="Este campo es obligatorio"
-                            :state="serviceState.area"
+                            :state="staffState.area"
                         >
                             <b-form-select
-                                v-model="service.area"
+                                v-model="staff.area"
                                 :options="areas"
                                 value-field="id"
                                 text-field="name"
-                                :state="serviceState.area"
+                                :state="staffState.area"
                                 required
                             ></b-form-select>
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <b-form-group label="Ingrese la criticidad">
-                    <b-form-spinbutton
-                        v-model.number="service.criticality"
-                        :min="scaleView.scale_min_value"
-                        :max="scaleView.scale_max_value"
-                    ></b-form-spinbutton>
-                </b-form-group>
                 <b-row>
                     <b-col>
-                        <p class="mb-1">
-                            <strong
-                                >Escala a utilizar para la criticidad: </strong
-                            >{{ scaleView.scale_name }}
-                        </p>
+                        <b-form-group
+                            label="Ingrese el ingreso promedio personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.earnings"
+                        >
+                            <b-form-input
+                                id="name-input"
+                                v-model.number="staff.earnings"
+                                :state="staffState.earnings"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Seleccione el cargo del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.position"
+                        >
+                            <b-form-select
+                                v-model="staff.position"
+                                :options="positions"
+                                value-field="id"
+                                text-field="name"
+                                :state="staffState.position"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
                     </b-col>
                 </b-row>
             </form>
@@ -258,7 +229,7 @@
                         class="float-right"
                         @click="handleSubmitCreate"
                     >
-                        Crear servicio de la organización
+                        Crear personal
                     </b-button>
                 </div>
             </template>
@@ -269,16 +240,16 @@
         -->
         <b-modal
             id="modal-confirm-create"
-            title="Confirmar crear servicio de la organización"
+            title="Confirmar crear personal"
             centered
         >
-            <h4>¿Está seguro de crear este {{ type }} ofrecido?</h4>
+            <h4>¿Está seguro de crear esta personal?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="success"
                         class="float-right"
-                        @click="createService"
+                        @click="createStaff"
                     >
                         Confirmar
                     </b-button>
@@ -289,127 +260,26 @@
         <!--
             Modal de editar  
         -->
-
         <b-modal
             id="modal-update"
-            title="Editar servicio de la organización"
+            title="Editar personal"
             ref="modal"
             size="lg"
             centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
                 <b-form-group
-                    label="Ingrese el título del servicio de la organización"
+                    label="Ingrese el nombre del personal"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="serviceState.name"
+                    :state="staffState.names"
                 >
                     <b-form-input
-                        v-model="service.name"
-                        :state="serviceState.name"
+                        id="name-input"
+                        v-model="staff.names"
+                        :state="staffState.names"
                         required
                     ></b-form-input>
                 </b-form-group>
-                <b-row>
-                    <b-col>
-                        <b-form-group
-                            label="Seleccione el tipo"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="serviceState.type"
-                        >
-                            <b-form-select
-                                v-model="service.type"
-                                :options="types"
-                                value-field="value"
-                                text-field="name"
-                                :state="serviceState.type"
-                                required
-                            ></b-form-select>
-                        </b-form-group>
-                    </b-col>
-                    <b-col>
-                        <b-form-group
-                            label="Ingrese la ganacia (en dólares)"
-                            invalid-feedback="La ganancia no puede ser negativa ni cero"
-                            :state="serviceState.profit"
-                        >
-                            <b-form-input
-                                type="number"
-                                v-model.number="service.profit"
-                                :state="serviceState.profit"
-                                required
-                            ></b-form-input>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-                <b-row align-v="center">
-                    <b-col>
-                        <b-form-group
-                            label="Tiempo de recuperación"
-                            invalid-feedback="Este campo es obligatorio"
-                        >
-                            <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
-                                <b-col>
-                                    <b-form-group label="Días">
-                                        <b-form-input
-                                            type="number"
-                                            v-model.number="duration.days"
-                                        ></b-form-input>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Horas">
-                                        <b-form-select
-                                            v-model="duration.hours"
-                                            :options="hours"
-                                            label="Horas"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Minutos">
-                                        <b-form-select
-                                            v-model="duration.minutes"
-                                            :options="minutes"
-                                            label="Minutos"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                            </b-row>
-                        </b-form-group>
-                    </b-col>
-                    <b-col>
-                        <b-form-group
-                            label="Seleccione el área asociada a este servicio de la organización"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="serviceState.area"
-                        >
-                            <b-form-select
-                                v-model="service.area"
-                                :options="areas"
-                                value-field="id"
-                                text-field="name"
-                                :state="serviceState.area"
-                                required
-                            ></b-form-select>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-                <b-form-group label="Ingrese la criticidad">
-                    <b-form-spinbutton
-                        v-model.number="service.criticality"
-                        :min="scaleView.scale_min_value"
-                        :max="scaleView.scale_max_value"
-                    ></b-form-spinbutton>
-                </b-form-group>
-                <b-row>
-                    <b-col>
-                        <p class="mb-1">
-                            <strong
-                                >Escala a utilizar para la criticidad: </strong
-                            >{{ scaleView.scale_name }}
-                        </p>
-                    </b-col>
-                </b-row>
             </form>
 
             <template #modal-footer>
@@ -419,7 +289,7 @@
                         class="float-right"
                         @click="handleSubmitUpdate"
                     >
-                        Editar servicio
+                        Editar personal
                     </b-button>
                 </div>
             </template>
@@ -430,16 +300,16 @@
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar editar servicio de la organización"
+            title="Confirmar editar personal"
             centered
         >
-            <h4>¿Está seguro de editar este {{ type }} ofrecido?</h4>
+            <h4>¿Está seguro de editar este personal?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="warning"
                         class="float-right"
-                        @click="updateService"
+                        @click="updateStaff"
                     >
                         Confirmar
                     </b-button>
@@ -452,16 +322,16 @@
         -->
         <b-modal
             id="modal-confirm-delete"
-            title="Confirmar eliminar servicio de la organización"
+            title="Confirmar eliminar personal"
             centered
         >
-            <h4>¿Está seguro de eliminar este {{ type }} ofrecido?</h4>
+            <h4>¿Está seguro de eliminar este personal?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="danger"
                         class="float-right"
-                        @click="deleteService"
+                        @click="deleteStaff"
                     >
                         Confirmar
                     </b-button>
@@ -475,19 +345,11 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
-import Multiselect from "vue-multiselect";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
-import {
-    getRecoveryTimeText,
-    getRecoveryTime,
-    setRecoveryTime,
-} from "../../helpers/helpers";
 
 export default {
-    name: "ServicesOffered",
-    components: {
-        Multiselect,
-    },
+    name: "Staffs",
+
     data: () => ({
         loading: false,
         filterGlobal: {
@@ -497,64 +359,33 @@ export default {
         // Variables para manejar los modales
         show_modal_create: false,
 
-        services: [],
-        serviceId: 0,
-        type: "",
+        staffs: [],
+        staffId: 0,
 
-        service: {
-            name: "",
-            type: 0,
-            profit: 0,
-            recovery_time: "",
-            criticality: 0,
+        staff: {
+            staff_number: "",
+            names: "",
+            surnames: "",
+            earnings: 0,
             area: 0,
-            scale: 0,
+            position: 0,
         },
-        serviceState: {
-            name: null,
-            type: null,
-            profit: null,
+        staffState: {
+            staff_number: null,
+            names: null,
+            surnames: null,
+            earnings: null,
             area: null,
+            position: null,
         },
-        duration: {
-            days: 0,
-            hours: 0,
-            minutes: 0,
-        },
-        hours: [
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-            19, 20, 21, 22, 23,
-        ],
-        minutes: [0, 15, 30, 45],
+
         areas: [],
-        types: [
-            {
-                value: 1,
-                name: "Producto",
-            },
-            {
-                value: 2,
-                name: "Servicio",
-            },
-            {
-                value: 3,
-                name: "Proceso",
-            },
-        ],
-        // Variable en la que se maneja la escala de la vista
-        scaleView: {
-            id: 0,
-            name: "",
-            scale: 0,
-            scale_name: "",
-            scale_min_value: 0,
-            scale_max_value: 0,
-        },
+        positions: [],
     }),
     mounted() {
-        this.getServicesOffered();
+        this.getStaffs();
         this.getAreas();
-        this.getScaleView();
+        this.getPositions();
     },
     methods: {
         successMessage(successText) {
@@ -608,24 +439,17 @@ export default {
                     }
                 });
         },
-        async getScaleView() {
+        async getPositions() {
+            this.positions = [];
             axios
-                .get(`${SERVER_ADDRESS}/api/config/scales/view/`, {
-                    params: { name: "Servicios Ofrecidos" },
+                .get(`${SERVER_ADDRESS}/api/config/positions/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.scaleView = res.data[0];
-                    this.scaleView.scale_min_value = parseInt(
-                        this.scaleView.scale_min_value
-                    );
-                    this.scaleView.scale_max_value = parseInt(
-                        this.scaleView.scale_max_value
-                    );
-                    this.service.criticality = res.data[0].scale_min_value;
+                    this.positions = res.data;
                 })
                 .catch((err) => {
                     try {
@@ -646,26 +470,19 @@ export default {
                     }
                 });
         },
-
-        async getServicesOffered() {
+        async getStaffs() {
             this.loading = true;
-            this.services = [];
+            this.staffs = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/services/offered/`, {
+                .get(`${SERVER_ADDRESS}/api/phase2/staffs/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    for (var i = 0; i < res.data.length; i++) {
-                        //Convertimos en texto la duración
-                        res.data[i].recovery_time = getRecoveryTimeText(
-                            res.data[i].recovery_time
-                        );
-                        this.services.push(res.data[i]);
-                    }
+                    this.staffs = res.data;
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -695,7 +512,8 @@ export default {
         },
         initFilters1() {
             this.filterGlobal = {
-                global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                value: null,
+                matchMode: FilterMatchMode.CONTAINS,
             };
         },
 
@@ -704,87 +522,45 @@ export default {
          */
         checkFormValidity() {
             let valid = true;
-            if (!this.service.name) {
-                this.serviceState.name = false;
-                valid = false;
-            }
-            if (this.service.area == 0) {
-                this.serviceState.area = false;
-                valid = false;
-            }
-            if (this.service.type == 0) {
-                this.serviceState.type = false;
-                valid = false;
-            }
-            if (this.service.profit <= 0) {
-                this.serviceState.profit = false;
+            if (!this.staff.names) {
+                this.staffState.name = false;
                 valid = false;
             }
             return valid;
         },
         resetModal() {
-            this.service.name = "";
-            this.serviceState.name = null;
-            this.service.type = 0;
-            this.serviceState.type = null;
-            this.service.profit = 0;
-            this.serviceState.profit = null;
-            this.service.area = 0;
-            this.serviceState.area = null;
-            this.service.criticality = this.scaleView.scale_min_value;
-
-            this.duration.days = 0;
-            this.duration.hours = 0;
-            this.duration.minutes = 0;
+            this.staff.names = "";
+            this.staffState.names = null;
         },
         /**
          * Create
          */
         handleSubmitCreate() {
             // Inicializamos variables de estados
-            this.serviceState.name = null;
-            this.serviceState.type = null;
-            this.serviceState.profit = null;
-            this.serviceState.area = null;
+            this.staffState.name = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
                 return;
             }
 
-            if (this.service.type == 1) this.type = "producto";
-            else if (this.service.type == 2) this.type = "servicio";
-            else this.type = "proceso";
-
             // Mostrar modal de confirmar
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-create");
             });
         },
-        async createService() {
-            this.service.recovery_time = setRecoveryTime(this.duration);
-            this.service.scale = this.scaleView.scale;
-
+        async createStaff() {
             axios
-                .post(
-                    `${SERVER_ADDRESS}/api/phase2/services/offered/`,
-                    this.service,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
+                .post(`${SERVER_ADDRESS}/api/phase2/staffs/`, this.staff, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
                 .then((res) => {
                     // Mensaje de éxito
-                    let successType = "";
-                    if (this.service.type == 1) successType = "producto";
-                    else if (this.service.type == 2) successType = "servicio";
-                    else successType = "proceso";
-
                     this.successMessage(
-                        "¡El " + successType + " ha sido creado exitosamente!"
+                        "¡El personal ha sido creado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -793,7 +569,8 @@ export default {
                         this.$bvModal.hide("modal-create");
                     });
 
-                    this.getServicesOffered();
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getStaffs();
                 })
                 .catch((err) => {
                     try {
@@ -814,48 +591,35 @@ export default {
                     }
                 });
         },
-
         /**
          * Update
          */
         handleSubmitUpdate() {
             // Inicializamos variables de estados
-            this.serviceState.name = null;
-            this.serviceState.type = null;
-            this.serviceState.profit = null;
-            this.serviceState.area = null;
+            this.staffState.name = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
                 return;
             }
 
-            if (this.service.type == 1) this.type = "producto";
-            else if (this.service.type == 2) this.type = "servicio";
-            else this.type = "proceso";
-
             // Mostrar modal de confirmar
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-update");
             });
         },
-        show_modal_update(id, type_name) {
-            this.serviceId = id;
-            this.type = type_name;
+        async show_modal_update(id) {
+            this.staffId = id;
 
             axios
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/service/offered/${this.serviceId}/`,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
+                .get(`${SERVER_ADDRESS}/api/phase2/staff/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
                 .then((res) => {
-                    this.service = res.data;
-                    this.duration = getRecoveryTime(res.data.recovery_time);
+                    this.staff = res.data;
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -879,14 +643,11 @@ export default {
                     }
                 });
         },
-        async updateService() {
-            this.service.recovery_time = setRecoveryTime(this.duration);
-            this.service.scale = this.scaleView.scale;
-
+        async updateStaff() {
             axios
                 .patch(
-                    `${SERVER_ADDRESS}/api/phase2/service/offered/${this.serviceId}/`,
-                    this.service,
+                    `${SERVER_ADDRESS}/api/phase2/staff/${this.staffId}/`,
+                    this.staff,
                     {
                         withCredentials: true,
                         headers: {
@@ -896,15 +657,8 @@ export default {
                 )
                 .then((res) => {
                     // Mensaje de éxito
-                    let successType = "";
-                    if (this.service.type == 1) successType = "producto";
-                    else if (this.service.type == 2) successType = "servicio";
-                    else successType = "proceso";
-
                     this.successMessage(
-                        "¡El " +
-                            successType +
-                            " ha sido actualizado exitosamente!"
+                        "¡El personal ha sido actualizado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -913,8 +667,8 @@ export default {
                         this.$bvModal.hide("modal-update");
                     });
 
-                    // Cargamos de nuevo la tabla de escenario crítico
-                    this.getServicesOffered();
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getAreas();
                 })
                 .catch((err) => {
                     try {
@@ -938,37 +692,33 @@ export default {
         /**
          * Delete
          */
-        show_modal_delete(id, type_name) {
-            this.serviceId = id;
-            this.type = type_name;
-
+        show_modal_delete(id) {
+            this.staffId = id;
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-delete");
             });
         },
-        async deleteService() {
+        async deleteStaff() {
             axios
-                .delete(
-                    `${SERVER_ADDRESS}/api/phase2/service/offered/${this.serviceId}/`,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
+                .delete(`${SERVER_ADDRESS}/api/phase2/staff/${this.staffId}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El " +
-                            toString(type) +
-                            " ha sido eliminado exitosamente!"
+                        "¡El personal ha sido eliminado exitosamente!"
                     );
-                    this.getServicesOffered();
 
+                    //Ocultamos los modales
                     this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-delete");
                     });
+
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getstaffs();
                 })
                 .catch((err) => {
                     try {

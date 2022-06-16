@@ -1,5 +1,5 @@
 from django.db import models
-from configuration.models import Staff, Headquarter
+from configuration.models import Headquarter
 
 
 class Risk(models.Model):
@@ -9,7 +9,7 @@ class Risk(models.Model):
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_risk')
     staffs = models.ManyToManyField(
-        Staff, related_name='staff_risk')
+        'bcm_phase2.staff', related_name='staff_risk')
 
 
 class CrisisScenario(models.Model):

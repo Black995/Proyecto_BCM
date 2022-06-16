@@ -1,6 +1,7 @@
 from django.db import models
-from configuration.models import Organization, Headquarter, Area, Scale
+from configuration.models import Organization, Headquarter, Area, Scale, Position
 from bcm_phase1.models import Risk
+from users.models import User
 
 
 class InterestedParty(models.Model):
@@ -24,13 +25,31 @@ class InterestedParty(models.Model):
         Organization, related_name='organization_interested_party', on_delete=models.CASCADE)
 
 
+class Staff(models.Model):
+    staff_number = models.CharField(max_length=30, unique=True)
+    names = models.CharField(max_length=100)
+    surnames = models.CharField(max_length=100)
+    earnings = models.FloatField()
+
+    user = models.OneToOneField(
+        User, null=True, related_name='user_staff', on_delete=models.SET_NULL)
+    headquarter = models.ForeignKey(Headquarter, related_name='headquarter_staff', null=True,
+                                    on_delete=models.SET_NULL)
+    area = models.ForeignKey(Area, related_name='area_staff', null=True,
+                             on_delete=models.SET_NULL)
+    position = models.ForeignKey(
+        Position, related_name='position_staff', on_delete=models.CASCADE)
+
+
 class ServiceOffered(models.Model):
 
     PRODUCT = 1
     SERVICE = 2
+    PROCESS = 3
     TYPE = (
         (PRODUCT, 'Producto'),
         (SERVICE, 'Servicio'),
+        (PROCESS, 'Proceso'),
     )
 
     name = models.CharField(max_length=100, unique=True)
@@ -46,6 +65,8 @@ class ServiceOffered(models.Model):
                               on_delete=models.SET_NULL)
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_service_offered')
+    staffs = models.ManyToManyField(
+        Staff, related_name='staff_service_offered')
 
 
 class ServiceUsed(models.Model):
@@ -126,3 +147,5 @@ class OrganizationActivity(models.Model):
                 risk = Risk.objects.filter(id=risk_id).first()
                 if(risk is not None):
                     self._risks.add(risk)
+
+

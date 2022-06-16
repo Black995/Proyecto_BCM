@@ -1,4 +1,4 @@
-from configuration.models import Area, Scale, ScaleView
+from configuration.models import Area, Scale, ScaleView, Position
 from rest_framework import serializers
 from django.db.models import F, Q
 
@@ -50,4 +50,14 @@ class ScaleViewSerializer(serializers.ModelSerializer):
             'scale_name',
             'scale_min_value',
             'scale_max_value',
+        ]
+
+
+class PositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Position
+        fields = [
+            'id',
+            'name',
+            'relevant'
         ]

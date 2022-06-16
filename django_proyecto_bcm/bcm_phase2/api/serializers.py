@@ -1,4 +1,4 @@
-from bcm_phase2.models import ServiceOffered, ServiceUsed
+from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff
 from rest_framework import serializers
 from django.db.models import F, Q
 from bcm_phase1.api.serializers import RiskSerializer
@@ -107,4 +107,48 @@ class ServiceUsedSerializer(serializers.ModelSerializer):
             '_services_offered',
             'risks',
             '_risks'
+        ]
+
+
+class StaffListSerializer(serializers.ModelSerializer):
+    area_name = serializers.CharField(read_only=True)
+    position_name = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Staff
+        fields = [
+            'id',
+            'staff_number',
+            'names',
+            'surnames',
+            'earnings',
+            'area',
+            'area_name',
+            'position',
+            'position_name',
+        ]
+
+
+class StaffSerializer(serializers.ModelSerializer):
+    area_name = serializers.CharField(read_only=True)
+    position_name = serializers.CharField(read_only=True)
+    headquarter_name = serializers.CharField(read_only=True)
+    user_email = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Staff
+        fields = [
+            'id',
+            'staff_number',
+            'names',
+            'surnames',
+            'earnings',
+            'area',
+            'area_name',
+            'position',
+            'position_name',
+            'headquarter',
+            'headquarter_name',
+            'user',
+            'user_email'
         ]

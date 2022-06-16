@@ -628,8 +628,8 @@ export default {
          * Lista de todas las vistas del sistema en la que se utilizan escalas
          */
         viewsName: [
-            "Servicios Ofrecidos",
-            "Servicios Usados",
+            "Servicios de la Organización",
+            "Servicios Contratados",
             "Actividades de la Organización",
             "Partes Interesadas",
         ],

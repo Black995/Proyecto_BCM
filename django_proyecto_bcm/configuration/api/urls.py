@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import (AreaViewSet, ScaleViewSet, ScaleviewViewSet)
+from .views import (AreaViewSet, ScaleViewSet, ScaleviewViewSet, PositionViewSet)
 
 
 urlpatterns = [
@@ -28,4 +28,12 @@ urlpatterns = [
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='scale_view_detail'),
+    path('positions/', PositionViewSet.as_view({
+        'get': 'list',
+        'post': 'create'}), name='position_list'),
+    path('position/<int:pk>/', PositionViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'}), name='position_detail'),
 ]

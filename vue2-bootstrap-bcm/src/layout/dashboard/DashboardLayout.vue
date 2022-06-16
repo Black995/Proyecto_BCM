@@ -2,6 +2,10 @@
     <div class="wrapper">
         <side-bar>
             <template slot="links">
+                <!--
+                    Encabezado Fase 1
+                -->
+                <sidebar-link to="#1" class="disabled" name="Fase 1" />
                 <sidebar-link
                     to="/layout/riesgos"
                     name="Riesgos"
@@ -12,16 +16,29 @@
                     name="Escenarios Críticos"
                     icon="ti-panel"
                 />
+                <!--
+                    Encabezado Fase 2
+                -->
+                <sidebar-link to="#2" name="Fase 2" />
                 <sidebar-link
                     to="/layout/servicios-ofrecidos"
-                    name="Servicios Ofrecidos"
+                    name="Servicios de la Org."
                     icon="ti-desktop"
                 />
                 <sidebar-link
                     to="/layout/servicios-usados"
-                    name="Servicios Usados"
+                    name="Servicios Contratados"
                     icon="ti-dropbox"
                 />
+                <sidebar-link
+                    to="/layout/personal"
+                    name="Personal de la Org."
+                    icon="ti-layout-accordion-list"
+                />
+                <!--
+                    Encabezado Configuración
+                -->
+                <sidebar-link to="#3" name="Configuración" />
                 <sidebar-link
                     to="/layout/areas"
                     name="Areas de la Org."
