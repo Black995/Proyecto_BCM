@@ -1,6 +1,6 @@
-from configuration.models import Area, Scale, ScaleView, Position
+from configuration.models import Area, Scale, ScaleView, Position, Headquarter
 from django.shortcuts import get_object_or_404
-from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer
+from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q, F
@@ -31,3 +31,9 @@ class PositionViewSet(viewsets.ModelViewSet):
     model = Position
     queryset = Position.objects.all().order_by('name')
     serializer_class = PositionSerializer
+
+
+class HeadquarterViewSet(viewsets.ModelViewSet):
+    model = Headquarter
+    queryset = Headquarter.objects.annotate(location_name=F('location__name')).order_by('name')
+    serializer_class = HeadquarterSerializer

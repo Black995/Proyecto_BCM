@@ -1,4 +1,4 @@
-from configuration.models import Area, Scale, ScaleView, Position
+from configuration.models import Area, Scale, ScaleView, Position, Headquarter
 from rest_framework import serializers
 from django.db.models import F, Q
 
@@ -60,4 +60,17 @@ class PositionSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'relevant'
+        ]
+        
+
+class HeadquarterSerializer(serializers.ModelSerializer):
+    location_name = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Headquarter
+        fields = [
+            'id',
+            'name',
+            'location',
+            'location_name'
         ]

@@ -74,6 +74,18 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        title="Detalle del personal"
+                                        pill
+                                        variant="info"
+                                        @click="
+                                            show_modal_detail(slotProps.data.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-search"
+                                        />
+                                    </b-button>
+                                    <b-button
                                         title="Editar personal"
                                         pill
                                         variant="warning"
@@ -112,6 +124,67 @@
             <!-- /.col -->
         </div>
         <div class="row"></div>
+
+        <!--
+            Modal del detalle  
+        -->
+        <b-modal
+            id="modal-detail"
+            title="Detalle del personal"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <h3 class="text-center font-weight-bold">
+                {{ staffDetail.names }} {{ staffDetail.surnames }}
+            </h3>
+            <ul class="list-group list-group-flush">
+                <li v-if="staffDetail.user_email" class="list-group-item">
+                    <strong
+                        >Correo del usuario del sistema asociado a este
+                        personal:</strong
+                    >
+                    {{ staffDetail.user_email }}
+                </li>
+                <li v-if="!staffDetail.user_email" class="list-group-item">
+                    <strong
+                        >Este personal no posee un usuario en el sistema</strong
+                    >
+                </li>
+                <li class="list-group-item">
+                    <strong>Número de Staff: </strong
+                    >{{ staffDetail.staff_number }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Ingreso promedio: </strong
+                    >{{ staffDetail.earnings }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Area: </strong>{{ staffDetail.area_name }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Cargo: </strong>{{ staffDetail.position_name }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Area: </strong>{{ staffDetail.area_name }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Sede: </strong>{{ staffDetail.headquarter_name }}
+                </li>
+            </ul>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="info"
+                        class="float-right"
+                        @click="$bvModal.hide('modal-detail')"
+                    >
+                        Cerrar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
 
         <!--
             Modal de crear  
@@ -191,8 +264,8 @@
                 <b-row>
                     <b-col>
                         <b-form-group
-                            label="Ingrese el ingreso promedio personal"
-                            invalid-feedback="Este campo es obligatorio"
+                            label="Ingrese el ingreso promedio personal (en dólares)"
+                            invalid-feedback="Este campo no puede ser negativo ni cero"
                             :state="staffState.earnings"
                         >
                             <b-form-input
@@ -215,6 +288,24 @@
                                 value-field="id"
                                 text-field="name"
                                 :state="staffState.position"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Seleccione la sede del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.headquarter"
+                        >
+                            <b-form-select
+                                v-model="staff.headquarter"
+                                :options="headquarters"
+                                value-field="id"
+                                text-field="name"
+                                :state="staffState.headquarter"
                                 required
                             ></b-form-select>
                         </b-form-group>
@@ -268,18 +359,117 @@
             centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
-                <b-form-group
-                    label="Ingrese el nombre del personal"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="staffState.names"
-                >
-                    <b-form-input
-                        id="name-input"
-                        v-model="staff.names"
-                        :state="staffState.names"
-                        required
-                    ></b-form-input>
-                </b-form-group>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese los nombres del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.names"
+                        >
+                            <b-form-input
+                                id="name-input"
+                                v-model="staff.names"
+                                :state="staffState.names"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese los apellidos del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.surnames"
+                        >
+                            <b-form-input
+                                id="name-input"
+                                v-model="staff.surnames"
+                                :state="staffState.surnames"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese el número de staff del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.staff_number"
+                        >
+                            <b-form-input
+                                id="name-input"
+                                v-model="staff.staff_number"
+                                :state="staffState.staff_number"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Seleccione el área a la que pertenece este personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.area"
+                        >
+                            <b-form-select
+                                v-model="staff.area"
+                                :options="areas"
+                                value-field="id"
+                                text-field="name"
+                                :state="staffState.area"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese el ingreso promedio personal (en dólares)"
+                            invalid-feedback="Este campo no puede ser negativo ni cero"
+                            :state="staffState.earnings"
+                        >
+                            <b-form-input
+                                id="name-input"
+                                v-model.number="staff.earnings"
+                                :state="staffState.earnings"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Seleccione el cargo del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.position"
+                        >
+                            <b-form-select
+                                v-model="staff.position"
+                                :options="positions"
+                                value-field="id"
+                                text-field="name"
+                                :state="staffState.position"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col> </b-row
+                ><b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Seleccione la sede del personal"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="staffState.headquarter"
+                        >
+                            <b-form-select
+                                v-model="staff.headquarter"
+                                :options="headquarters"
+                                value-field="id"
+                                text-field="name"
+                                :state="staffState.headquarter"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
             </form>
 
             <template #modal-footer>
@@ -360,6 +550,16 @@ export default {
         show_modal_create: false,
 
         staffs: [],
+        staffDetail: {
+            staff_number: "",
+            names: "",
+            surnames: "",
+            earnings: 0,
+            area_name: "",
+            position_name: "",
+            headquarter_name: "",
+            user_email: "",
+        },
         staffId: 0,
 
         staff: {
@@ -369,6 +569,7 @@ export default {
             earnings: 0,
             area: 0,
             position: 0,
+            headquarter: 0,
         },
         staffState: {
             staff_number: null,
@@ -377,15 +578,18 @@ export default {
             earnings: null,
             area: null,
             position: null,
+            headquarter: null,
         },
 
         areas: [],
         positions: [],
+        headquarters: [],
     }),
     mounted() {
         this.getStaffs();
         this.getAreas();
         this.getPositions();
+        this.getHeadquarters();
     },
     methods: {
         successMessage(successText) {
@@ -470,6 +674,37 @@ export default {
                     }
                 });
         },
+        async getHeadquarters() {
+            this.headquarters = [];
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/headquarters/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.headquarters = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
         async getStaffs() {
             this.loading = true;
             this.staffs = [];
@@ -523,7 +758,31 @@ export default {
         checkFormValidity() {
             let valid = true;
             if (!this.staff.names) {
-                this.staffState.name = false;
+                this.staffState.names = false;
+                valid = false;
+            }
+            if (!this.staff.surnames) {
+                this.staffState.surnames = false;
+                valid = false;
+            }
+            if (!this.staff.staff_number) {
+                this.staffState.staff_number = false;
+                valid = false;
+            }
+            if (this.staff.earnings <= 0) {
+                this.staffState.earnings = false;
+                valid = false;
+            }
+            if (this.staff.area == 0) {
+                this.staffState.area = false;
+                valid = false;
+            }
+            if (this.staff.position == 0) {
+                this.staffState.position = false;
+                valid = false;
+            }
+            if (this.staff.headquarter == 0) {
+                this.staffState.headquarter = false;
                 valid = false;
             }
             return valid;
@@ -531,13 +790,82 @@ export default {
         resetModal() {
             this.staff.names = "";
             this.staffState.names = null;
+            this.staff.surnames = "";
+            this.staffState.surnames = null;
+            this.staff.staff_number = "";
+            this.staffState.staff_number = null;
+            this.staff.earnings = 0;
+            this.staffState.earnings = null;
+            this.staff.area = 0;
+            this.staffState.area = null;
+            this.staff.position = 0;
+            this.staffState.position = null;
+            this.staff.headquarter = 0;
+            this.staffState.headquarter = null;
         },
+
+        /**
+         * Detail
+         */
+        async show_modal_detail(id) {
+            this.staffDetail = {
+                staff_number: "",
+                names: "",
+                surnames: "",
+                earnings: 0,
+                area_name: "",
+                position_name: "",
+                headquarter_name: "",
+                user_email: "",
+            };
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/staff/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    console.log(res.data);
+                    this.staffDetail = res.data;
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-detail");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
         /**
          * Create
          */
         handleSubmitCreate() {
             // Inicializamos variables de estados
-            this.staffState.name = null;
+            this.staffState.names = null;
+            this.staffState.surnames = null;
+            this.staffState.staff_number = null;
+            this.staffState.earnings = null;
+            this.staffState.area = null;
+            this.staffState.position = null;
+            this.staffState.headquarter = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -591,12 +919,19 @@ export default {
                     }
                 });
         },
+
         /**
          * Update
          */
         handleSubmitUpdate() {
             // Inicializamos variables de estados
-            this.staffState.name = null;
+            this.staffState.names = null;
+            this.staffState.surnames = null;
+            this.staffState.staff_number = null;
+            this.staffState.earnings = null;
+            this.staffState.area = null;
+            this.staffState.position = null;
+            this.staffState.headquarter = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -667,8 +1002,7 @@ export default {
                         this.$bvModal.hide("modal-update");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getAreas();
+                    this.getStaffs();
                 })
                 .catch((err) => {
                     try {
@@ -717,8 +1051,7 @@ export default {
                         this.$bvModal.hide("modal-confirm-delete");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getstaffs();
+                    this.getStaffs();
                 })
                 .catch((err) => {
                     try {
