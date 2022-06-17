@@ -2,6 +2,7 @@ from bcm_phase1.models import Risk, CrisisScenario
 from rest_framework import serializers
 from django.db.models import F, Q
 
+
 class RiskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Risk
@@ -13,7 +14,9 @@ class RiskSerializer(serializers.ModelSerializer):
 
 
 class CrisisScenarioSerializer(serializers.ModelSerializer):
-    risks = serializers.ListField(child=serializers.IntegerField(), required=False, write_only=True)
+    # El risks funciona para llenar los elementos del many to many
+    risks = serializers.ListField(
+        child=serializers.IntegerField(), required=False, write_only=True)
     # Serializer aninado
     _risks = RiskSerializer(many=True, read_only=True)
 
@@ -26,6 +29,8 @@ class CrisisScenarioSerializer(serializers.ModelSerializer):
             'risks',
             '_risks',
         ]
+
+
 """
     def create(self, validate_data):
         risks_data = validate_data.pop('risks', None)
@@ -48,5 +53,3 @@ class CrisisScenarioListSerializer(serializers.ModelSerializer):
             'name',
             'description',
         ]
-
-    

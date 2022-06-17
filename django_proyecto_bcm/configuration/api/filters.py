@@ -10,5 +10,18 @@ class ScaleViewFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         name = request.GET.get('name')
         if name:
-            queryset = queryset.filter(name=name)
+            print('nombre de la escala: ', name)
+            # Verificamos que exista el nombre. Si no existe, entonces filtramos por defecto con
+            # la escala con nombre "default"
+            try:
+                scale_view = ScaleView.objects.filter(name=name)
+            except ScaleView.DoesNotExist:
+                scale_view = None
+            print('escala')
+            if(scale_view):
+                print(name)
+                queryset = queryset.filter(name=name)
+            else:
+                print('default')
+                queryset = queryset.filter(name='default')
         return queryset

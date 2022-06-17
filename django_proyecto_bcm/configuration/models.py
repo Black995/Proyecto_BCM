@@ -1,5 +1,4 @@
 from django.db import models
-from users.models import User
 
 
 
@@ -66,20 +65,4 @@ class ScaleView(models.Model):
 
     scale = models.ForeignKey(
         Scale, related_name='scale_view', on_delete=models.CASCADE)
-
-
-class Staff(models.Model):
-    staff_number = models.IntegerField(null=True)
-    names = models.CharField(max_length=100)
-    surnames = models.CharField(max_length=100)
-    earnings = models.IntegerField()
-
-    user = models.OneToOneField(
-        User, null=True, related_name='user_staff', on_delete=models.SET_NULL)
-    Headquarter = models.ForeignKey(Headquarter, related_name='headquarter_staff', null=True,
-                                    on_delete=models.SET_NULL)
-    area = models.ForeignKey(Area, related_name='area_staff', null=True,
-                             on_delete=models.SET_NULL)
-    position = models.ForeignKey(
-        Position, related_name='position_staff', on_delete=models.CASCADE)
 

@@ -17,9 +17,15 @@ import TableList from "@/pages/TableList.vue";
 // Stage 1
 import Risks from "@/pages/Stage1/Risks.vue";
 import CrisisScenarios from "@/pages/Stage1/CrisisScenarios.vue";
+// Stage 2
 import ServicesOffered from "@/pages/Stage2/ServicesOffered.vue";
 import ServicesUsed from "@/pages/Stage2/ServicesUsed.vue";
+import Staffs from "@/pages/Stage2/Staffs.vue";
+// Stage 3
+
+// Configuration
 import Areas from "@/pages/Configuration/Areas.vue";
+import Scales from "@/pages/Configuration/Scales.vue";
 
 
 const routes = [
@@ -34,7 +40,7 @@ const routes = [
     redirect: "/dashboard",
     children: [
       /**
-       * Phase 1
+       * Stage 1
        */
       {
         path: "riesgos",
@@ -47,7 +53,7 @@ const routes = [
         component: CrisisScenarios
       },
       /**
-       * Phase 2
+       * Stage 2
        */
       {
         path: "servicios-ofrecidos",
@@ -59,6 +65,11 @@ const routes = [
         name: "Servicios Usados",
         component: ServicesUsed
       },
+      {
+        path: "personal",
+        name: "Personal de la Organización",
+        component: Staffs
+      },
       /**
        * Configuration
        */
@@ -66,6 +77,11 @@ const routes = [
         path: "areas",
         name: "Areas de la Organización",
         component: Areas
+      },
+      {
+        path: "escalas",
+        name: "Escalas",
+        component: Scales
       },
       /**
        * Additional

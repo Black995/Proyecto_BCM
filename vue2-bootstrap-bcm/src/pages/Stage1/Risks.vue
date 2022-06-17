@@ -23,6 +23,7 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            title="Crear riesgo"
                                             variant="success"
                                             @click="show_modal_create = true"
                                         >
@@ -52,6 +53,7 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        title="Editar riesgo"
                                         pill
                                         variant="warning"
                                         @click="
@@ -63,6 +65,7 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        title="Eliminar riesgo"
                                         pill
                                         variant="danger"
                                         @click="
@@ -167,7 +170,7 @@
         </b-modal>
 
         <!--
-            Modal de actualizar  
+            Modal de editar  
         -->
         <b-modal
             id="modal-update"
@@ -220,14 +223,14 @@
         </b-modal>
 
         <!--
-            Modal de confirmar actualizar  
+            Modal de confirmar editar  
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar actualizar riesgo"
+            title="Confirmar editar riesgo"
             centered
         >
-            <h4>¿Está seguro de actualizar este riesgo?</h4>
+            <h4>¿Está seguro de editar este riesgo?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button

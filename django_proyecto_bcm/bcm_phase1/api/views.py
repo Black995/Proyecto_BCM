@@ -8,7 +8,7 @@ from django.db.models import Q, F
 
 class RiskViewSet(viewsets.ModelViewSet):
     model = Risk
-    queryset = Risk.objects.all()
+    queryset = Risk.objects.all().order_by('name')
     serializer_class = RiskSerializer
 
 
@@ -20,8 +20,13 @@ class CrisisScenarioViewSet(viewsets.ModelViewSet):
 
 class CrisisScenarioListViewSet(viewsets.ModelViewSet):
     model = CrisisScenario
-    queryset = CrisisScenario.objects.all()
+    queryset = CrisisScenario.objects.all().order_by('name')
     serializer_class = CrisisScenarioListSerializer
+
+class CrisisScenarioListRisksViewSet(viewsets.ModelViewSet):
+    model = CrisisScenario
+    queryset = CrisisScenario.objects.all()
+    serializer_class = CrisisScenarioSerializer
 
 
 

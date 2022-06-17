@@ -6,6 +6,7 @@
 *.log
 *.pot
 *.pyc
+migrations/
 __pycache__/
 local_settings.py
 db.sqlite3
@@ -344,3 +345,12 @@ yarn-error.log
 # End of https://www.toptal.com/developers/gitignore/api/node,python,django,vuejs
 
 *.venv
+
+
+#Django Migrations
+
+*/migrations/*
+
+!**/migrations
+
+!**/migrations/_init_.py
