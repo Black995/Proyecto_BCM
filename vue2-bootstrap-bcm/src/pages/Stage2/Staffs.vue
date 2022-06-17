@@ -587,9 +587,6 @@ export default {
     }),
     mounted() {
         this.getStaffs();
-        this.getAreas();
-        this.getPositions();
-        this.getHeadquarters();
     },
     methods: {
         successMessage(successText) {
@@ -719,6 +716,11 @@ export default {
                 .then((res) => {
                     this.staffs = res.data;
                     this.loading = false;
+
+                    // Mientras tanto vamos cargando los elementos de los formularios
+                    this.getAreas();
+                    this.getPositions();
+                    this.getHeadquarters();
                 })
                 .catch((err) => {
                     try {

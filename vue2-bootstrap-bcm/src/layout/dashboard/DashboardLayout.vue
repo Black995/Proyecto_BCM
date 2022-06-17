@@ -21,6 +21,11 @@
                 -->
                 <sidebar-link to="#2" name="Fase 2" />
                 <sidebar-link
+                    to="/layout/personal"
+                    name="Personal de la Org."
+                    icon="ti-layout-accordion-list"
+                />
+                <sidebar-link
                     to="/layout/servicios-ofrecidos"
                     name="Servicios de la Org."
                     icon="ti-desktop"
@@ -29,11 +34,6 @@
                     to="/layout/servicios-usados"
                     name="Servicios Contratados"
                     icon="ti-dropbox"
-                />
-                <sidebar-link
-                    to="/layout/personal"
-                    name="Personal de la Org."
-                    icon="ti-layout-accordion-list"
                 />
                 <!--
                     Encabezado Configuración

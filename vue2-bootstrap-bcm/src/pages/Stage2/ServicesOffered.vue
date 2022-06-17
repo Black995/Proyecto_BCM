@@ -79,6 +79,18 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        title="Detalle del servicio"
+                                        pill
+                                        variant="info"
+                                        @click="
+                                            show_modal_detail(slotProps.data.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-search"
+                                        />
+                                    </b-button>
+                                    <b-button
                                         title="Editar servicio de la organización"
                                         pill
                                         variant="warning"
@@ -110,6 +122,27 @@
                                     </b-button>
                                 </template>
                             </Column>
+                            <Column field="id_2" header="Asociar personal">
+                                <template #body="slotProps">
+                                    <div class="text-center">
+                                        <b-button
+                                            pill
+                                            title="Asociar personal de la organización encargado"
+                                            variant="primary"
+                                            @click="
+                                                show_modal_association_staffs(
+                                                    slotProps.data.id,
+                                                    slotProps.data.name
+                                                )
+                                            "
+                                        >
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-users"
+                                            />
+                                        </b-button>
+                                    </div>
+                                </template>
+                            </Column>
 
                             <template #empty>
                                 No hay servicios encontrados.
@@ -123,6 +156,84 @@
             <!-- /.col -->
         </div>
         <div class="row"></div>
+
+        <!--
+            Modal del detalle
+        -->
+        <b-modal
+            id="modal-detail"
+            title="Detalle del servicio de la organización"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <h3 class="text-center font-weight-bold">
+                {{ serviceDetail.name }}
+            </h3>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Tipo: </strong>{{ serviceDetail.type_name }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Ganancia promedio: </strong
+                    >{{ serviceDetail.spending }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Tiempo de recuperación: </strong
+                    >{{ serviceDetail.recovery_time }}
+                </li>
+                <li class="list-group-item">
+                    <div v-if="!serviceDetail.scale_max_value">
+                        <strong>Criticidad: </strong
+                        >{{ serviceDetail.criticality }}
+                    </div>
+                    <div v-if="serviceDetail.scale_max_value">
+                        <strong>Criticidad: </strong
+                        >{{ serviceDetail.criticality }}/{{
+                            serviceDetail.scale_max_value
+                        }}
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <strong>Area: </strong>{{ serviceDetail.area_name }}
+                </li>
+            </ul>
+            <h4 class="mt-5 text-center font-weight-bold">
+                Personal de la organización encargado en el servicio
+            </h4>
+            <b-list-group-item
+                class="mt-2 flex-column align-items-start"
+                v-for="item in serviceDetail._staffs"
+                :key="item.key"
+            >
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ item.names }} {{ item.surnames }}</h5>
+                    <small class="text-muted"
+                        >Número de staff: {{ item.staff_number }}
+                    </small>
+                </div>
+                <div class="mb-1 d-flex w-100 justify-content-between">
+                    <div>Area: {{ item.area_name }}</div>
+                    <div>Cargo: {{ item.position_name }}</div>
+                    <div>Sede: {{ item.headquarter_name }}</div>
+                </div>
+            </b-list-group-item>
+            <h3 class="mt-3 text-center" v-if="!serviceDetail._staffs.length">
+                No existe personal de la organización encargado en este servicio
+            </h3>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="info"
+                        class="float-right"
+                        @click="$bvModal.hide('modal-detail')"
+                    >
+                        Cerrar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
 
         <!--
             Modal de crear  
@@ -468,6 +579,93 @@
                 </div>
             </template>
         </b-modal>
+
+        <!--
+            Modal de asociar staff de la organización con servicios de la organización  
+        -->
+        <b-modal
+            id="modal-associate-staffs"
+            title="Personal de la organización encargado de los servicios de la organización"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <multiselect
+                v-model="selectedStaffs"
+                placeholder="Buscar personal de la organización"
+                label="names"
+                track-by="id"
+                :options="staffs"
+                :multiple="true"
+            ></multiselect>
+
+            <b-list-group v-if="selectedStaffs.length" class="mt-3">
+                <b-list-group-item
+                    href="#"
+                    class="flex-column align-items-start"
+                    v-for="item in selectedStaffs"
+                    :key="item.key"
+                >
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            {{ item.names }}
+                        </h5>
+                        <small class="text-muted"
+                            >Número de staff: {{ item.staff_number }}</small
+                        >
+                    </div>
+                    <div class="mb-1 d-flex w-100 justify-content-between">
+                        <div>Area: {{ item.area_name }}</div>
+                        <div>Cargo: {{ item.position_name }}</div>
+                        <div>Sede: {{ item.headquarter_name }}</div>
+                    </div>
+                </b-list-group-item>
+            </b-list-group>
+
+            <h3 class="mt-3 text-center" v-if="!selectedStaffs.length">
+                No existe personal de la organización encargado e este servicio
+                de la organización
+            </h3>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        class="float-right"
+                        @click="show_modal_confirm_association_staffs"
+                    >
+                        Asociar personal de la organización
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar asociar servicios  
+        -->
+        <b-modal
+            id="modal-confirm-associate-staffs"
+            title="Confirmar personal de la organización"
+            centered
+        >
+            <h4>
+                ¿Está seguro de asociar este personal de la organización al
+                servicio
+                <strong>{{ serviceName }}</strong
+                >?
+            </h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        class="float-right"
+                        @click="associateStaffs"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </div>
 </template>
 
@@ -498,7 +696,20 @@ export default {
         show_modal_create: false,
 
         services: [],
+        serviceDetail: {
+            name: "",
+            type_name: "",
+            profit: 0,
+            recovery_time: "",
+            criticality: 0,
+            area_name: "",
+            scale_name: "",
+            scale_min_value: 0,
+            scale_max_value: 0,
+            _staffs: [],
+        },
         serviceId: 0,
+        serviceName: "",
         type: "",
 
         service: {
@@ -550,6 +761,10 @@ export default {
             scale_min_value: 0,
             scale_max_value: 0,
         },
+
+        // Lista de staffs de la organización para realizar la asociación
+        staffs: [],
+        selectedStaffs: [],
     }),
     mounted() {
         this.getServicesOffered();
@@ -667,6 +882,9 @@ export default {
                         this.services.push(res.data[i]);
                     }
                     this.loading = false;
+
+                    // Mientras tanto vamos cargando el staff
+                    this.getStaffs();
                 })
                 .catch((err) => {
                     try {
@@ -737,6 +955,61 @@ export default {
             this.duration.hours = 0;
             this.duration.minutes = 0;
         },
+
+        /**
+         * Detail
+         */
+        async show_modal_detail(id) {
+            this.serviceDetail = {
+                name: "",
+                type_name: "",
+                profit: 0,
+                recovery_time: "",
+                criticality: 0,
+                area_name: "",
+                scale_name: "",
+                scale_min_value: 0,
+                scale_max_value: 0,
+                _staffs: [],
+            };
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/service/offered/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.serviceDetail = res.data;
+                    this.serviceDetail.recovery_time = getRecoveryTimeText(
+                        this.serviceDetail.recovery_time
+                    );
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-detail");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
         /**
          * Create
          */
@@ -935,6 +1208,7 @@ export default {
                     }
                 });
         },
+
         /**
          * Delete
          */
@@ -968,6 +1242,148 @@ export default {
 
                     this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-delete");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Associate staff
+         */
+        async getStaffs() {
+            this.staffs = [];
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/staffs/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    for (let i = 0; i < res.data.length; i++) {
+                        res.data[i].names =
+                            res.data[i].names + " " + res.data[i].surnames;
+                        this.staffs.push(res.data);
+                    }
+                    this.staffs = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async show_modal_association_staffs(id, name) {
+            this.serviceId = id;
+            this.serviceName = name;
+            this.selectedStaffs = [];
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/service/offered/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    for (let i = 0; i < res.data._staffs.length; i++) {
+                        res.data._staffs[i].names =
+                            res.data._staffs[i].names +
+                            " " +
+                            res.data._staffs[i].surnames;
+                        this.selectedStaffs.push(res.data._staffs[i]);
+                    }
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-associate-staffs");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            this.errorMessage(err.response.data);
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        show_modal_confirm_association_staffs() {
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-associate-staffs");
+            });
+        },
+        async associateStaffs() {
+            let staffsIds = [];
+            for (let i = 0; i < this.selectedStaffs.length; i++) {
+                staffsIds.push(this.selectedStaffs[i].id);
+            }
+            //Es necesario que el array de IDs tenga este nombre
+            let ids = {
+                staffs: staffsIds,
+            };
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase2/service/offered/${this.serviceId}/`,
+                    ids,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡Los servicios de la organización fueron asociados al servicio contratado exitosamente!"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-associate-staffs");
+                        this.$bvModal.hide("modal-associate-staffs");
                     });
                 })
                 .catch((err) => {

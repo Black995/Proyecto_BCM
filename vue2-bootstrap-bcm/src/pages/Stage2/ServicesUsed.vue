@@ -169,7 +169,7 @@
         <div class="row"></div>
 
         <!--
-            Modal del detalle  
+            Modal del detalle
         -->
         <b-modal
             id="modal-detail"
@@ -183,7 +183,8 @@
             </h3>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <strong>Costo: </strong>{{ serviceDetail.spending }}
+                    <strong>Costo promedio: </strong
+                    >{{ serviceDetail.spending }}
                 </li>
                 <li class="list-group-item">
                     <strong>Tiempo de recuperación: </strong
@@ -955,6 +956,7 @@ export default {
                 scale_min_value: 0,
                 scale_max_value: 0,
                 _services_offered: [],
+                _risks: [],
             };
 
             axios
@@ -966,6 +968,9 @@ export default {
                 })
                 .then((res) => {
                     this.serviceDetail = res.data;
+                    this.serviceDetail.recovery_time = getRecoveryTimeText(
+                        this.serviceDetail.recovery_time
+                    );
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-detail");
