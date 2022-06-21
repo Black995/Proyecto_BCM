@@ -204,7 +204,7 @@
                 </li>
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
-                Servicios de la organización usados por el servicio contratado
+                Servicios de la organización usados por el servicio de soporte
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -230,7 +230,7 @@
                 v-if="!serviceDetail._services_offered.length"
             >
                 No existen servicios de la organización asociados a este
-                servicio contratado
+                servicio de soporte
             </h3>
 
             <h4 class="mt-5 text-center font-weight-bold">
@@ -248,7 +248,7 @@
                 class="mt-3 text-center"
                 v-if="!serviceDetail._services_offered.length"
             >
-                No existen riesgos asociados a este servicio contratado
+                No existen riesgos asociados a este servicio de soporte
             </h3>
 
             <template #modal-footer>
@@ -540,11 +540,11 @@
         </b-modal>
 
         <!--
-            Modal de asociar servicios de la organización con servicios contratado  
+            Modal de asociar servicios de la organización con servicios de soporte  
         -->
         <b-modal
             id="modal-associate-services"
-            title="Asociar servicios de la organización con servicios contratados"
+            title="Asociar servicios de la organización con servicios de soporte"
             ref="modal"
             size="lg"
             centered
@@ -586,7 +586,7 @@
 
             <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
                 No existen servicios de la organización asociados a este
-                servicio contratado
+                servicio de soporte
             </h3>
 
             <template #modal-footer>
@@ -630,11 +630,11 @@
         </b-modal>
 
         <!--
-            Modal de asociar riesgos con servicios contratados
+            Modal de asociar riesgos con servicios de soporte
         -->
         <b-modal
             id="modal-associate-risks"
-            title="Asociar riesgos con servicios contratados"
+            title="Asociar riesgos con servicios de soporte"
             ref="modal"
             size="lg"
             centered
@@ -672,7 +672,7 @@
             </b-list-group>
 
             <h3 class="mt-3 text-center" v-if="!selectedRisks.length">
-                No existen riesgos asociados a este servicio contratado
+                No existen riesgos asociados a este servicio de soporte
             </h3>
 
             <template #modal-footer>
@@ -823,7 +823,7 @@ export default {
         async getScaleView() {
             axios
                 .get(`${SERVER_ADDRESS}/api/config/scales/view/`, {
-                    params: { name: "Servicios Contratados" },
+                    params: { name: "Servicios de Soporte" },
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
@@ -1386,7 +1386,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡Los servicios de la organización fueron asociados al servicio contratado exitosamente!"
+                        "¡Los servicios de la organización fueron asociados al servicio de soporte exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -1570,7 +1570,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡Los riesgos fueron asociados al servicio contratado exitosamente!"
+                        "¡Los riesgos fueron asociados al servicio de soporte exitosamente!"
                     );
 
                     //Ocultamos los modales

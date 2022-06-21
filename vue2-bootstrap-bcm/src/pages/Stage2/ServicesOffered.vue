@@ -830,7 +830,7 @@ export default {
         async getScaleView() {
             axios
                 .get(`${SERVER_ADDRESS}/api/config/scales/view/`, {
-                    params: { name: "Servicios Ofrecidos" },
+                    params: { name: "Servicios de la Organización" },
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,

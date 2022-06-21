@@ -1,7 +1,8 @@
 from configuration.models import Area, Scale, ScaleView, Position, Headquarter
+from bcm_phase2.models import ServiceOffered, ServiceUsed, OrganizationActivity
 from django.shortcuts import get_object_or_404
 from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers, status
 from rest_framework.response import Response
 from django.db.models import Q, F
 from configuration.api.filters import (ScaleViewFilterBackend,)
@@ -25,6 +26,33 @@ class ScaleviewViewSet(viewsets.ModelViewSet):
         'scale__min_value'), scale_max_value=F('scale__max_value')).order_by('name')
     serializer_class = ScaleViewSerializer
     filter_backends = [ScaleViewFilterBackend, ]
+
+    # Al actualizar la escala se debe tener la opción de:
+    # 1. Pasar a nulo todas las escalas de todos los ServiceOffered, ServiceUsed y OrganizationActivity
+    # 2. Hacer un promedio de las escalas existentes    
+    def partial_update(self, request, pk):
+        name = request.data.get('name')
+        option = request.data.get('option')
+        print(option)
+        if(option == '1'):
+            print('opción 1')
+            if(name == 'Servicios de la Organización'):
+                ServiceOffered.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
+            elif(name == 'Servicios de Soporte'):
+                ServiceUsed.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
+            if(name == 'Actividades de la Organización'):
+                OrganizationActivity.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
+        elif(option == '2'):
+            print('opción 2')
+        else:
+            raise serializers.ValidationError(
+                {'Error': 'Opción seleccionada inválida'})
+
+        updated = True
+        msg, sta = ('Escalas actualizadas exitosamente', status.HTTP_200_OK) if updated else (
+            'Las escalas no pudieron ser actualizadas', status.HTTP_400_BAD_REQUEST)
+        return Response({'Error': msg}, status=sta)
+
 
 
 class PositionViewSet(viewsets.ModelViewSet):

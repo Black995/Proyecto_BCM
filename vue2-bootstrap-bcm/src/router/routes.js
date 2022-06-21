@@ -58,12 +58,12 @@ const routes = [
        */
       {
         path: "servicios-ofrecidos",
-        name: "Servicios Ofrecidos",
+        name: "Servicios de la Organización",
         component: ServicesOffered
       },
       {
         path: "servicios-usados",
-        name: "Servicios Usados",
+        name: "Servicios de Soporte",
         component: ServicesUsed
       },
       {

@@ -32,7 +32,7 @@
                 />
                 <sidebar-link
                     to="/layout/servicios-usados"
-                    name="Servicios Contratados"
+                    name="Servicios de Soporte"
                     icon="ti-dropbox"
                 />
                 <!--
