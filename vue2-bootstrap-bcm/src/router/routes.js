@@ -25,6 +25,7 @@ import Staffs from "@/pages/Stage2/Staffs.vue";
 
 // Configuration
 import Areas from "@/pages/Configuration/Areas.vue";
+import Positions from "@/pages/Configuration/Positions.vue";
 import Scales from "@/pages/Configuration/Scales.vue";
 
 
@@ -57,12 +58,12 @@ const routes = [
        */
       {
         path: "servicios-ofrecidos",
-        name: "Servicios Ofrecidos",
+        name: "Servicios de la Organización",
         component: ServicesOffered
       },
       {
         path: "servicios-usados",
-        name: "Servicios Usados",
+        name: "Servicios de Soporte",
         component: ServicesUsed
       },
       {
@@ -82,6 +83,11 @@ const routes = [
         path: "escalas",
         name: "Escalas",
         component: Scales
+      },
+      {
+        path: "cargos",
+        name: "Cargos de la Organización",
+        component: Positions
       },
       /**
        * Additional

@@ -587,9 +587,6 @@ export default {
     }),
     mounted() {
         this.getStaffs();
-        this.getAreas();
-        this.getPositions();
-        this.getHeadquarters();
     },
     methods: {
         successMessage(successText) {
@@ -628,7 +625,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -659,7 +660,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -690,7 +695,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -719,12 +728,21 @@ export default {
                 .then((res) => {
                     this.staffs = res.data;
                     this.loading = false;
+
+                    // Mientras tanto vamos cargando los elementos de los formularios
+                    this.getAreas();
+                    this.getPositions();
+                    this.getHeadquarters();
                 })
                 .catch((err) => {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -827,7 +845,6 @@ export default {
                     },
                 })
                 .then((res) => {
-                    console.log(res.data);
                     this.staffDetail = res.data;
 
                     this.$nextTick(() => {
@@ -838,7 +855,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -904,7 +925,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -963,7 +988,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1008,7 +1037,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1057,7 +1090,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(

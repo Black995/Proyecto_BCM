@@ -21,19 +21,19 @@
                 -->
                 <sidebar-link to="#2" name="Fase 2" />
                 <sidebar-link
+                    to="/layout/personal"
+                    name="Personal de la Org."
+                    icon="ti-layout-accordion-list"
+                />
+                <sidebar-link
                     to="/layout/servicios-ofrecidos"
                     name="Servicios de la Org."
                     icon="ti-desktop"
                 />
                 <sidebar-link
                     to="/layout/servicios-usados"
-                    name="Servicios Contratados"
+                    name="Servicios de Soporte"
                     icon="ti-dropbox"
-                />
-                <sidebar-link
-                    to="/layout/personal"
-                    name="Personal de la Org."
-                    icon="ti-layout-accordion-list"
                 />
                 <!--
                     Encabezado Configuración
@@ -43,6 +43,11 @@
                     to="/layout/areas"
                     name="Areas de la Org."
                     icon="ti-menu-alt"
+                />
+                <sidebar-link
+                    to="/layout/cargos"
+                    name="Cargos"
+                    icon="ti-bar-chart"
                 />
                 <sidebar-link
                     to="/layout/escalas"

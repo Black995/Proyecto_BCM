@@ -169,7 +169,7 @@
         <div class="row"></div>
 
         <!--
-            Modal del detalle  
+            Modal del detalle
         -->
         <b-modal
             id="modal-detail"
@@ -183,7 +183,8 @@
             </h3>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <strong>Costo: </strong>{{ serviceDetail.spending }}
+                    <strong>Costo promedio: </strong
+                    >{{ serviceDetail.spending }}$
                 </li>
                 <li class="list-group-item">
                     <strong>Tiempo de recuperación: </strong
@@ -203,7 +204,7 @@
                 </li>
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
-                Servicios de la organización usados por el servicio contratado
+                Servicios de la organización usados por el servicio de soporte
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -229,7 +230,7 @@
                 v-if="!serviceDetail._services_offered.length"
             >
                 No existen servicios de la organización asociados a este
-                servicio contratado
+                servicio de soporte
             </h3>
 
             <h4 class="mt-5 text-center font-weight-bold">
@@ -247,7 +248,7 @@
                 class="mt-3 text-center"
                 v-if="!serviceDetail._services_offered.length"
             >
-                No existen riesgos asociados a este servicio contratado
+                No existen riesgos asociados a este servicio de soporte
             </h3>
 
             <template #modal-footer>
@@ -539,11 +540,11 @@
         </b-modal>
 
         <!--
-            Modal de asociar servicios de la organización con servicios contratado  
+            Modal de asociar servicios de la organización con servicios de soporte  
         -->
         <b-modal
             id="modal-associate-services"
-            title="Asociar servicios de la organización con servicios contratados"
+            title="Asociar servicios de la organización con servicios de soporte"
             ref="modal"
             size="lg"
             centered
@@ -585,7 +586,7 @@
 
             <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
                 No existen servicios de la organización asociados a este
-                servicio contratado
+                servicio de soporte
             </h3>
 
             <template #modal-footer>
@@ -629,11 +630,11 @@
         </b-modal>
 
         <!--
-            Modal de asociar riesgos con servicios contratados
+            Modal de asociar riesgos con servicios de soporte
         -->
         <b-modal
             id="modal-associate-risks"
-            title="Asociar riesgos con servicios contratados"
+            title="Asociar riesgos con servicios de soporte"
             ref="modal"
             size="lg"
             centered
@@ -671,7 +672,7 @@
             </b-list-group>
 
             <h3 class="mt-3 text-center" v-if="!selectedRisks.length">
-                No existen riesgos asociados a este servicio contratado
+                No existen riesgos asociados a este servicio de soporte
             </h3>
 
             <template #modal-footer>
@@ -822,7 +823,7 @@ export default {
         async getScaleView() {
             axios
                 .get(`${SERVER_ADDRESS}/api/config/scales/view/`, {
-                    params: { name: "Servicios Contratados" },
+                    params: { name: "Servicios de Soporte" },
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
@@ -842,7 +843,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -888,7 +893,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -955,6 +964,7 @@ export default {
                 scale_min_value: 0,
                 scale_max_value: 0,
                 _services_offered: [],
+                _risks: [],
             };
 
             axios
@@ -966,6 +976,9 @@ export default {
                 })
                 .then((res) => {
                     this.serviceDetail = res.data;
+                    this.serviceDetail.recovery_time = getRecoveryTimeText(
+                        this.serviceDetail.recovery_time
+                    );
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-detail");
@@ -975,7 +988,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1042,7 +1059,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1119,7 +1140,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1167,7 +1192,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1219,7 +1248,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1255,7 +1288,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1301,7 +1338,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1345,7 +1386,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡Los servicios de la organización fueron asociados al servicio contratado exitosamente!"
+                        "¡Los servicios de la organización fueron asociados al servicio de soporte exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -1358,7 +1399,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1390,7 +1435,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1429,7 +1478,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1469,7 +1522,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1485,8 +1542,6 @@ export default {
                 });
         },
         show_modal_confirm_association_risks() {
-            console.log("riesgos seleccionados");
-            console.log(this.selectedRisks);
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-risks");
             });
@@ -1515,7 +1570,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡Los riesgos fueron asociados al servicio contratado exitosamente!"
+                        "¡Los riesgos fueron asociados al servicio de soporte exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -1528,7 +1583,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(

@@ -4,6 +4,50 @@ from django.db.models import F, Q
 from bcm_phase1.api.serializers import RiskSerializer
 
 
+
+class StaffListSerializer(serializers.ModelSerializer):
+    area_name = serializers.CharField(read_only=True)
+    position_name = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Staff
+        fields = [
+            'id',
+            'staff_number',
+            'names',
+            'surnames',
+            'earnings',
+            'area',
+            'area_name',
+            'position',
+            'position_name',
+        ]
+
+
+class StaffSerializer(serializers.ModelSerializer):
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    position_name = serializers.CharField(read_only=True, source="position.name")
+    headquarter_name = serializers.CharField(read_only=True, source="headquarter.name")
+    user_email = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Staff
+        fields = [
+            'id',
+            'staff_number',
+            'names',
+            'surnames',
+            'earnings',
+            'area',
+            'area_name',
+            'position',
+            'position_name',
+            'headquarter',
+            'headquarter_name',
+            'user',
+            'user_email'
+        ]
+
 class ServiceOfferedListSerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only=True)
     area_name = serializers.CharField(read_only=True)
@@ -37,6 +81,11 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
         read_only=True, source="scale.min_value")
     scale_max_value = serializers.CharField(
         read_only=True, source="scale.max_value")
+    # El staffs funciona para llenar los elementos del many to many
+    staffs = serializers.ListField(
+        child=serializers.IntegerField(), required=False, write_only=True)
+    # Serializer aninado
+    _staffs = StaffSerializer(many=True, read_only=True)
 
     class Meta:
         model = ServiceOffered
@@ -54,6 +103,8 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
             'scale_name',
             'scale_min_value',
             'scale_max_value',
+            'staffs',
+            '_staffs'
         ]
 
     def get_type_name(self, obj):
@@ -109,46 +160,3 @@ class ServiceUsedSerializer(serializers.ModelSerializer):
             '_risks'
         ]
 
-
-class StaffListSerializer(serializers.ModelSerializer):
-    area_name = serializers.CharField(read_only=True)
-    position_name = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Staff
-        fields = [
-            'id',
-            'staff_number',
-            'names',
-            'surnames',
-            'earnings',
-            'area',
-            'area_name',
-            'position',
-            'position_name',
-        ]
-
-
-class StaffSerializer(serializers.ModelSerializer):
-    area_name = serializers.CharField(read_only=True)
-    position_name = serializers.CharField(read_only=True)
-    headquarter_name = serializers.CharField(read_only=True)
-    user_email = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Staff
-        fields = [
-            'id',
-            'staff_number',
-            'names',
-            'surnames',
-            'earnings',
-            'area',
-            'area_name',
-            'position',
-            'position_name',
-            'headquarter',
-            'headquarter_name',
-            'user',
-            'user_email'
-        ]

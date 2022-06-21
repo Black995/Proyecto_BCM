@@ -2,3 +2,8 @@
     background-color: rgb(17, 17, 17);
     color: rgb(255, 255, 255);
 }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
