@@ -184,7 +184,7 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>Costo promedio: </strong
-                    >{{ serviceDetail.spending }}
+                    >{{ serviceDetail.spending }}$
                 </li>
                 <li class="list-group-item">
                     <strong>Tiempo de recuperación: </strong
@@ -843,7 +843,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -889,7 +893,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -980,7 +988,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1047,7 +1059,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1124,7 +1140,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1172,7 +1192,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1224,7 +1248,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1260,7 +1288,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1306,7 +1338,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1363,7 +1399,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1395,7 +1435,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1434,7 +1478,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1474,7 +1522,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
@@ -1490,8 +1542,6 @@ export default {
                 });
         },
         show_modal_confirm_association_risks() {
-            console.log("riesgos seleccionados");
-            console.log(this.selectedRisks);
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-risks");
             });
@@ -1533,7 +1583,11 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            this.errorMessage(err.response.data);
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
                         } else {
                             // Servidor no disponible
                             this.errorMessage(

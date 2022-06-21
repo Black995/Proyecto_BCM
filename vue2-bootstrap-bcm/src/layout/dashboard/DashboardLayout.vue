@@ -45,6 +45,11 @@
                     icon="ti-menu-alt"
                 />
                 <sidebar-link
+                    to="/layout/cargos"
+                    name="Cargos"
+                    icon="ti-bar-chart"
+                />
+                <sidebar-link
                     to="/layout/escalas"
                     name="Escalas"
                     icon="ti-ruler-alt"
