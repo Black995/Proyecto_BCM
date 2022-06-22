@@ -32,7 +32,9 @@ class ScaleviewViewSet(viewsets.ModelViewSet):
     # 2. Hacer un promedio de las escalas existentes    
     def partial_update(self, request, pk):
         name = request.data.get('name')
+        scale_id = request.data.get('scale')
         option = request.data.get('option')
+        new_scale = Scale.objects.get(id=scale_id)
         print(option)
         if(option == '1'):
             print('opción 1')
@@ -43,12 +45,24 @@ class ScaleviewViewSet(viewsets.ModelViewSet):
             if(name == 'Actividades de la Organización'):
                 OrganizationActivity.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
         elif(option == '2'):
-            print('opción 2')
+            if(name == 'Servicios de la Organización'):
+                list_obj = ServiceOffered.objects.filter(criticality__isnull=False, scale__isnull=False)
+            elif(name == 'Servicios de Soporte'):
+                list_obj = ServiceUsed.objects.filter(criticality__isnull=False, scale__isnull=False)
+            elif(name == 'Actividades de la Organización'):
+                list_obj = OrganizationActivity.objects.filter(criticality__isnull=False, scale__isnull=False)
+            else: 
+                list_obj = []
+            for s in list_obj:
+                    new_value = round(s.criticality*new_scale.max_value/s.scale.max_value)
+                    s.criticality= new_value if(new_value>=new_scale.min_value) else new_scale.min_value
+                    s.scale=new_scale
+                    s.save()
         else:
             raise serializers.ValidationError(
                 {'Error': 'Opción seleccionada inválida'})
 
-        updated = True
+        updated = ScaleView.objects.filter(name=name).update(scale=new_scale)
         msg, sta = ('Escalas actualizadas exitosamente', status.HTTP_200_OK) if updated else (
             'Las escalas no pudieron ser actualizadas', status.HTTP_400_BAD_REQUEST)
         return Response({'Error': msg}, status=sta)

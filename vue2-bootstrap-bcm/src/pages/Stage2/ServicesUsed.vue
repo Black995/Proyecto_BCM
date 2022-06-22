@@ -18,7 +18,7 @@
                             :loading="loading"
                             :globalFilterFields="[
                                 'name',
-                                'recovery_time',
+                                'type_name',
                                 'spending',
                                 'criticality',
                             ]"
@@ -51,10 +51,7 @@
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
-                            <Column
-                                field="recovery_time"
-                                header="Tiempo de recuperación"
-                            ></Column>
+                            <Column field="type_name" header="Tipo"></Column>
                             <Column field="spending" header="Gasto">
                                 <template #body="slotProps">
                                     {{ slotProps.data.spending }}$
@@ -183,12 +180,21 @@
             </h3>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
+                    <strong>Tipo: </strong>{{ serviceDetail.type_name }}
+                </li>
+                <li class="list-group-item">
                     <strong>Costo promedio: </strong
                     >{{ serviceDetail.spending }}$
                 </li>
                 <li class="list-group-item">
-                    <strong>Tiempo de recuperación: </strong
-                    >{{ serviceDetail.recovery_time }}
+                    <div v-if="serviceDetail.type == 1">
+                        <strong>Acuerdo de nivel de servicio (SLA): </strong
+                        >{{ serviceDetail.agreement_comment }}
+                    </div>
+                    <div v-if="serviceDetail.type == 2">
+                        <strong>Acuerdo de nivel operativo (OLA): </strong
+                        >{{ serviceDetail.agreement_comment }}
+                    </div>
                 </li>
                 <li class="list-group-item">
                     <div v-if="!serviceDetail.scale_max_value">
@@ -234,7 +240,7 @@
             </h3>
 
             <h4 class="mt-5 text-center font-weight-bold">
-                Riesgos del servicios de la organización
+                Riesgos del servicio de la organización
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -291,37 +297,18 @@
                 <b-row align-v="center">
                     <b-col>
                         <b-form-group
-                            label="Tiempo de recuperación"
+                            label="Seleccione el tipo"
                             invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.type"
                         >
-                            <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
-                                <b-col>
-                                    <b-form-group label="Días">
-                                        <b-form-input
-                                            type="number"
-                                            v-model.number="duration.days"
-                                        ></b-form-input>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Horas">
-                                        <b-form-select
-                                            v-model="duration.hours"
-                                            :options="hours"
-                                            label="Horas"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Minutos">
-                                        <b-form-select
-                                            v-model="duration.minutes"
-                                            :options="minutes"
-                                            label="Minutos"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                            </b-row>
+                            <b-form-select
+                                v-model="service.type"
+                                :options="types"
+                                value-field="value"
+                                text-field="name"
+                                :state="serviceState.type"
+                                required
+                            ></b-form-select>
                         </b-form-group>
                     </b-col>
                     <b-col>
@@ -339,11 +326,44 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <b-form-group label="Ingrese la criticidad">
+                <b-form-group
+                    v-if="service.type == 1"
+                    label="Ingrese el acuerdo de nivel de servicio (SLA)"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="serviceState.agreement_comment"
+                >
+                    <b-form-textarea
+                        id="name-input"
+                        v-model="service.agreement_comment"
+                        :state="serviceState.agreement_comment"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+                <b-form-group
+                    v-if="service.type == 2"
+                    label="Ingrese el acuerdo de nivel operativo (OLA)"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="serviceState.agreement_comment"
+                >
+                    <b-form-textarea
+                        id="name-input"
+                        v-model="service.agreement_comment"
+                        :state="serviceState.agreement_comment"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+                <b-form-group
+                    label="Ingrese la criticidad"
+                    invalid-feedback="El valor de la criticidad está fuera de la escala actual"
+                    :state="serviceState.criticality"
+                >
                     <b-form-spinbutton
                         v-model.number="service.criticality"
                         :min="scaleView.scale_min_value"
                         :max="scaleView.scale_max_value"
+                        :state="serviceState.criticality"
                     ></b-form-spinbutton>
                 </b-form-group>
                 <b-row>
@@ -417,37 +437,18 @@
                 <b-row align-v="center">
                     <b-col>
                         <b-form-group
-                            label="Tiempo de recuperación"
+                            label="Seleccione el tipo"
                             invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.type"
                         >
-                            <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
-                                <b-col>
-                                    <b-form-group label="Días">
-                                        <b-form-input
-                                            type="number"
-                                            v-model.number="duration.days"
-                                        ></b-form-input>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Horas">
-                                        <b-form-select
-                                            v-model="duration.hours"
-                                            :options="hours"
-                                            label="Horas"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col>
-                                    <b-form-group label="Minutos">
-                                        <b-form-select
-                                            v-model="duration.minutes"
-                                            :options="minutes"
-                                            label="Minutos"
-                                        ></b-form-select>
-                                    </b-form-group>
-                                </b-col>
-                            </b-row>
+                            <b-form-select
+                                v-model="service.type"
+                                :options="types"
+                                value-field="value"
+                                text-field="name"
+                                :state="serviceState.type"
+                                required
+                            ></b-form-select>
                         </b-form-group>
                     </b-col>
                     <b-col>
@@ -465,11 +466,44 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <b-form-group label="Ingrese la criticidad">
+                <b-form-group
+                    v-if="service.type == 1"
+                    label="Ingrese el acuerdo de nivel de servicio (SLA)"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="serviceState.agreement_comment"
+                >
+                    <b-form-textarea
+                        id="name-input"
+                        v-model="service.agreement_comment"
+                        :state="serviceState.agreement_comment"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+                <b-form-group
+                    v-if="service.type == 2"
+                    label="Ingrese el acuerdo de nivel operativo (OLA)"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="serviceState.agreement_comment"
+                >
+                    <b-form-textarea
+                        id="name-input"
+                        v-model="service.agreement_comment"
+                        :state="serviceState.agreement_comment"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+                <b-form-group
+                    label="Ingrese la criticidad"
+                    invalid-feedback="El valor de la criticidad está fuera de la escala actual"
+                    :state="serviceState.criticality"
+                >
                     <b-form-spinbutton
                         v-model.number="service.criticality"
                         :min="scaleView.scale_min_value"
                         :max="scaleView.scale_max_value"
+                        :state="serviceState.criticality"
                     ></b-form-spinbutton>
                 </b-form-group>
                 <b-row>
@@ -639,14 +673,6 @@
             size="lg"
             centered
         >
-            <!--multiselect
-                v-model="selectedRisks"
-                placeholder="Buscar riesgos"
-                label="name"
-                track-by="id"
-                :options="risks"
-                :multiple="true"
-            ></multiselect-->
             <multiselect
                 v-model="selectedRisks"
                 placeholder="Buscar riesgos"
@@ -721,11 +747,6 @@ import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
 import Multiselect from "vue-multiselect";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
-import {
-    getRecoveryTimeText,
-    getRecoveryTime,
-    setRecoveryTime,
-} from "../../helpers/helpers";
 
 export default {
     name: "ServicesUsed",
@@ -744,9 +765,11 @@ export default {
         servicesUsed: [],
         serviceDetail: {
             name: "",
+            type: 0,
+            type_name: "",
             spending: 0,
-            recovery_time: "",
             criticality: 0,
+            agreement_comment: "",
             scale_name: "",
             scale_min_value: 0,
             scale_max_value: 0,
@@ -758,25 +781,29 @@ export default {
 
         service: {
             name: "",
+            type: 0,
             spending: 0,
-            recovery_time: "",
             criticality: 0,
+            agreement_comment: "",
             scale: 0,
         },
         serviceState: {
             name: null,
+            type: null,
+            criticality: null,
             spending: null,
+            agreement_comment: null,
         },
-        duration: {
-            days: 0,
-            hours: 0,
-            minutes: 0,
-        },
-        hours: [
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-            19, 20, 21, 22, 23,
+        types: [
+            {
+                value: 1,
+                name: "Contratado",
+            },
+            {
+                value: 2,
+                name: "Interno",
+            },
         ],
-        minutes: [0, 15, 30, 45],
         // Variable en la que se maneja la escala de la vista
         scaleView: {
             id: 0,
@@ -791,9 +818,8 @@ export default {
         servicesOffered: [],
         selectedServicesOffered: [],
         // Lista de riesgos para realizar la asociación
-        risks: [],
-        selectedRisks: [],
         crisisScenarioRisks: [],
+        selectedRisks: [],
     }),
     mounted() {
         this.getServicesUsed();
@@ -875,18 +901,11 @@ export default {
                     },
                 })
                 .then((res) => {
-                    for (var i = 0; i < res.data.length; i++) {
-                        //Convertimos en texto la duración
-                        res.data[i].recovery_time = getRecoveryTimeText(
-                            res.data[i].recovery_time
-                        );
-                        this.servicesUsed.push(res.data[i]);
-                    }
+                    this.servicesUsed = res.data;
                     this.loading = false;
 
                     // Mientras tanto vamos cargando la lista de servicios de la organización y riesgos
                     this.getServicesOffered();
-                    this.getRisks();
                     this.getCrisisScenarioRisks();
                 })
                 .catch((err) => {
@@ -933,8 +952,23 @@ export default {
                 this.serviceState.name = false;
                 valid = false;
             }
+            if (this.service.type == 0) {
+                this.serviceState.type = false;
+                valid = false;
+            }
             if (this.service.spending <= 0) {
                 this.serviceState.spending = false;
+                valid = false;
+            }
+            if (!this.service.agreement_comment) {
+                this.serviceState.agreement_comment = false;
+                valid = false;
+            }
+            if (
+                this.service.criticality < this.scaleView.scale_min_value ||
+                this.service.criticality > this.scaleView.scale_max_value
+            ) {
+                this.serviceState.criticality = false;
                 valid = false;
             }
             return valid;
@@ -942,13 +976,16 @@ export default {
         resetModal() {
             this.service.name = "";
             this.serviceState.name = null;
+            this.service.type = 0;
+            this.serviceState.type = null;
+            this.service.criticality = 0;
+            this.serviceState.criticality = null;
             this.service.spending = 0;
             this.serviceState.spending = null;
+            this.service.agreement_comment = "";
+            this.serviceState.agreement_comment = null;
+            this.serviceState.criticality = null;
             this.service.criticality = this.scaleView.scale_min_value;
-
-            this.duration.days = 0;
-            this.duration.hours = 0;
-            this.duration.minutes = 0;
         },
 
         /**
@@ -957,9 +994,11 @@ export default {
         async show_modal_detail(id) {
             this.serviceDetail = {
                 name: "",
+                type: 0,
+                type_name: "",
                 spending: 0,
-                recovery_time: "",
                 criticality: 0,
+                agreement_comment: "",
                 scale_name: "",
                 scale_min_value: 0,
                 scale_max_value: 0,
@@ -975,16 +1014,15 @@ export default {
                     },
                 })
                 .then((res) => {
+                    console.log(res.data);
                     this.serviceDetail = res.data;
-                    this.serviceDetail.recovery_time = getRecoveryTimeText(
-                        this.serviceDetail.recovery_time
-                    );
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-detail");
                     });
                 })
                 .catch((err) => {
+                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
@@ -1014,7 +1052,10 @@ export default {
         handleSubmitCreate() {
             // Inicializamos variables de estados
             this.serviceState.name = null;
+            this.serviceState.type = null;
+            this.serviceState.criticality = null;
             this.serviceState.spending = null;
+            this.serviceState.agreement_comment = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -1027,7 +1068,6 @@ export default {
             });
         },
         async createService() {
-            this.service.recovery_time = setRecoveryTime(this.duration);
             this.service.scale = this.scaleView.scale;
 
             axios
@@ -1085,26 +1125,10 @@ export default {
         handleSubmitUpdate() {
             // Inicializamos variables de estados
             this.serviceState.name = null;
+            this.serviceState.type = null;
+            this.serviceState.criticality = null;
             this.serviceState.spending = null;
-
-            // Exit when the form isn't valid
-            if (!this.checkFormValidity()) {
-                return;
-            }
-
-            // Mostrar modal de confirmar
-            this.$nextTick(() => {
-                this.$bvModal.show("modal-confirm-update");
-            });
-        },
-
-        /**
-         * Update
-         */
-        handleSubmitUpdate() {
-            // Inicializamos variables de estados
-            this.serviceState.name = null;
-            this.serviceState.spending = null;
+            this.serviceState.agreement_comment = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -1131,7 +1155,7 @@ export default {
                 )
                 .then((res) => {
                     this.service = res.data;
-                    this.duration = getRecoveryTime(res.data.recovery_time);
+
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -1160,7 +1184,6 @@ export default {
                 });
         },
         async updateService() {
-            this.service.recovery_time = setRecoveryTime(this.duration);
             this.service.scale = this.scaleView.scale;
 
             axios
@@ -1418,42 +1441,10 @@ export default {
                     }
                 });
         },
-        async getRisks() {
-            this.risks = [];
 
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase1/risks/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
-                .then((res) => {
-                    this.risks = res.data;
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
-                        } else {
-                            // Servidor no disponible
-                            this.errorMessage(
-                                "Ups! Ha ocurrido un error en el servidor"
-                            );
-                        }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
-        },
+        /**
+         * Associate Risks
+         */
         async getCrisisScenarioRisks() {
             this.crisisScenarioRisks = [];
 

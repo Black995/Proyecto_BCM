@@ -6,8 +6,9 @@ from bcm_phase1.api.serializers import RiskSerializer
 
 
 class StaffListSerializer(serializers.ModelSerializer):
-    area_name = serializers.CharField(read_only=True)
-    position_name = serializers.CharField(read_only=True)
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    position_name = serializers.CharField(read_only=True, source="position.name")
+    headquarter_name = serializers.CharField(read_only=True, source="headquarter.name")
 
     class Meta:
         model = Staff
@@ -21,6 +22,8 @@ class StaffListSerializer(serializers.ModelSerializer):
             'area_name',
             'position',
             'position_name',
+            'headquarter',
+            'headquarter_name',
         ]
 
 
@@ -86,6 +89,11 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
         child=serializers.IntegerField(), required=False, write_only=True)
     # Serializer aninado
     _staffs = StaffSerializer(many=True, read_only=True)
+    # El risks funciona para llenar los elementos del many to many
+    risks = serializers.ListField(
+        child=serializers.IntegerField(), required=False, write_only=True)
+    # Serializer aninado
+    _risks = RiskSerializer(many=True, read_only=True)
 
     class Meta:
         model = ServiceOffered
@@ -96,6 +104,8 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
             'type_name',
             'profit',
             'recovery_time',
+            'recovery_point',
+            'maximum_recovery_time',
             'criticality',
             'area',
             'area_name',
@@ -104,7 +114,9 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
             'scale_min_value',
             'scale_max_value',
             'staffs',
-            '_staffs'
+            '_staffs',
+            'risks',
+            '_risks'
         ]
 
     def get_type_name(self, obj):
@@ -112,6 +124,7 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
 
 
 class ServiceUsedListSerializer(serializers.ModelSerializer):
+    type_name = serializers.SerializerMethodField(read_only=True)
     scale_max_value = serializers.CharField(read_only=True)
 
     class Meta:
@@ -119,15 +132,21 @@ class ServiceUsedListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+            'type',
+            'type_name',
             'spending',
-            'recovery_time',
             'criticality',
+            'agreement_comment',
             'scale',
             'scale_max_value',
         ]
 
+    def get_type_name(self, obj):
+        return dict(ServiceUsed.TYPE).get(obj.type)
+
 
 class ServiceUsedSerializer(serializers.ModelSerializer):
+    type_name = serializers.SerializerMethodField(read_only=True)
     scale_name = serializers.CharField(read_only=True)
     scale_min_value = serializers.CharField(read_only=True)
     scale_max_value = serializers.CharField(read_only=True)
@@ -147,9 +166,11 @@ class ServiceUsedSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+            'type',
+            'type_name',
             'spending',
-            'recovery_time',
             'criticality',
+            'agreement_comment',
             'scale',
             'scale_name',
             'scale_min_value',
@@ -159,4 +180,7 @@ class ServiceUsedSerializer(serializers.ModelSerializer):
             'risks',
             '_risks'
         ]
+
+    def get_type_name(self, obj):
+        return dict(ServiceUsed.TYPE).get(obj.type)
 
