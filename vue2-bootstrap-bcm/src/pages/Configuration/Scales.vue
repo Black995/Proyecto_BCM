@@ -1032,7 +1032,6 @@ export default {
          */
         checkFormValidityScalesView() {
             let valid = true;
-            console.log(this.scaleView);
             if (!this.scaleView.name) {
                 this.scaleViewState.name = false;
                 valid = false;
