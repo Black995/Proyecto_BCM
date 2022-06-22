@@ -54,7 +54,7 @@
                             </template>
                             <Column
                                 field="staff_number"
-                                header="Número de Staff"
+                                header="Número de Identificación"
                             ></Column>
                             <Column field="names" header="Nombres"></Column>
                             <Column
@@ -152,7 +152,7 @@
                     >
                 </li>
                 <li class="list-group-item">
-                    <strong>Número de Staff: </strong
+                    <strong>Número de Identificación: </strong
                     >{{ staffDetail.staff_number }}
                 </li>
                 <li class="list-group-item">
@@ -232,7 +232,7 @@
                 <b-row>
                     <b-col>
                         <b-form-group
-                            label="Ingrese el número de staff del personal"
+                            label="Ingrese el número de Identificación del personal"
                             invalid-feedback="Este campo es obligatorio"
                             :state="staffState.staff_number"
                         >
@@ -392,7 +392,7 @@
                 <b-row>
                     <b-col>
                         <b-form-group
-                            label="Ingrese el número de staff del personal"
+                            label="Ingrese el número de Identificación del personal"
                             invalid-feedback="Este campo es obligatorio"
                             :state="staffState.staff_number"
                         >

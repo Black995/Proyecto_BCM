@@ -31,19 +31,23 @@ export function getRecoveryTime(durationText) {
 	}
 	let stringArray = []
 
+	// Verificamos si el campo es nulo
+	if (!durationText) {
+		return duration;
+	}
 	//Verificamos si el string tiene espacios (para separar días)
-	if(durationText.indexOf(' ') >= 0) {
+	if (durationText.indexOf(' ') >= 0) {
 		stringArray = durationText.split(" ");
 		duration.days = parseInt(stringArray[0]);
-		duration.hours = parseInt(stringArray[1].slice(0,2))
-		duration.minutes = parseInt(stringArray[1].slice(3,5))
+		duration.hours = parseInt(stringArray[1].slice(0, 2))
+		duration.minutes = parseInt(stringArray[1].slice(3, 5))
 	}
 	else {
 		duration.days = 0;
-		duration.hours = parseInt(durationText.slice(0,2))
-		duration.minutes = parseInt(durationText.slice(3,5))
+		duration.hours = parseInt(durationText.slice(0, 2))
+		duration.minutes = parseInt(durationText.slice(3, 5))
 	}
-	
+
 	return duration;
 }
 
@@ -57,20 +61,24 @@ export function getRecoveryTimeText(durationText) {
 	let stringArray = []
 	let text = '';
 
+	// Verificamos si el campo es nulo
+	if (!durationText) {
+		return '';
+	}
 	//Verificamos si el string tiene espacios (para separar días)
-	if(durationText.indexOf(' ') >= 0) {
+	else if (durationText.indexOf(' ') >= 0) {
 		stringArray = durationText.split(" ");
 		duration.days = parseInt(stringArray[0]);
-		duration.hours = parseInt(stringArray[1].slice(0,2))
-		duration.minutes = parseInt(stringArray[1].slice(3,5))
+		duration.hours = parseInt(stringArray[1].slice(0, 2))
+		duration.minutes = parseInt(stringArray[1].slice(3, 5))
 		text = duration.days.toString() + ' días, ' + duration.hours.toString() + ' horas, ' + duration.minutes.toString() + ' minutos'
 	}
 	else {
 		duration.days = 0;
-		duration.hours = parseInt(durationText.slice(0,2))
-		duration.minutes = parseInt(durationText.slice(3,5))
+		duration.hours = parseInt(durationText.slice(0, 2))
+		duration.minutes = parseInt(durationText.slice(3, 5))
 		text = duration.hours.toString() + ' horas, ' + duration.minutes.toString() + ' minutos'
 	}
-	
+
 	return text;
 }

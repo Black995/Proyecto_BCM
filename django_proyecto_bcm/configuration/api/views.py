@@ -32,6 +32,7 @@ class ScaleviewViewSet(viewsets.ModelViewSet):
     # 2. Hacer un promedio de las escalas existentes    
     def partial_update(self, request, pk):
         name = request.data.get('name')
+        scale = request.data.get('scale')
         option = request.data.get('option')
         print(option)
         if(option == '1'):
@@ -48,7 +49,7 @@ class ScaleviewViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 {'Error': 'Opción seleccionada inválida'})
 
-        updated = True
+        updated = ScaleView.objects.filter(name=name).update(scale=Scale.objects.get(id=scale))
         msg, sta = ('Escalas actualizadas exitosamente', status.HTTP_200_OK) if updated else (
             'Las escalas no pudieron ser actualizadas', status.HTTP_400_BAD_REQUEST)
         return Response({'Error': msg}, status=sta)
