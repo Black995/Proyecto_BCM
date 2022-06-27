@@ -27,6 +27,7 @@ import Staffs from "@/pages/Stage2/Staffs.vue";
 import Areas from "@/pages/Configuration/Areas.vue";
 import Positions from "@/pages/Configuration/Positions.vue";
 import Scales from "@/pages/Configuration/Scales.vue";
+import Headquarters from "@/pages/Configuration/Headquarters.vue";
 
 
 const routes = [
@@ -88,6 +89,11 @@ const routes = [
         path: "cargos",
         name: "Cargos de la Organización",
         component: Positions
+      },
+      {
+        path: "sedes",
+        name: "Sedes de la Organización",
+        component: Headquarters
       },
       /**
        * Additional

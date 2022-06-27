@@ -11,10 +11,40 @@ class Organization(models.Model):
         upload_to='organization_logo', null=True, blank=True)
 
 
+class State(models.Model):
 
-"""
-    Recursive relation will be evaluated, depending the final location model use
-"""
+    name = models.CharField(max_length=100, unique=True)
+    iso_3166_2 = models.CharField(max_length=5)
+    
+
+class City(models.Model):
+
+    CAPITAL = 1
+    NON_CAPITAL = 0
+    TYPE = (
+        (CAPITAL, 'Capital'),
+        (NON_CAPITAL, 'No es capital')
+    )
+
+    name = models.CharField(max_length=100)
+    capital = models.SmallIntegerField(choices=TYPE)
+    state = models.ForeignKey(
+        State, related_name='state_city', on_delete=models.CASCADE)
+    
+
+class Township(models.Model):
+
+    name = models.CharField(max_length=100)
+    state = models.ForeignKey(
+        State, related_name='state_twonship', on_delete=models.CASCADE)
+        
+
+class Parish(models.Model):
+
+    name = models.CharField(max_length=100)
+    township = models.ForeignKey(
+        State, related_name='township_parish', on_delete=models.CASCADE)
+
 
 
 class Location(models.Model):
