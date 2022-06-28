@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .views import (AreaViewSet, ScaleViewSet, ScaleviewViewSet, PositionViewSet, HeadquarterViewSet)
+from .views import (AreaViewSet, ScaleViewSet, ScaleviewViewSet, PositionViewSet, 
+    HeadquarterViewSet, StateViewSet, CityViewSet, TownshipViewSet, ParishViewSet)
 
 
 urlpatterns = [
@@ -44,4 +45,14 @@ urlpatterns = [
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='headquarter_detail'),
+
+    # Requests de estados, ciudades, municipios y parroquias
+    path('states/', StateViewSet.as_view({
+        'get': 'list'}), name='state_list'),
+    path('cities/', CityViewSet.as_view({
+        'get': 'list'}), name='city_list'),
+    path('townships/', TownshipViewSet.as_view({
+        'get': 'list'}), name='township_list'),
+    path('parishes/', ParishViewSet.as_view({
+        'get': 'list'}), name='parish_list'),
 ]

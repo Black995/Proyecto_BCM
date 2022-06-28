@@ -54,6 +54,7 @@
                     name="Escalas"
                     icon="ti-ruler-alt"
                 />
+                <sidebar-link to="/layout/sedes" name="Sedes" icon="ti-map" />
                 <!--sidebar-link
                     to="/layout/stats"
                     name="User Profile"
