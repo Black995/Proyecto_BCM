@@ -43,32 +43,19 @@ class Parish(models.Model):
 
     name = models.CharField(max_length=100)
     township = models.ForeignKey(
-        State, related_name='township_parish', on_delete=models.CASCADE)
+        Township, related_name='township_parish', on_delete=models.CASCADE)
 
 
 
-class Location(models.Model):
-
-    COUNTRY = 1
-    STATE = 2
-    CITY = 3
-    TYPE = (
-        (COUNTRY, 'País'),
-        (STATE, 'Estado'),
-        (CITY, 'Ciudad'),
-    )
-
-    name = models.CharField(max_length=100, unique=True)
-    type = models.SmallIntegerField(choices=TYPE)
-    # uper_location = models.ForeignKey(
-    #    'Location', blank=True, null=True, related_name='upper_location', on_delete=models.SET_NULL)
 
 
 class Headquarter(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
-    location = models.OneToOneField(Location, related_name='location_headquarter', null=True,
-                                    on_delete=models.SET_NULL)
+    city = models.ForeignKey(
+        City, related_name='city_headquarter', null=True, on_delete=models.SET_NULL)
+    parish = models.ForeignKey(
+        Parish, related_name='parish_headquarter', null=True, on_delete=models.SET_NULL)
 
 
 class Position(models.Model):

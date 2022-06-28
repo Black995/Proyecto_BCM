@@ -1,11 +1,11 @@
-from configuration.models import Area, Scale, ScaleView, Position, Headquarter
+from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish
 from bcm_phase2.models import ServiceOffered, ServiceUsed, OrganizationActivity
 from django.shortcuts import get_object_or_404
-from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer
+from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer, StateSerializer, CitySerializer, TownshipSerializer, ParishSerializer
 from rest_framework import viewsets, serializers, status
 from rest_framework.response import Response
 from django.db.models import Q, F
-from configuration.api.filters import (ScaleViewFilterBackend,)
+from configuration.api.filters import (ScaleViewFilterBackend, CityTownshipFilterBackend, ParishFilterBackend)
 
 
 class AreaViewSet(viewsets.ModelViewSet):
@@ -77,5 +77,36 @@ class PositionViewSet(viewsets.ModelViewSet):
 
 class HeadquarterViewSet(viewsets.ModelViewSet):
     model = Headquarter
-    queryset = Headquarter.objects.annotate(location_name=F('location__name')).order_by('name')
+    queryset = Headquarter.objects.order_by('name')
     serializer_class = HeadquarterSerializer
+
+
+"""
+    Vistas de estados, ciudades, municipios y parroquias
+"""
+class StateViewSet(viewsets.ModelViewSet):
+    model = State
+    queryset = State.objects.order_by('name')
+    serializer_class = StateSerializer
+
+
+class CityViewSet(viewsets.ModelViewSet):
+    model = City
+    queryset = City.objects.order_by('name')
+    serializer_class = CitySerializer
+    filter_backends = [CityTownshipFilterBackend, ]
+
+
+class TownshipViewSet(viewsets.ModelViewSet):
+    model = Township
+    queryset = Township.objects.order_by('name')
+    serializer_class = TownshipSerializer
+    filter_backends = [CityTownshipFilterBackend, ]
+
+
+class ParishViewSet(viewsets.ModelViewSet):
+    model = Parish
+    queryset = Parish.objects.order_by('name')
+    serializer_class = ParishSerializer
+    filter_backends = [ParishFilterBackend, ]
+

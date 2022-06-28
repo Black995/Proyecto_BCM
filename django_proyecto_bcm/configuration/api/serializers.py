@@ -1,4 +1,4 @@
-from configuration.models import Area, Scale, ScaleView, Position, Headquarter
+from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish
 from rest_framework import serializers
 from django.db.models import F, Q
 
@@ -64,13 +64,69 @@ class PositionSerializer(serializers.ModelSerializer):
         
 
 class HeadquarterSerializer(serializers.ModelSerializer):
-    location_name = serializers.CharField(read_only=True)
+    city_name = serializers.CharField(read_only=True,  source="city.name")
+    parish_name = serializers.CharField(read_only=True,  source="parish.name")
+    township_name = serializers.CharField(read_only=True,  source="parish.township.name")
+    state_name = serializers.CharField(read_only=True,  source="parish.township.state.name")
 
     class Meta:
         model = Headquarter
         fields = [
             'id',
             'name',
-            'location',
-            'location_name'
+            'city',
+            'city_name',
+            'parish',
+            'parish_name',
+            'township_name',
+            'state_name',
+        ]
+
+
+
+"""
+    Serializers de estados, ciudades, municipios y parroquias
+"""
+class StateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        fields = [
+            'id',
+            'name',
+            'iso_3166_2'
+        ]
+
+
+class CitySerializer(serializers.ModelSerializer):
+    capital_name = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = City
+        fields = [
+            'id',
+            'name',
+            'capital',
+            'capital_name',
+            'state'
+        ]
+    
+    def get_capital_name(self, obj):
+        return dict(City.TYPE).get(obj.capital)
+
+
+class TownshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Township
+        fields = [
+            'id',
+            'name',
+        ]
+
+
+class ParishSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parish
+        fields = [
+            'id',
+            'name',
         ]

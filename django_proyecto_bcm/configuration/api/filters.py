@@ -1,6 +1,6 @@
 from rest_framework import filters
 from django.db.models import Q, F
-from configuration.models import ScaleView, Scale
+from configuration.models import ScaleView, State, City, Township, Parish
 from django.utils.timezone import utc
 from datetime import datetime, timedelta
 
@@ -21,3 +21,22 @@ class ScaleViewFilterBackend(filters.BaseFilterBackend):
             else:
                 queryset = queryset.filter(name='default')
         return queryset
+
+
+class CityTownshipFilterBackend(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        state_id = request.GET.get('state_id')
+        if state_id:
+            queryset = queryset.filter(state=state_id)
+        return queryset
+
+
+class ParishFilterBackend(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        township_id = request.GET.get('township_id')
+        if township_id:
+            queryset = queryset.filter(township=township_id)
+        return queryset
+

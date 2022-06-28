@@ -16,7 +16,13 @@
                             :responsive="true"
                             :reorderableColumns="true"
                             :loading="loading"
-                            :globalFilterFields="['name', 'location_name']"
+                            :globalFilterFields="[
+                                'name',
+                                'city_name',
+                                'parish_name',
+                                'township_name',
+                                'state_name',
+                            ]"
                             :filters="filterGlobal"
                         >
                             <template #header>
@@ -46,10 +52,16 @@
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
+                            <Column field="city_name" header="Ciudad"></Column>
                             <Column
-                                field="location_name"
-                                header="Ubicación"
+                                field="parish_name"
+                                header="Parroquia"
                             ></Column>
+                            <Column
+                                field="township_name"
+                                header="Municipio"
+                            ></Column>
+                            <Column field="state_name" header="Estado"></Column>
                             <Column field="id_2" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
