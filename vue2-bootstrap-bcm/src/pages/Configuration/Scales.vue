@@ -1030,7 +1030,19 @@ export default {
         /**
          * Validar formularios
          */
-        checkFormValidityScalesView() {
+        checkFormValidityScalesViewCreate() {
+            let valid = true;
+            if (!this.scaleView.name) {
+                this.scaleViewState.name = false;
+                valid = false;
+            }
+            if (this.scaleView.scale == 0) {
+                this.scaleViewState.scale = false;
+                valid = false;
+            }
+            return valid;
+        },
+        checkFormValidityScalesViewUpdate() {
             let valid = true;
             if (!this.scaleView.name) {
                 this.scaleViewState.name = false;
@@ -1063,7 +1075,7 @@ export default {
             this.scaleViewState.scale = null;
 
             // Exit when the form isn't valid
-            if (!this.checkFormValidityScalesView()) {
+            if (!this.checkFormValidityScalesViewCreate()) {
                 return;
             }
 
@@ -1149,7 +1161,7 @@ export default {
             this.scaleViewState.scale = null;
 
             // Exit when the form isn't valid
-            if (!this.checkFormValidityScalesView()) {
+            if (!this.checkFormValidityScalesViewUpdate()) {
                 return;
             }
 
