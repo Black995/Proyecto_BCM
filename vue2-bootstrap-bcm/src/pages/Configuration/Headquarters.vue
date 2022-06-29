@@ -52,16 +52,16 @@
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
+                            <Column field="state_name" header="Estado"></Column>
                             <Column field="city_name" header="Ciudad"></Column>
-                            <Column
-                                field="parish_name"
-                                header="Parroquia"
-                            ></Column>
                             <Column
                                 field="township_name"
                                 header="Municipio"
                             ></Column>
-                            <Column field="state_name" header="Estado"></Column>
+                            <Column
+                                field="parish_name"
+                                header="Parroquia"
+                            ></Column>
                             <Column field="id_2" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
@@ -130,6 +130,76 @@
                         required
                     ></b-form-input>
                 </b-form-group>
+                <b-form-group
+                    label="Seleccione el Estado"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="headquarterState.state"
+                >
+                    <b-form-select
+                        @change="
+                            getCities(true);
+                            getTownships(true);
+                        "
+                        v-model="stateId"
+                        :options="states"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.state"
+                        required
+                    ></b-form-select>
+                </b-form-group>
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione la ciudad"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.city"
+                        >
+                            <b-form-select
+                                v-model="headquarter.city"
+                                :options="cities"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.city"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione el municipio"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.township"
+                        >
+                            <b-form-select
+                                @change="getParishes(true)"
+                                v-model="townshipId"
+                                :options="townships"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.township"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-form-group
+                    v-if="townshipId"
+                    label="Seleccione la parroquia"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="headquarterState.parish"
+                >
+                    <b-form-select
+                        v-model="headquarter.parish"
+                        :options="parishes"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.parish"
+                        required
+                    ></b-form-select>
+                </b-form-group>
             </form>
 
             <template #modal-footer>
@@ -190,6 +260,76 @@
                         :state="headquarterState.name"
                         required
                     ></b-form-input>
+                </b-form-group>
+                <b-form-group
+                    label="Seleccione el Estado"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="headquarterState.state"
+                >
+                    <b-form-select
+                        @change="
+                            getCities(true);
+                            getTownships(true);
+                        "
+                        v-model="stateId"
+                        :options="states"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.state"
+                        required
+                    ></b-form-select>
+                </b-form-group>
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione la ciudad"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.city"
+                        >
+                            <b-form-select
+                                v-model="headquarter.city"
+                                :options="cities"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.city"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione el municipio"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.township"
+                        >
+                            <b-form-select
+                                @change="getParishes(true)"
+                                v-model="townshipId"
+                                :options="townships"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.township"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-form-group
+                    v-if="townshipId"
+                    label="Seleccione la parroquia"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="headquarterState.parish"
+                >
+                    <b-form-select
+                        v-model="headquarter.parish"
+                        :options="parishes"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.parish"
+                        required
+                    ></b-form-select>
                 </b-form-group>
             </form>
 
@@ -275,10 +415,26 @@ export default {
 
         headquarter: {
             name: "",
+            city: 0,
+            parish: 0,
         },
         headquarterState: {
             name: null,
+            state: null,
+            city: null,
+            township: null,
+            parish: null,
         },
+
+        /**
+         * Variables utilizadas para manejo de estados, ciudades, municipios y parroquias
+         */
+        states: [],
+        cities: [],
+        townships: [],
+        parishes: [],
+        stateId: 0,
+        townshipId: 0,
     }),
     mounted() {
         this.getHeadquarters();
@@ -318,6 +474,9 @@ export default {
                 .then((res) => {
                     this.headquarters = res.data;
                     this.loading = false;
+
+                    // Mientras tanto vamos cargando la lista de estados
+                    this.getStates();
                 })
                 .catch((err) => {
                     try {
@@ -364,11 +523,35 @@ export default {
                 this.headquarterState.name = false;
                 valid = false;
             }
+            if (this.stateId == 0) {
+                this.headquarterState.state = false;
+                valid = false;
+            }
+            if (this.townshipId == 0) {
+                this.headquarterState.township = false;
+                valid = false;
+            }
+            if (this.headquarter.city == 0) {
+                this.headquarterState.city = false;
+                valid = false;
+            }
+            if (this.headquarter.parish == 0) {
+                this.headquarterState.parish = false;
+                valid = false;
+            }
             return valid;
         },
         resetModal() {
             this.headquarter.name = "";
             this.headquarterState.name = null;
+            this.stateId = 0;
+            this.headquarterState.state = null;
+            this.townshipId = 0;
+            this.headquarterState.township = null;
+            this.headquarter.city = 0;
+            this.headquarterState.city = null;
+            this.headquarter.parish = 0;
+            this.headquarterState.parish = null;
         },
         /**
          * Create
@@ -376,6 +559,10 @@ export default {
         handleSubmitCreate() {
             // Inicializamos variables de estados
             this.headquarterState.name = null;
+            this.headquarterState.state = null;
+            this.headquarterState.township = null;
+            this.headquarterState.city = null;
+            this.headquarterState.parish = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -443,6 +630,10 @@ export default {
         handleSubmitUpdate() {
             // Inicializamos variables de estados
             this.headquarterState.name = null;
+            this.headquarterState.state = null;
+            this.headquarterState.township = null;
+            this.headquarterState.city = null;
+            this.headquarterState.parish = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -465,7 +656,15 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.headquarter = res.data;
+                    this.headquarter.name = res.data.name;
+                    this.headquarter.city = res.data.city;
+                    this.headquarter.parish = res.data.parish;
+                    this.stateId = res.data.state;
+                    this.townshipId = res.data.township;
+                    this.getCities(false);
+                    this.getTownships(false);
+                    this.getParishes(false);
+
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -576,6 +775,166 @@ export default {
 
                     // Cargamos de nuevo la tabla de riesgos
                     this.getHeadquarters();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Obtener estados, ciudades, municipios y parroquias
+         */
+        async getStates() {
+            this.states = [];
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/states/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.states = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getCities(reset) {
+            this.cities = [];
+            if (reset) {
+                this.headquarter.city = 0;
+            }
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/cities/`, {
+                    params: { state_id: this.stateId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.cities = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getTownships(reset) {
+            this.townships = [];
+            if (reset) {
+                this.townshipId = 0;
+            }
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/townships/`, {
+                    params: { state_id: this.stateId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.townships = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getParishes(reset) {
+            this.parishes = [];
+            if (reset) {
+                this.headquarter.parish = 0;
+            }
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/parishes/`, {
+                    params: { township_id: this.townshipId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.parishes = res.data;
                 })
                 .catch((err) => {
                     try {

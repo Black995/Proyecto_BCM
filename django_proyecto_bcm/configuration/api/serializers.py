@@ -64,10 +64,12 @@ class PositionSerializer(serializers.ModelSerializer):
         
 
 class HeadquarterSerializer(serializers.ModelSerializer):
-    city_name = serializers.CharField(read_only=True,  source="city.name")
-    parish_name = serializers.CharField(read_only=True,  source="parish.name")
-    township_name = serializers.CharField(read_only=True,  source="parish.township.name")
-    state_name = serializers.CharField(read_only=True,  source="parish.township.state.name")
+    city_name = serializers.CharField(read_only=True, source="city.name")
+    parish_name = serializers.CharField(read_only=True, source="parish.name")
+    township_name = serializers.CharField(read_only=True, source="parish.township.name")
+    state_name = serializers.CharField(read_only=True, source="parish.township.state.name")
+    township = serializers.IntegerField(read_only=True, source="parish.township.id")
+    state = serializers.IntegerField(read_only=True, source="parish.township.state.id")
 
     class Meta:
         model = Headquarter
@@ -78,7 +80,9 @@ class HeadquarterSerializer(serializers.ModelSerializer):
             'city_name',
             'parish',
             'parish_name',
+            'township',
             'township_name',
+            'state',
             'state_name',
         ]
 
