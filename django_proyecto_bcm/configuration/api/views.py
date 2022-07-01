@@ -1,7 +1,7 @@
-from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish
+from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish, Organization
 from bcm_phase2.models import ServiceOffered, ServiceUsed, OrganizationActivity
 from django.shortcuts import get_object_or_404
-from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer, StateSerializer, CitySerializer, TownshipSerializer, ParishSerializer
+from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer, StateSerializer, CitySerializer, TownshipSerializer, ParishSerializer, OrganizationSerializer
 from rest_framework import viewsets, serializers, status
 from rest_framework.response import Response
 from django.db.models import Q, F
@@ -109,4 +109,10 @@ class ParishViewSet(viewsets.ModelViewSet):
     queryset = Parish.objects.order_by('name')
     serializer_class = ParishSerializer
     filter_backends = [ParishFilterBackend, ]
+
+
+class OrganizationViewSet(viewsets.ModelViewSet):
+    model = Organization
+    queryset = Organization.objects.order_by('name')
+    serializer_class = OrganizationSerializer
 

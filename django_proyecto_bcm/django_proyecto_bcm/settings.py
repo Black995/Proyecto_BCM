@@ -180,3 +180,33 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+### LDAP Settings ###
+import ldap
+from django_auth_ldap.config import LDAPSearch
+
+if env('AUTH_LDAP'):
+    # Baseline configuration.
+    AUTH_LDAP_SERVER_URI = env('AUTH_LDAP_SERVER_URI')
+
+    AUTH_LDAP_USER_SEARCH = LDAPSearch(
+        env('AUTH_LDAP_USER_SEARCH_BASE_DN'),
+        ldap.SCOPE_SUBTREE,
+        '(uid=%(user)s)',
+    )
+
+    # Populate the Django user from the LDAP directory.
+    AUTH_LDAP_USER_ATTR_MAP = {
+        'first_name': 'givenName',
+        'last_name': 'sn',
+        'email': 'mail',
+    }
+
+    AUTH_LDAP_ALWAYS_UPDATE_USER = True
+
+    AUTHENTICATION_BACKENDS = (
+        'django_proyecto_bcm.authenticators_ldap.CustomLDAPBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    )
+
