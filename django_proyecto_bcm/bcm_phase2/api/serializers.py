@@ -1,7 +1,8 @@
-from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff
+from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity
 from rest_framework import serializers
 from django.db.models import F, Q
 from bcm_phase1.api.serializers import RiskSerializer
+from configuration.api.serializers import HeadquarterSerializer
 
 
 class ServiceOfferedListSerializer(serializers.ModelSerializer):
@@ -151,4 +152,58 @@ class StaffSerializer(serializers.ModelSerializer):
             'headquarter_name',
             'user',
             'user_email'
+        ]
+
+class OrganizationActivityListSerializer(serializers.ModelSerializer):
+    scale_max_value = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = OrganizationActivity
+        fields =[
+            'id',
+            'name',
+            'cost',
+            'recovery_time',
+            'criticality',
+            'scale',
+            'scale_max_value'
+        ]
+
+class OrganizationActivitySerializer(serializers.ModelSerializer):
+    scale_name = serializers.CharField(read_only=True)
+    scale_min_value = serializers.CharField(read_only=True, source="scale.min_value")
+    scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
+    
+    services_ofered = serializers.ListField(
+        child=serializers.IntegerField(),required=False,write_only=True)
+    _services_ofered = ServiceOfferedSerializer(many=True,read_only=True)
+
+    risks = serializers.ListField(
+        child=serializers.IntegerField(), required=False, write_only=True)
+    _risks = RiskSerializer(many=True, read_only=True)
+    
+    headquarters = serializers.ListField(
+        child=serializers.IntegerField(),required=False,write_only=True)
+    _headquarters = HeadquarterSerializer(many=True,read_only=True)
+
+    class Meta:
+        model = OrganizationActivity
+        fields = [
+            'id',
+            'name',
+            'description',
+            'cost',
+            'recovery_time',
+            'criticality',
+            'services_ofered',
+            '_services_ofered',
+            'scale',
+            'scale_name',
+            'scale_min_value',
+            'scale_max_value',
+            'risks',
+            '_risks',
+            'headquarters',
+            '_headquarters',
+
         ]
