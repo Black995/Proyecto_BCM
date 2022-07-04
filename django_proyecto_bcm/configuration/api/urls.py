@@ -57,6 +57,10 @@ urlpatterns = [
     path('parishes/', ParishViewSet.as_view({
         'get': 'list'}), name='parish_list'),
 
+    # Request para crear a la primera empresa y traerla
+    path('organizations/', OrganizationViewSet.as_view({
+        'get': 'list',
+        'post': 'create'}), name='organization_list'),
     # Request para detallar la empresa y actualizarla
     path('organization/<int:pk>/', OrganizationViewSet.as_view({
         'get': 'retrieve',

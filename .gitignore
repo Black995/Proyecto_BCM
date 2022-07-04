@@ -354,3 +354,7 @@ yarn-error.log
 !**/migrations
 
 !**/migrations/_init_.py
+
+
+#Others
+staticfiles/

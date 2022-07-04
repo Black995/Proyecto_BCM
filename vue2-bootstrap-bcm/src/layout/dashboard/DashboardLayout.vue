@@ -21,13 +21,13 @@
                 -->
                 <sidebar-link to="#2" name="Fase 2" />
                 <sidebar-link
-                    to="/layout/partes-interesadas"
-                    name="Partes Interesadas"
+                    to="/layout/actividades-de-negocio"
+                    name="Act. del Negocio"
                     icon="ti-desktop"
                 />
                 <sidebar-link
-                    to="/layout/actividades-de-negocio"
-                    name="Act. del Negocio"
+                    to="/layout/partes-interesadas"
+                    name="Partes Interesadas"
                     icon="ti-desktop"
                 />
                 <sidebar-link
@@ -70,12 +70,12 @@
                     icon="ti-ruler-alt"
                 />
                 <sidebar-link to="/layout/sedes" name="Sedes" icon="ti-map" />
-                <!--sidebar-link
+                <sidebar-link
                     to="/layout/stats"
                     name="User Profile"
                     icon="ti-user"
                 />
-                <sidebar-link
+                <!--sidebar-link
                     to="/layout/table-list"
                     name="Table List"
                     icon="ti-view-list-alt"

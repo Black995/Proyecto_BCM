@@ -203,14 +203,15 @@ class StaffListSerializer(serializers.ModelSerializer):
             'area_name',
             'position',
             'position_name',
+            'headquarter'
         ]
 
 
 class StaffSerializer(serializers.ModelSerializer):
-    area_name = serializers.CharField(read_only=True)
-    position_name = serializers.CharField(read_only=True)
-    headquarter_name = serializers.CharField(read_only=True)
-    user_email = serializers.CharField(read_only=True)
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    position_name = serializers.CharField(read_only=True, source="position.name")
+    headquarter_name = serializers.CharField(read_only=True, source="headquarter.name")
+    user_email = serializers.CharField(read_only=True, source="user.email")
 
     class Meta:
         model = Staff
@@ -282,7 +283,6 @@ class OrganizationActivitySerializer(serializers.ModelSerializer):
             '_risks',
             'headquarters',
             '_headquarters',
-
         ]
 
 

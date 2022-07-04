@@ -207,5 +207,5 @@ class OrganizationActivity(models.Model):
                 service = ServiceOffered.objects.filter(id=service_id).first()
                 if(service is not None):
                     self._services_offered.add(service)
-
+    
 

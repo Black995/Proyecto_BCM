@@ -1,14 +1,21 @@
 from django.db import models
+import os
+from django.conf import settings
 
 
-
+def ruta_archivo_org(instance, filename):
+    print('parámetros de la función')
+    print(instance)
+    print(filename)
+    
+    return os.path.join(settings.STATICFILES_DIRS[0], str(instance.name), str(instance.name) + str(os.path.splitext(filename)[1]))
 
 class Organization(models.Model):
     name = models.CharField(max_length=150, unique=True)
     legal_id = models.CharField(max_length=50, unique=True)
     description = models.TextField(max_length=350)
     logo = models.ImageField(
-        upload_to='organization_logo', null=True, blank=True)
+        upload_to=ruta_archivo_org, null=True, blank=True, max_length=1000000)
 
 
 class State(models.Model):

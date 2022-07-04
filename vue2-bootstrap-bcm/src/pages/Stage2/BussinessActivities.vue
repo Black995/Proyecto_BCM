@@ -37,24 +37,22 @@
                                             />
                                         </b-button>
                                     </b-col>
-                                     <b-col sm="4">
+                                    <b-col sm="4">
                                         <span class="p-input-icon-left">
-                                            <i class="pi pi-search" /> 
-                                            
+                                            <i class="pi pi-search" />
+
                                             <InputText
-                                            
                                                 v-model="
                                                     filterGlobal['global'].value
                                                 "
                                                 placeholder="Buscar..."
                                             />
-                                        
                                         </span>
                                     </b-col>
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
-                            
+
                             <Column field="cost" header="Costo">
                                 <template #body="slotProps">
                                     {{ slotProps.data.cost }}$
@@ -74,7 +72,7 @@
                                             slotProps.data.scale_max_value
                                         }}
                                     </div>
-                                </template>    
+                                </template>
                             </Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
@@ -95,9 +93,7 @@
                                         pill
                                         variant="warning"
                                         @click="
-                                            show_modal_update(
-                                                slotProps.data.id
-                                            )
+                                            show_modal_update(slotProps.data.id)
                                         "
                                     >
                                         <font-awesome-icon
@@ -116,7 +112,6 @@
                                             icon="fa-solid fa-trash"
                                         />
                                     </b-button>
-
                                 </template>
                             </Column>
                             <Column field="id_2" header="Asociar servicios">
@@ -164,7 +159,6 @@
                             <template #empty>
                                 No hay actividades encontradas.
                             </template>
-
                         </DataTable>
                     </div>
                 </div>
@@ -184,28 +178,35 @@
             centered
         >
             <h3 class="text-center font-weight-bold">
-                {{ activityDetail.name }}    
+                {{ activityDetail.name }}
             </h3>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item ">
-                    <strong>Descripción: </strong> {{ activityDetail.description }}
+                <li class="list-group-item">
+                    <strong>Descripción: </strong>
+                    {{ activityDetail.description }}
                 </li>
-                <li class="list-group-item ">
-                    <strong>Costo: </strong> {{ activityDetail.cost}}
+                <li v-if="activityDetail.cost" class="list-group-item">
+                    <strong>Costo: </strong> {{ activityDetail.cost }}
                 </li>
-                <li class="list-group-item ">
-                    <strong>Tiempo de recuperación: </strong> 
+                <li v-if="!activityDetail.cost" class="list-group-item">
+                    <strong>Costo: </strong> no aplica
+                </li>
+                <li class="list-group-item">
+                    <strong>Tiempo de recuperación: </strong>
                     {{ activityDetail.recovery_time }}
                 </li>
-                <li class="list-group-item ">
+                <li class="list-group-item">
                     <div v-if="!activityDetail.scale_max_value">
-                        <strong>Criticidad: </strong> {{ activityDetail.criticality}}
+                        <strong>Criticidad: </strong>
+                        {{ activityDetail.criticality }}
                     </div>
                     <div v-if="activityDetail.scale_max_value">
-                        <strong>Criticidad: </strong> {{ activityDetail.criticality}}/{{activityDetail.scale_max_value}}
+                        <strong>Criticidad: </strong>
+                        {{ activityDetail.criticality }}/{{
+                            activityDetail.scale_max_value
+                        }}
                     </div>
                 </li>
-                
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
                 Servicios de la organización que dependen de esta actividad
@@ -213,11 +214,10 @@
             <b-list-group-item
                 class="mt2 flex-column align-items-start"
                 v-for="item in activityDetail._services_offered"
-                v-if="activityDetail._services_offered.length"
-                :key="item-key"
+                :key="item.key"
             >
-                <h5 class="mb-1">{{item.name}}</h5>
-                <div class=" mb-1 d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ item.name }}</h5>
+                <div class="mb-1 d-flex w-100 justify-content-between">
                     <div>Area: {{ item.area_name }}</div>
                     <div>Tipo: {{ item.type_name }}</div>
                     <div v-if="!item.scale_max_value">
@@ -234,7 +234,8 @@
                 class="mt-3 text-center"
                 v-if="!activityDetail._services_offered.length"
             >
-                No existen servicios de la organización asociados a esta actividad
+                No existen servicios de la organización asociados a esta
+                actividad
             </h3>
             <h4 class="mt-5 text-center font-weight-bold">
                 Riesgos asociados a la actividad de la organización
@@ -242,25 +243,20 @@
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
                 v-for="item in activityDetail._risks"
-                v-if="activityDetail._risks.length"
                 :key="item.key"
             >
                 <h5 class="mb-1">{{ item.name }}</h5>
                 <p class="mb-1">Descripción: {{ item.description }}</p>
             </b-list-group-item>
-            <h3
-                class="mt-3 text-center"
-                v-if="!activityDetail._risks.length"
-            >
-                No existen riesgos asociados a esta actividad 
+            <h3 class="mt-3 text-center" v-if="!activityDetail._risks.length">
+                No existen riesgos asociados a esta actividad
             </h3>
-            <h4 class="mt-5 text-center font-weight-bold">
+            <!--h4 class="mt-5 text-center font-weight-bold">
                 Sedes donde se realiza la actividad de la organización
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
                 v-for="item in activityDetail._headquarters"
-                v-if="activityDetail._headquarters.length"
                 :key="item.key"
             >
                 <h5 class="mb-1">{{ item.name }}</h5>
@@ -271,7 +267,7 @@
                 v-if="!activityDetail._headquarters.length"
             >
                 Esta actividad no esta asociada a ninguna sede
-            </h3>
+            </h3-->
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -283,7 +279,6 @@
                     </b-button>
                 </div>
             </template>
-
         </b-modal>
 
         <!--
@@ -311,18 +306,18 @@
                     >
                     </b-form-input>
                 </b-form-group>
-                    <b-form-group
-                        label="Ingrese la descripción de la actividad"
-                        invalid-feedback="Este campo es obligatorio"
+                <b-form-group
+                    label="Ingrese la descripción de la actividad"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="activityState.description"
+                >
+                    <b-form-textarea
+                        v-model="activity.description"
                         :state="activityState.description"
-                    >
-                        <b-form-input
-                            v-model="activity.description"
-                            :state="activityState.description"
-                            required
-                        ></b-form-input>
-                        
-                    </b-form-group>
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
                 <b-row align-v="center">
                     <b-col>
                         <b-form-group
@@ -339,7 +334,6 @@
                                     </b-form-group>
                                 </b-col>
                                 <b-col>
-
                                     <b-form-group label="Horas">
                                         <b-form-select
                                             v-model="duration.hours"
@@ -357,16 +351,13 @@
                                         ></b-form-select>
                                     </b-form-group>
                                 </b-col>
-                                
                             </b-row>
-
                         </b-form-group>
                     </b-col>
                     <b-col>
-                        <b-form-group 
+                        <b-form-group
                             label="Ingrese el costo (en dolares)"
                             invalid-feedback="El costo no puede ser negativo ni cero"
-                            :state="activityState.cost"
                         >
                             <b-form-input
                                 type="number"
@@ -376,11 +367,16 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <b-form-group label="Ingrese la criticidad">
+                <b-form-group
+                    label="Ingrese la criticidad"
+                    invalid-feedback="El valor de la criticidad está fuera de la escala actual"
+                    :state="activityState.criticality"
+                >
                     <b-form-spinbutton
                         v-model.number="activity.criticality"
                         :min="scaleView.scale_min_value"
                         :max="scaleView.scale_max_value"
+                        :state="activityState.criticality"
                     ></b-form-spinbutton>
                 </b-form-group>
                 <b-row>
@@ -388,7 +384,8 @@
                         <p class="mb-1">
                             <strong>
                                 Escala a utilizar pasa la criticidad:
-                            </strong> {{scaleView.scale_name}}
+                            </strong>
+                            {{ scaleView.scale_name }}
                         </p>
                     </b-col>
                 </b-row>
@@ -414,7 +411,7 @@
             title="Confirmar crear actividad de la organización"
             centered
         >
-            <h4> ¿Está seguro de crear esta actividad?</h4>
+            <h4>¿Está seguro de crear esta actividad?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -448,18 +445,18 @@
                     >
                     </b-form-input>
                 </b-form-group>
-                    <b-form-group
-                        label="Ingrese la descripción de la actividad"
-                        invalid-feedback="Este campo es obligatorio"
+                <b-form-group
+                    label="Ingrese la descripción de la actividad"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="activityState.description"
+                >
+                    <b-form-textarea
+                        v-model="activity.description"
                         :state="activityState.description"
-                    >
-                        <b-form-input
-                            v-model="activity.description"
-                            :state="activityState.description"
-                            required
-                        ></b-form-input>
-                        
-                    </b-form-group>
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
                 <b-row align-v="center">
                     <b-col>
                         <b-form-group
@@ -476,7 +473,6 @@
                                     </b-form-group>
                                 </b-col>
                                 <b-col>
-
                                     <b-form-group label="Horas">
                                         <b-form-select
                                             v-model="duration.hours"
@@ -494,16 +490,13 @@
                                         ></b-form-select>
                                     </b-form-group>
                                 </b-col>
-                                
                             </b-row>
-
                         </b-form-group>
                     </b-col>
                     <b-col>
-                        <b-form-group 
+                        <b-form-group
                             label="Ingrese el costo (en dolares)"
                             invalid-feedback="El costo no puede ser negativo ni cero"
-                            :state="activityState.cost"
                         >
                             <b-form-input
                                 type="number"
@@ -513,11 +506,16 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <b-form-group label="Ingrese la criticidad">
+                <b-form-group
+                    label="Ingrese la criticidad"
+                    invalid-feedback="El valor de la criticidad está fuera de la escala actual"
+                    :state="activityState.criticality"
+                >
                     <b-form-spinbutton
                         v-model.number="activity.criticality"
                         :min="scaleView.scale_min_value"
                         :max="scaleView.scale_max_value"
+                        :state="activityState.criticality"
                     ></b-form-spinbutton>
                 </b-form-group>
                 <b-row>
@@ -525,7 +523,8 @@
                         <p class="mb-1">
                             <strong>
                                 Escala a utilizar pasa la criticidad:
-                            </strong> {{scaleView.scale_name}}
+                            </strong>
+                            {{ scaleView.scale_name }}
                         </p>
                     </b-col>
                 </b-row>
@@ -542,7 +541,6 @@
                     </b-button>
                 </div>
             </template>
-            
         </b-modal>
 
         <b-modal
@@ -550,7 +548,7 @@
             title="Confirmar crear actividad de la organización"
             centered
         >
-            <h4> ¿Está seguro de editar esta actividad?</h4>
+            <h4>¿Está seguro de editar esta actividad?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -592,7 +590,7 @@
         <b-modal
             id="modal-associate-services"
             title="Asociar servicios de la organización con la actividad"
-            ref="modal"
+            size="lg"
             centered
         >
             <multiselect
@@ -646,8 +644,7 @@
                     </b-button>
                 </div>
             </template>
-
-        </b-modal> 
+        </b-modal>
 
         <!--
             Modal de confirmar asociar servicios  
@@ -658,7 +655,8 @@
             centered
         >
             <h4>
-                ¿Está seguro de asociar estos servicios de la organización a la actividad
+                ¿Está seguro de asociar estos servicios de la organización a la
+                actividad
                 <strong>{{ activityName }}</strong
                 >?
             </h4>
@@ -680,18 +678,9 @@
         <b-modal
             id="modal-associate-risks"
             title="Asociar riesgos con servicios contratados"
-            ref="modal"
             size="lg"
             centered
         >
-            <!--multiselect
-                v-model="selectedRisks"
-                placeholder="Buscar riesgos"
-                label="name"
-                track-by="id"
-                :options="risks"
-                :multiple="true"
-            ></multiselect-->
             <multiselect
                 v-model="selectedRisks"
                 placeholder="Buscar riesgos"
@@ -757,13 +746,7 @@
                 </div>
             </template>
         </b-modal>
-
-
-
-        
-
     </div>
-
 </template>
 
 <script>
@@ -785,8 +768,8 @@ export default {
     },
     data: () => ({
         loading: false,
-        filterGlobal:{
-            global: { value:null, matchMode: FilterMatchMode.CONTAINS},
+        filterGlobal: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
 
         show_modal_create: false,
@@ -797,32 +780,30 @@ export default {
         type: "",
 
         activity: {
-            name:"",
+            name: "",
             description: "",
             cost: 0,
-            recovery_time:"",
+            recovery_time: "",
             criticality: 0,
-            scale:0,
-            
+            scale: 0,
         },
-        activityDetail:{
-            name:"",
-            description:"",
-            cost:0,
-            recovery_time:"",
-            criticality:0,
-            scale_name:"",
-            scale_min_value:0,
-            scale_max_value:0,
-            _services_offered:[],
-            _risks:[],
-            _headquarters:[]
+        activityDetail: {
+            name: "",
+            description: "",
+            cost: 0,
+            recovery_time: "",
+            criticality: 0,
+            scale_name: "",
+            scale_min_value: 0,
+            scale_max_value: 0,
+            _services_offered: [],
+            _risks: [],
+            _headquarters: [],
         },
-        activityState:{
+        activityState: {
             nam: null,
             description: null,
-            cost:null,
-
+            criticality: null,
         },
         duration: {
             days: 0,
@@ -848,20 +829,20 @@ export default {
         servicesOffered: [],
         selectedServicesOffered: [],
 
-        risks:[],
-        selectedRisks:[],
+        risks: [],
+        selectedRisks: [],
 
-        headquarters:[],
-        selectedHeadquarters:[],
+        headquarters: [],
+        selectedHeadquarters: [],
 
         crisisScenarioRisks: [],
     }),
     mounted() {
-        this.getBussinesActivities()
-        this.getScaleView()
-        this.getServicesOffered()
-        this.getRisks()
-        this.getCrisisScenarioRisks()
+        this.getBussinesActivities();
+        this.getScaleView();
+        this.getServicesOffered();
+        this.getRisks();
+        this.getCrisisScenarioRisks();
     },
     methods: {
         successMessage(successText) {
@@ -884,28 +865,27 @@ export default {
                 type: "danger",
             });
         },
-        async getBussinesActivities(){
-            this.activities = []
+        async getBussinesActivities() {
+            this.activities = [];
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/organizationActivities/`,{
-                    withCredentials:true,
-                    headers:{
+                .get(`${SERVER_ADDRESS}/api/phase2/organizationActivities/`, {
+                    withCredentials: true,
+                    headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.activities = []
-                    for(var i = 0; i < res.data.length; i++){
+                    this.activities = [];
+                    for (var i = 0; i < res.data.length; i++) {
                         res.data[i].recovery_time = getRecoveryTimeText(
                             res.data[i].recovery_time
-                        )
-                        this.activities.push(res.data[i])
+                        );
+                        this.activities.push(res.data[i]);
                     }
-                    this.loading = false
-
+                    this.loading = false;
                 })
-                .catch((err)=>{
-                    try{
+                .catch((err) => {
+                    try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
                             this.errorMessage(err.response.data);
@@ -915,14 +895,13 @@ export default {
                                 "Ups! Ha ocurrido un error en el servidor"
                             );
                         }
-                    }
-                    catch {
+                    } catch {
                         // Servidor no disponible
                         this.errorMessage(
                             "Ups! Ha ocurrido un error en el servidor"
                         );
                     }
-                })
+                });
         },
         /**
          * Filtros que se manejan en Prime Vue
@@ -973,40 +952,48 @@ export default {
                     }
                 });
         },
-        checkFormValidity(){
-            let valid = true
-            if (!this.activity.name){
-                valid = false
-                this.activityState.name = false
+        checkFormValidity() {
+            let valid = true;
+            if (!this.activity.name) {
+                valid = false;
+                this.activityState.name = false;
             }
-            if(!this.activity.description){
-                valid = false
-                this.activityState.description = false
+            if (!this.activity.description) {
+                valid = false;
+                this.activityState.description = false;
             }
-            if(this.activity.cost <= 0){
-                valid = false
-                this.activityState.cost = false
+            // Los costos son opcionales
+            /*
+            if (this.activity.cost <= 0) {
+                valid = false;
+                this.activityState.cost = false;
+            }
+            */
+            if (
+                this.activity.criticality < this.scaleView.scale_min_value ||
+                this.activity.criticality > this.scaleView.scale_max_value
+            ) {
+                this.activityState.criticality = false;
+                valid = false;
             }
             return valid;
-
         },
-        handleSubmitCreate(){
-            this.activityState.name = null
-            this.activityState.description = null
-            this.activityState.cost = null
+        handleSubmitCreate() {
+            this.activityState.name = null;
+            this.activityState.description = null;
+            this.activityState.criticality = null;
 
-            if(!this.checkFormValidity()){
-                return
+            if (!this.checkFormValidity()) {
+                return;
             }
 
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-create")
-            })
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-create");
+            });
         },
-        createActivity(){
-            this.activity.recovery_time = setRecoveryTime(this.duration)
-            this.activity.scale = this.scaleView.scale
-
+        createActivity() {
+            this.activity.recovery_time = setRecoveryTime(this.duration);
+            this.activity.scale = this.scaleView.scale;
 
             axios
                 .post(
@@ -1016,21 +1003,23 @@ export default {
                         withCredentials: true,
                         headers: {
                             Authorization: TOKEN,
-                        }
+                        },
                     }
                 )
-                .then((res)=>{
-                    this.successMessage("¡La actividad ha sido creada exitosamente!")
+                .then((res) => {
+                    this.successMessage(
+                        "¡La actividad ha sido creada exitosamente!"
+                    );
 
-                    this.$nextTick(()=>{
-                        this.$bvModal.hide("modal-confirm-create")
-                        this.$bvModal.hide("modal-create")
-                    })
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-create");
+                        this.$bvModal.hide("modal-create");
+                    });
 
-                    this.getBussinesActivities()
+                    this.getBussinesActivities();
                 })
-                .catch((err)=>{
-                    try{
+                .catch((err) => {
+                    try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
                             this.errorMessage(err.response.data);
@@ -1046,25 +1035,24 @@ export default {
                             "Ups! Ha ocurrido un error en el servidor"
                         );
                     }
-                })
-
+                });
         },
-        handleSubmitUpdate(){
-            this.activityState.name = null
-            this.activityState.description = null
-            this.activityState.cost = null
+        handleSubmitUpdate() {
+            this.activityState.name = null;
+            this.activityState.description = null;
+            this.activityState.criticality = null;
 
-            if (!this.checkFormValidity()){
-                return
+            if (!this.checkFormValidity()) {
+                return;
             }
 
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-update");
             });
         },
-        show_modal_update(id){
-            this.activityId= id
-            
+        show_modal_update(id) {
+            this.activityId = id;
+
             axios
                 .get(
                     `${SERVER_ADDRESS}/api/phase2/organizationActivity/${this.activityId}/`,
@@ -1075,13 +1063,12 @@ export default {
                         },
                     }
                 )
-                .then((res)=>{
-                    this.activity = res.data
-                    this.duration = getRecoveryTime(res.data.recovery_time)
-                    this.$nextTick(()=>{
-                        this.$bvModal.show("modal-update")
-                    })
-
+                .then((res) => {
+                    this.activity = res.data;
+                    this.duration = getRecoveryTime(res.data.recovery_time);
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-update");
+                    });
                 })
                 .catch((err) => {
                     try {
@@ -1102,30 +1089,30 @@ export default {
                     }
                 });
         },
-        async updateActivity(){
-            this.activity.recovery_time = setRecoveryTime(this.duration)
-            this.activity.scale = this.scaleView.scale
+        async updateActivity() {
+            this.activity.recovery_time = setRecoveryTime(this.duration);
+            this.activity.scale = this.scaleView.scale;
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/phase2/organizationActivity/${this.activityId}/`,
                     this.activity,
                     {
                         withCredentials: true,
-                        headers:{
+                        headers: {
                             Authorization: TOKEN,
-                        }
+                        },
                     }
                 )
-                .then((res)=>{
+                .then((res) => {
                     this.successMessage(
                         "¡La actividad ha sido actualizada exitosamente!"
-                    )
+                    );
 
-                    this.$nextTick(()=>{
-                        this.$bvModal.hide("modal-confirm-update")
-                        this.$bvModal.hide("modal-update")
-                    })
-                    this.getBussinesActivities()
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-update");
+                        this.$bvModal.hide("modal-update");
+                    });
+                    this.getBussinesActivities();
                 })
                 .catch((err) => {
                     try {
@@ -1145,33 +1132,34 @@ export default {
                         );
                     }
                 });
-
-                
         },
-        async show_modal_detail(id){
+        async show_modal_detail(id) {
             this.activityDetail = {
-                name:"",
-                description:"",
-                cost:0,
-                recovery_time:"",
-                criticality:0,
-                scale_name:"",
-                scale_min_value:0,
-                scale_max_value:0,
-                _services_offered:[],
-                _risks:[],
-                _headquarters:[]
-            }
+                name: "",
+                description: "",
+                cost: 0,
+                recovery_time: "",
+                criticality: 0,
+                scale_name: "",
+                scale_min_value: 0,
+                scale_max_value: 0,
+                _services_offered: [],
+                _risks: [],
+                _headquarters: [],
+            };
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/organizationActivity/${id}/`,{
-                    withCredentials: true,
-                    headers:{
-                        Authorization: TOKEN,
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/organizationActivity/${id}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
                     }
-                })
-                .then((res)=>{
-                    this.activityDetail = res.data
-                    this.$bvModal.show("modal-detail")
+                )
+                .then((res) => {
+                    this.activityDetail = res.data;
+                    this.$bvModal.show("modal-detail");
                 })
                 .catch((err) => {
                     try {
@@ -1192,32 +1180,32 @@ export default {
                     }
                 });
         },
-        async show_modal_delete(id){
-            this.activityId = id
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-delete")
-            })
+        async show_modal_delete(id) {
+            this.activityId = id;
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-delete");
+            });
         },
-        async deleteActivity(){
+        async deleteActivity() {
             axios
                 .delete(
                     `${SERVER_ADDRESS}/api/phase2/organizationActivity/${this.activityId}/`,
                     {
                         withCredentials: true,
-                        headers:{
-                            Authorization: TOKEN
-                        }
+                        headers: {
+                            Authorization: TOKEN,
+                        },
                     }
                 )
-                .then((res)=>{
+                .then((res) => {
                     this.successMessage(
                         "¡La actividad ha sido eliminada exitosamente!"
-                    )
-                    this.getBussinesActivities()
+                    );
+                    this.getBussinesActivities();
 
-                    this.$nextTick(()=>{
+                    this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-delete");
-                    })
+                    });
                 })
                 .catch((err) => {
                     try {
@@ -1238,61 +1226,70 @@ export default {
                     }
                 });
         },
-        async show_modal_association_services(id,name){
-            this.activityId = id
-            this.activityName = name
-            this.selectedServicesOffered = []
+        async show_modal_association_services(id, name) {
+            this.activityId = id;
+            this.activityName = name;
+            this.selectedServicesOffered = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/organizationActivity/${id}/`,{
-                    withCredentials:true,
-                    headers:{
-                        Authorization: TOKEN,
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/organizationActivity/${id}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
                     }
-                })
-                .then((res)=>{
-                    for(let i = 0; i<res.data._services_offered.length; i++){
-                        this.selectedServicesOffered.push(res.data._services_offered[i])
+                )
+                .then((res) => {
+                    for (
+                        let i = 0;
+                        i < res.data._services_offered.length;
+                        i++
+                    ) {
+                        this.selectedServicesOffered.push(
+                            res.data._services_offered[i]
+                        );
                     }
 
-                    this.$nextTick(()=>{
-                        this.$bvModal.show("modal-associate-services")
-                    })
-                })
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-associate-services");
+                    });
+                });
         },
-        show_modal_confirm_association_services(){
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-associate-services")
-            })
+        show_modal_confirm_association_services() {
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-associate-services");
+            });
         },
-        async associateServices(){
-            let servicesIds = []
-            for(let i = 0;i< this.selectedServicesOffered.length;i++){
-                servicesIds.push(this.selectedServicesOffered[i].id)
+        async associateServices() {
+            let servicesIds = [];
+            for (let i = 0; i < this.selectedServicesOffered.length; i++) {
+                servicesIds.push(this.selectedServicesOffered[i].id);
             }
             let ids = {
                 services_offered: servicesIds,
-            }
+            };
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/phase2/organizationActivity/${this.activityId}/`,
                     ids,
                     {
-                        withCredentials:true,
-                        headers:{
+                        withCredentials: true,
+                        headers: {
                             Authorization: TOKEN,
-                        }
+                        },
                     }
                 )
-                .then((res)=>{
+                .then((res) => {
                     this.successMessage(
                         "¡Los servicios fuero asociados a la actividad exitosamente!"
-                    )
+                    );
 
-                    this.$nextTick(()=>{
+                    this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-associate-services");
                         this.$bvModal.hide("modal-associate-services");
-                    })
+                    });
                 })
                 .catch((err) => {
                     try {
@@ -1313,17 +1310,17 @@ export default {
                     }
                 });
         },
-        async getServicesOffered(){
-            this.servicesOffered = []
+        async getServicesOffered() {
+            this.servicesOffered = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/services/offered/`,{
+                .get(`${SERVER_ADDRESS}/api/phase2/services/offered/`, {
                     withCredentials: true,
-                    headers:{
+                    headers: {
                         Authorization: TOKEN,
-                    }
+                    },
                 })
-                .then((res)=>{
+                .then((res) => {
                     this.servicesOffered = res.data;
                 })
                 .catch((err) => {
@@ -1345,15 +1342,15 @@ export default {
                     }
                 });
         },
-        async getRisks(){
-            this.risks = []
+        async getRisks() {
+            this.risks = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/risks/`,{
-                    withCredentials:true,
-                    headers:{
+                .get(`${SERVER_ADDRESS}/api/phase1/risks/`, {
+                    withCredentials: true,
+                    headers: {
                         Authorization: TOKEN,
-                    }
+                    },
                 })
                 .then((res) => {
                     this.risks = res.data;
@@ -1422,12 +1419,15 @@ export default {
             this.selectedRisks = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/organizationActivity/${id}/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/organizationActivity/${id}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
                 .then((res) => {
                     for (let i = 0; i < res.data._risks.length; i++) {
                         this.selectedRisks.push(res.data._risks[i]);
@@ -1513,20 +1513,20 @@ export default {
                     }
                 });
         },
-        async getHeadquarters(){
-            this.headquarters = []
-        
+        async getHeadquarters() {
+            this.headquarters = [];
+
             axios
-                .get(`${SERVER_ADDRESS}/api/config/headquarters/`,{
-                    withCredentials:true,
-                    headers:{
-                        Authorization: TOKEN
+                .get(`${SERVER_ADDRESS}/api/config/headquarters/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
                     },
                 })
-                .then((res)=>{
-                    this.headquarters = res.data
+                .then((res) => {
+                    this.headquarters = res.data;
                 })
-                .catch((err)=>{
+                .catch((err) => {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
@@ -1543,19 +1543,21 @@ export default {
                             "Ups! Ha ocurrido un error en el servidor"
                         );
                     }
-                })
+                });
         },
-        resetModal(){
-            this.activity.name = ""
-            this.activity.description= ""
-            this.activity.cost= 0
-            this.activity.recovery_time=""
-            this.activity.criticality= 0
-            this.activity.scale=0
-        }
-
-    }
-}
+        resetModal() {
+            this.activity.name = "";
+            this.activityState.name = null;
+            this.activity.description = "";
+            this.activityState.description = null;
+            this.activity.cost = 0;
+            this.activity.recovery_time = "";
+            this.activity.criticality = 0;
+            this.activityState.criticality = null;
+            this.activity.scale = 0;
+        },
+    },
+};
 </script>
 
 <style lang="scss">
