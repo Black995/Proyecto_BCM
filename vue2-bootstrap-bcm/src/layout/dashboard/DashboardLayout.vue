@@ -31,6 +31,11 @@
                     icon="ti-desktop"
                 />
                 <sidebar-link
+                    to="/layout/personal"
+                    name="Personal de la Org."
+                    icon="ti-layout-accordion-list"
+                />
+                <sidebar-link
                     to="/layout/servicios-ofrecidos"
                     name="Servicios de la Org."
                     icon="ti-desktop"
