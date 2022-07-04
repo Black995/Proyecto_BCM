@@ -1014,7 +1014,6 @@ export default {
                     },
                 })
                 .then((res) => {
-                    console.log(res.data);
                     this.serviceDetail = res.data;
 
                     this.$nextTick(() => {
@@ -1022,7 +1021,6 @@ export default {
                     });
                 })
                 .catch((err) => {
-                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {

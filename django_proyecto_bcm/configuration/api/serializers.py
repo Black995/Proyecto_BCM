@@ -1,4 +1,4 @@
-from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish
+from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish, Organization
 from rest_framework import serializers
 from django.db.models import F, Q
 
@@ -133,4 +133,16 @@ class ParishSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+        ]
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = [
+            'id',
+            'name',
+            'legal_id',
+            'description',
+            'logo',
         ]

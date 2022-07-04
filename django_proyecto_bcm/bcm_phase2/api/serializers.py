@@ -65,6 +65,8 @@ class ServiceOfferedListSerializer(serializers.ModelSerializer):
             'type_name',
             'profit',
             'recovery_time',
+            'recovery_point',
+            'maximum_recovery_time',
             'criticality',
             'area',
             'area_name',

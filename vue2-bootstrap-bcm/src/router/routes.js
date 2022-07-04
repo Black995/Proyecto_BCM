@@ -28,6 +28,7 @@ import Areas from "@/pages/Configuration/Areas.vue";
 import Positions from "@/pages/Configuration/Positions.vue";
 import Scales from "@/pages/Configuration/Scales.vue";
 import Headquarters from "@/pages/Configuration/Headquarters.vue";
+import Organization from "@/pages/Configuration/Organization.vue";
 
 
 const routes = [
@@ -79,6 +80,11 @@ const routes = [
         path: "areas",
         name: "Areas de la Organización",
         component: Areas
+      },
+      {
+        path: "empresa",
+        name: "Empresa",
+        component: Organization
       },
       {
         path: "escalas",

@@ -652,7 +652,7 @@ export default {
          */
         viewsName: [
             "Servicios de la Organización",
-            "Servicios Contratados",
+            "Servicios de Soporte",
             "Actividades de la Organización",
             "Partes Interesadas",
         ],

@@ -50,6 +50,11 @@
                     icon="ti-bar-chart"
                 />
                 <sidebar-link
+                    to="/layout/empresa"
+                    name="Empresa"
+                    icon="ti-briefcase"
+                />
+                <sidebar-link
                     to="/layout/escalas"
                     name="Escalas"
                     icon="ti-ruler-alt"
