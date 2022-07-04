@@ -185,7 +185,6 @@ class ServiceUsedSerializer(serializers.ModelSerializer):
     def get_type_name(self, obj):
         return dict(ServiceUsed.TYPE).get(obj.type)
 
-<<<<<<< HEAD
 class StaffListSerializer(serializers.ModelSerializer):
     area_name = serializers.CharField(read_only=True)
     position_name = serializers.CharField(read_only=True)
@@ -313,5 +312,3 @@ class interestedPartySerializer(serializers.ModelSerializer):
             'organization',
             'organization_name'
         ] 
-=======
->>>>>>> b474361fbd0a244ab6c3c166371499de6f34ede6
