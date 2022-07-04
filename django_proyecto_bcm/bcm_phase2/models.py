@@ -55,9 +55,10 @@ class ServiceOffered(models.Model):
     name = models.CharField(max_length=100, unique=True)
     type = models.SmallIntegerField(choices=TYPE)
     profit = models.FloatField()
-    # frecuency =
     recovery_time = models.DurationField()
     criticality = models.SmallIntegerField(null=True)
+    recovery_point = models.DurationField(null=True)
+    maximum_recovery_time = models.DurationField(null=True)
 
     area = models.ForeignKey(Area, related_name='area_service_offered', null=True,
                              on_delete=models.SET_NULL)
@@ -65,16 +66,57 @@ class ServiceOffered(models.Model):
                               on_delete=models.SET_NULL)
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_service_offered')
-    staffs = models.ManyToManyField(
+    _staffs = models.ManyToManyField(
         Staff, related_name='staff_service_offered')
+    _risks = models.ManyToManyField(
+        Risk, related_name='risk_service_offered')
+
+    @property
+    def staffs(self):
+        return self._staffs.values_list(flat=True)
+
+    @staffs.setter
+    def staffs(self, staffs_ids):
+        # Eliminamos los registros anteriores de los servicios ofrecidos
+        self._staffs.clear()
+        # Guardamos los nuevos registros
+        if(staffs_ids):
+            for staff_id in staffs_ids:
+                staff = Staff.objects.filter(id=staff_id).first()
+                if(staff is not None):
+                    self._staffs.add(staff)
+
+    @property
+    def risks(self):
+        return self._risks.values_list(flat=True)
+
+    @risks.setter
+    def risks(self, risks_ids):
+        # Eliminamos los registros anteriores de los riesgos
+        self._risks.clear()
+        # Guardamos los nuevos registros
+        if(risks_ids):
+            for risk_id in risks_ids:
+                risk = Risk.objects.filter(id=risk_id).first()
+                if(risk is not None):
+                    self._risks.add(risk)
+
 
 
 class ServiceUsed(models.Model):
+    
+    HIRED = 1
+    INTERNAL = 2
+    TYPE = (
+        (HIRED, 'Contratado'),
+        (INTERNAL, 'Interno'),
+    )
+
     name = models.CharField(max_length=100, unique=True)
+    type = models.SmallIntegerField(choices=TYPE)
     spending = models.FloatField()
-    # frecuency =
-    recovery_time = models.DurationField()
     criticality = models.SmallIntegerField(null=True)
+    agreement_comment = models.CharField(max_length=300)
 
     scale = models.ForeignKey(
         Scale, null=True, related_name='scale_service_used', on_delete=models.SET_NULL)
@@ -120,7 +162,6 @@ class OrganizationActivity(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=200)
     cost = models.FloatField()
-    # frecuency =
     recovery_time = models.DurationField()
     criticality = models.SmallIntegerField(null=True)
 

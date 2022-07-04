@@ -1,10 +1,11 @@
-from configuration.models import Area, Scale, ScaleView, Position, Headquarter
+from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish
+from bcm_phase2.models import ServiceOffered, ServiceUsed, OrganizationActivity
 from django.shortcuts import get_object_or_404
-from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer
-from rest_framework import viewsets
+from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer, StateSerializer, CitySerializer, TownshipSerializer, ParishSerializer
+from rest_framework import viewsets, serializers, status
 from rest_framework.response import Response
 from django.db.models import Q, F
-from configuration.api.filters import (ScaleViewFilterBackend,)
+from configuration.api.filters import (ScaleViewFilterBackend, CityTownshipFilterBackend, ParishFilterBackend)
 
 
 class AreaViewSet(viewsets.ModelViewSet):
@@ -26,6 +27,47 @@ class ScaleviewViewSet(viewsets.ModelViewSet):
     serializer_class = ScaleViewSerializer
     filter_backends = [ScaleViewFilterBackend, ]
 
+    # Al actualizar la escala se debe tener la opción de:
+    # 1. Pasar a nulo todas las escalas de todos los ServiceOffered, ServiceUsed y OrganizationActivity
+    # 2. Hacer un promedio de las escalas existentes    
+    def partial_update(self, request, pk):
+        name = request.data.get('name')
+        scale_id = request.data.get('scale')
+        option = request.data.get('option')
+        new_scale = Scale.objects.get(id=scale_id)
+        print(option)
+        if(option == '1'):
+            print('opción 1')
+            if(name == 'Servicios de la Organización'):
+                ServiceOffered.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
+            elif(name == 'Servicios de Soporte'):
+                ServiceUsed.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
+            if(name == 'Actividades de la Organización'):
+                OrganizationActivity.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
+        elif(option == '2'):
+            if(name == 'Servicios de la Organización'):
+                list_obj = ServiceOffered.objects.filter(criticality__isnull=False, scale__isnull=False)
+            elif(name == 'Servicios de Soporte'):
+                list_obj = ServiceUsed.objects.filter(criticality__isnull=False, scale__isnull=False)
+            elif(name == 'Actividades de la Organización'):
+                list_obj = OrganizationActivity.objects.filter(criticality__isnull=False, scale__isnull=False)
+            else: 
+                list_obj = []
+            for s in list_obj:
+                    new_value = round(s.criticality*new_scale.max_value/s.scale.max_value)
+                    s.criticality= new_value if(new_value>=new_scale.min_value) else new_scale.min_value
+                    s.scale=new_scale
+                    s.save()
+        else:
+            raise serializers.ValidationError(
+                {'Error': 'Opción seleccionada inválida'})
+
+        updated = ScaleView.objects.filter(name=name).update(scale=new_scale)
+        msg, sta = ('Escalas actualizadas exitosamente', status.HTTP_200_OK) if updated else (
+            'Las escalas no pudieron ser actualizadas', status.HTTP_400_BAD_REQUEST)
+        return Response({'Error': msg}, status=sta)
+
+
 
 class PositionViewSet(viewsets.ModelViewSet):
     model = Position
@@ -35,5 +77,36 @@ class PositionViewSet(viewsets.ModelViewSet):
 
 class HeadquarterViewSet(viewsets.ModelViewSet):
     model = Headquarter
-    queryset = Headquarter.objects.annotate(location_name=F('location__name')).order_by('name')
+    queryset = Headquarter.objects.order_by('name')
     serializer_class = HeadquarterSerializer
+
+
+"""
+    Vistas de estados, ciudades, municipios y parroquias
+"""
+class StateViewSet(viewsets.ModelViewSet):
+    model = State
+    queryset = State.objects.order_by('name')
+    serializer_class = StateSerializer
+
+
+class CityViewSet(viewsets.ModelViewSet):
+    model = City
+    queryset = City.objects.order_by('name')
+    serializer_class = CitySerializer
+    filter_backends = [CityTownshipFilterBackend, ]
+
+
+class TownshipViewSet(viewsets.ModelViewSet):
+    model = Township
+    queryset = Township.objects.order_by('name')
+    serializer_class = TownshipSerializer
+    filter_backends = [CityTownshipFilterBackend, ]
+
+
+class ParishViewSet(viewsets.ModelViewSet):
+    model = Parish
+    queryset = Parish.objects.order_by('name')
+    serializer_class = ParishSerializer
+    filter_backends = [ParishFilterBackend, ]
+

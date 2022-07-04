@@ -6,7 +6,7 @@
                     <div class="card-body table-responsive">
                         <DataTable
                             class="header-table"
-                            :value="risks"
+                            :value="positions"
                             responsiveLayout="scroll"
                             :paginator="true"
                             :rows="10"
@@ -16,14 +16,14 @@
                             :responsive="true"
                             :reorderableColumns="true"
                             :loading="loading"
-                            :globalFilterFields="['name', 'description']"
+                            :globalFilterFields="['name']"
                             :filters="filterGlobal"
                         >
                             <template #header>
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
-                                            title="Crear riesgo"
+                                            title="Crear cargo"
                                             variant="success"
                                             @click="show_modal_create = true"
                                         >
@@ -46,14 +46,18 @@
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
-                            <Column
-                                field="description"
-                                header="Descripción"
-                            ></Column>
+                            <Column field="relevant" header="Relevancia">
+                                <template #body="slotProps">
+                                    <div v-if="slotProps.data.relevant">Sí</div>
+                                    <div v-if="!slotProps.data.relevant">
+                                        No
+                                    </div>
+                                </template>
+                            </Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
-                                        title="Editar riesgo"
+                                        title="Editar cargo"
                                         pill
                                         variant="warning"
                                         @click="
@@ -65,7 +69,7 @@
                                         />
                                     </b-button>
                                     <b-button
-                                        title="Eliminar riesgo"
+                                        title="Eliminar cargo"
                                         pill
                                         variant="danger"
                                         @click="
@@ -80,7 +84,7 @@
                             </Column>
 
                             <template #empty>
-                                No hay riesgos encontrados.
+                                No hay cargos encontrados.
                             </template>
                         </DataTable>
                     </div>
@@ -98,7 +102,7 @@
         <b-modal
             v-model="show_modal_create"
             id="modal-create"
-            title="Crear riesgo"
+            title="Crear cargo de la organización"
             ref="modal"
             size="lg"
             centered
@@ -106,31 +110,22 @@
         >
             <form ref="form" @submit.stop.prevent="handleSubmitCreate">
                 <b-form-group
-                    label="Ingrese el título del riesgo"
+                    label="Ingrese el título del cargo"
                     label-for="name-input-create"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.name"
+                    :state="positionState.name"
                 >
                     <b-form-input
                         id="name-input"
-                        v-model="risk.name"
-                        :state="riskState.name"
+                        v-model="position.name"
+                        :state="positionState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
-                <b-form-group
-                    label="Ingrese la descripción del riesgo"
-                    label-for="description-input-create"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.description"
-                >
-                    <b-form-textarea
-                        id="name-input"
-                        v-model="risk.description"
-                        :state="riskState.description"
-                        required
-                        rows="3"
-                    ></b-form-textarea>
+                <b-form-group>
+                    <b-form-checkbox v-model="position.relevant">
+                        El cargo es relevante
+                    </b-form-checkbox>
                 </b-form-group>
             </form>
 
@@ -141,7 +136,7 @@
                         class="float-right"
                         @click="handleSubmitCreate"
                     >
-                        Crear riesgo
+                        Crear cargo
                     </b-button>
                 </div>
             </template>
@@ -152,16 +147,16 @@
         -->
         <b-modal
             id="modal-confirm-create"
-            title="Confirmar crear riesgo"
+            title="Confirmar crear cargo"
             centered
         >
-            <h4>¿Está seguro de crear este riesgo?</h4>
+            <h4>¿Está seguro de crear este cargo de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="success"
                         class="float-right"
-                        @click="createRisk"
+                        @click="createPosition"
                     >
                         Confirmar
                     </b-button>
@@ -174,38 +169,29 @@
         -->
         <b-modal
             id="modal-update"
-            title="Editar riesgo"
+            title="Editar cargo de la organización"
             ref="modal"
             size="lg"
             centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
                 <b-form-group
-                    label="Ingrese el título del riesgo"
+                    label="Ingrese el título del cargo"
                     label-for="name-input-update"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.name"
+                    :state="positionState.name"
                 >
                     <b-form-input
                         id="name-input"
-                        v-model="risk.name"
-                        :state="riskState.name"
+                        v-model="position.name"
+                        :state="positionState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
-                <b-form-group
-                    label="Ingrese la descripción del riesgo"
-                    label-for="description-input-update"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="riskState.description"
-                >
-                    <b-form-textarea
-                        id="name-input"
-                        v-model="risk.description"
-                        :state="riskState.description"
-                        required
-                        rows="3"
-                    ></b-form-textarea>
+                <b-form-group>
+                    <b-form-checkbox v-model="position.relevant">
+                        El cargo es relevante
+                    </b-form-checkbox>
                 </b-form-group>
             </form>
 
@@ -216,7 +202,7 @@
                         class="float-right"
                         @click="handleSubmitUpdate"
                     >
-                        Editar riesgo
+                        Editar cargo
                     </b-button>
                 </div>
             </template>
@@ -227,16 +213,16 @@
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar editar riesgo"
+            title="Confirmar editar cargo"
             centered
         >
-            <h4>¿Está seguro de editar este riesgo?</h4>
+            <h4>¿Está seguro de editar este cargo de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="warning"
                         class="float-right"
-                        @click="updateRisk"
+                        @click="updatePosition"
                     >
                         Confirmar
                     </b-button>
@@ -249,57 +235,33 @@
         -->
         <b-modal
             id="modal-confirm-delete"
-            title="Confirmar eliminar riesgo"
+            title="Confirmar eliminar cargo"
             centered
         >
-            <h4>¿Está seguro de eliminar este riesgo?</h4>
+            <h4>¿Está seguro de eliminar este cargo de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="danger"
                         class="float-right"
-                        @click="deleteRisk"
+                        @click="deletePosition"
                     >
                         Confirmar
                     </b-button>
                 </div>
             </template>
         </b-modal>
-
-        <!--Stats cards-->
-        <!--div class="row">
-          <div class="col-md-6 col-xl-3" v-for="stats in statsCards" :key="stats.title">
-            <stats-card>
-              <div class="icon-big text-center" :class="`icon-${stats.type}`" slot="header">
-                <i :class="stats.icon"></i>
-              </div>
-              <div class="numbers" slot="content">
-                <p>{{stats.title}}</p>
-                {{stats.value}}
-              </div>
-              <div class="stats" slot="footer">
-                <i :class="stats.footerIcon"></i> {{stats.footerText}}
-              </div>
-            </stats-card>
-          </div>
-        </div-->
-        <!--Charts-->
     </div>
 </template>
-<script>
-//import { StatsCard } from "@/components/index";
-/**
- * El ejemplo de Stats Cards puede servir para futuras versiones del sistema
- */
-// import Chartist from 'chartist';
 
+<script>
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 
 export default {
-    name: "Risks",
+    name: "Positions",
 
     data: () => ({
         loading: false,
@@ -310,20 +272,20 @@ export default {
         // Variables para manejar los modales
         show_modal_create: false,
 
-        risks: [],
-        riskId: 0,
+        positions: [],
+        positionId: 0,
 
-        risk: {
+        position: {
             name: "",
-            description: "",
+            relevant: false,
         },
-        riskState: {
+        positionState: {
             name: null,
-            description: null,
+            relevant: null,
         },
     }),
     mounted() {
-        this.getRisks();
+        this.getPositions();
     },
     methods: {
         successMessage(successText) {
@@ -346,19 +308,19 @@ export default {
                 type: "danger",
             });
         },
-        async getRisks() {
+        async getPositions() {
             this.loading = true;
-            this.risks = [];
+            this.positions = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/risks/`, {
+                .get(`${SERVER_ADDRESS}/api/config/positions/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.risks = res.data;
+                    this.positions = res.data;
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -401,36 +363,26 @@ export default {
          * Validar formularios
          */
         checkFormValidity() {
-            /*
-            const valid = this.$refs.form.checkValidity();
-            this.riskState.name = valid;
-            this.riskState.description = valid;
-            return valid;
-            */
             let valid = true;
-            if (!this.risk.name) {
-                this.riskState.name = false;
-                valid = false;
-            }
-            if (!this.risk.description) {
-                this.riskState.description = false;
+            if (!this.position.name) {
+                this.positionState.name = false;
                 valid = false;
             }
             return valid;
         },
         resetModal() {
-            this.risk.name = "";
-            this.riskState.name = null;
-            this.risk.description = "";
-            this.riskState.description = null;
+            this.position.name = "";
+            this.positionState.name = null;
+            this.position.relevant = false;
+            this.positionState.relevant = null;
         },
         /**
          * Create
          */
         handleSubmitCreate() {
             // Inicializamos variables de estados
-            this.riskState.name = null;
-            this.riskState.description = null;
+            this.positionState.name = null;
+            this.positionState.relevant = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -442,18 +394,22 @@ export default {
                 this.$bvModal.show("modal-confirm-create");
             });
         },
-        async createRisk() {
+        async createPosition() {
             axios
-                .post(`${SERVER_ADDRESS}/api/phase1/risks/`, this.risk, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
+                .post(
+                    `${SERVER_ADDRESS}/api/config/positions/`,
+                    this.position,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El riesgo ha sido creado exitosamente!"
+                        "¡El cargo ha sido creado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -463,7 +419,7 @@ export default {
                     });
 
                     // Cargamos de nuevo la tabla de riesgos
-                    this.getRisks();
+                    this.getPositions();
                 })
                 .catch((err) => {
                     try {
@@ -493,8 +449,8 @@ export default {
          */
         handleSubmitUpdate() {
             // Inicializamos variables de estados
-            this.riskState.name = null;
-            this.riskState.description = null;
+            this.positionState.name = null;
+            this.positionState.relevant = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -507,17 +463,17 @@ export default {
             });
         },
         async show_modal_update(id) {
-            this.riskId = id;
+            this.positionId = id;
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/risk/${id}/`, {
+                .get(`${SERVER_ADDRESS}/api/config/position/${id}/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.risk = res.data;
+                    this.position = res.data;
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -545,11 +501,11 @@ export default {
                     }
                 });
         },
-        async updateRisk() {
+        async updatePosition() {
             axios
                 .patch(
-                    `${SERVER_ADDRESS}/api/phase1/risk/${this.riskId}/`,
-                    this.risk,
+                    `${SERVER_ADDRESS}/api/config/position/${this.positionId}/`,
+                    this.position,
                     {
                         withCredentials: true,
                         headers: {
@@ -560,7 +516,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El riesgo ha sido actualizado exitosamente!"
+                        "¡El cargo ha sido actualizado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -570,7 +526,7 @@ export default {
                     });
 
                     // Cargamos de nuevo la tabla de riesgos
-                    this.getRisks();
+                    this.getPositions();
                 })
                 .catch((err) => {
                     try {
@@ -599,23 +555,26 @@ export default {
          * Delete
          */
         show_modal_delete(id) {
-            this.riskId = id;
+            this.positionId = id;
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-delete");
             });
         },
-        async deleteRisk() {
+        async deletePosition() {
             axios
-                .delete(`${SERVER_ADDRESS}/api/phase1/risk/${this.riskId}/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
+                .delete(
+                    `${SERVER_ADDRESS}/api/config/position/${this.positionId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El riesgo ha sido eliminado exitosamente!"
+                        "¡El cargo ha sido eliminado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -624,7 +583,7 @@ export default {
                     });
 
                     // Cargamos de nuevo la tabla de riesgos
-                    this.getRisks();
+                    this.getPositions();
                 })
                 .catch((err) => {
                     try {
@@ -650,53 +609,6 @@ export default {
                 });
         },
     },
-
-    /**
-     * Ejemplo con data para las tarjetas del comienzo
-     */
-    /*
-    components: {
-        StatsCard,
-    },
-    data() {
-        return {
-      statsCards: [
-        {
-          type: "warning",
-          icon: "ti-server",
-          title: "Capacity",
-          value: "105GB",
-          footerText: "Updated now",
-          footerIcon: "ti-reload"
-        },
-        {
-          type: "success",
-          icon: "ti-wallet",
-          title: "Revenue",
-          value: "$1,345",
-          footerText: "Last day",
-          footerIcon: "ti-calendar"
-        },
-        {
-          type: "danger",
-          icon: "ti-pulse",
-          title: "Errors",
-          value: "23",
-          footerText: "In the last hour",
-          footerIcon: "ti-timer"
-        },
-        {
-          type: "info",
-          icon: "ti-twitter-alt",
-          title: "Followers",
-          value: "+45",
-          footerText: "Updated now",
-          footerIcon: "ti-reload"
-        }
-      ],
-      };
-    },
-      */
 };
 </script>
 <style lang="scss">

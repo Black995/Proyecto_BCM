@@ -6,7 +6,7 @@
                     <div class="card-body table-responsive">
                         <DataTable
                             class="header-table"
-                            :value="crisisScenarios"
+                            :value="headquarters"
                             responsiveLayout="scroll"
                             :paginator="true"
                             :rows="10"
@@ -16,14 +16,20 @@
                             :responsive="true"
                             :reorderableColumns="true"
                             :loading="loading"
-                            :globalFilterFields="['name', 'description']"
+                            :globalFilterFields="[
+                                'name',
+                                'city_name',
+                                'parish_name',
+                                'township_name',
+                                'state_name',
+                            ]"
                             :filters="filterGlobal"
                         >
                             <template #header>
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
-                                            title="Crear escenario crítico"
+                                            title="Crear sede"
                                             variant="success"
                                             @click="show_modal_create = true"
                                         >
@@ -46,26 +52,20 @@
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
+                            <Column field="state_name" header="Estado"></Column>
+                            <Column field="city_name" header="Ciudad"></Column>
                             <Column
-                                field="description"
-                                header="Descripción"
+                                field="township_name"
+                                header="Municipio"
                             ></Column>
-                            <Column field="id" header="Opciones">
+                            <Column
+                                field="parish_name"
+                                header="Parroquia"
+                            ></Column>
+                            <Column field="id_2" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
-                                        title="Detalle del escenario crítico"
-                                        pill
-                                        variant="info"
-                                        @click="
-                                            show_modal_detail(slotProps.data.id)
-                                        "
-                                    >
-                                        <font-awesome-icon
-                                            icon="fa-solid fa-search"
-                                        />
-                                    </b-button>
-                                    <b-button
-                                        title="Editar escenario crítico"
+                                        title="Editar sede"
                                         pill
                                         variant="warning"
                                         @click="
@@ -77,8 +77,8 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        title="Eliminar sede"
                                         pill
-                                        title="Eliminar escenario crítico"
                                         variant="danger"
                                         @click="
                                             show_modal_delete(slotProps.data.id)
@@ -90,30 +90,9 @@
                                     </b-button>
                                 </template>
                             </Column>
-                            <Column field="id_2" header="Asociar riesgos">
-                                <template #body="slotProps">
-                                    <div class="text-center">
-                                        <b-button
-                                            pill
-                                            title="Asociar riesgos"
-                                            variant="primary"
-                                            @click="
-                                                show_modal_association(
-                                                    slotProps.data.id,
-                                                    slotProps.data.name
-                                                )
-                                            "
-                                        >
-                                            <font-awesome-icon
-                                                icon="fa-solid fa-clipboard-list"
-                                            />
-                                        </b-button>
-                                    </div>
-                                </template>
-                            </Column>
 
                             <template #empty>
-                                No hay escenarios críticos encontrados.
+                                No hay sedes encontradas.
                             </template>
                         </DataTable>
                     </div>
@@ -126,61 +105,12 @@
         <div class="row"></div>
 
         <!--
-            Modal del detalle  
-        -->
-        <b-modal
-            id="modal-detail"
-            title="Detalle del escenario crítico"
-            ref="modal"
-            size="lg"
-            centered
-        >
-            <h3 class="text-center font-weight-bold">
-                {{ crisisScenarioDetail.name }}
-            </h3>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <strong>Descripción: </strong
-                    >{{ crisisScenarioDetail.description }}
-                </li>
-            </ul>
-
-            <h4 class="mt-3 text-center font-weight-bold">
-                Riesgos del escenario crítico
-            </h4>
-
-            <b-list-group-item
-                class="mt-2 flex-column align-items-start"
-                v-for="item in crisisScenarioDetail._risks"
-                :key="item.key"
-            >
-                <h5 class="mb-1">{{ item.name }}</h5>
-
-                <p class="mb-1">
-                    {{ item.description }}
-                </p>
-            </b-list-group-item>
-
-            <template #modal-footer>
-                <div class="w-100">
-                    <b-button
-                        variant="info"
-                        class="float-right"
-                        @click="$bvModal.hide('modal-detail')"
-                    >
-                        Cerrar
-                    </b-button>
-                </div>
-            </template>
-        </b-modal>
-
-        <!--
             Modal de crear  
         -->
         <b-modal
             v-model="show_modal_create"
             id="modal-create"
-            title="Crear escenario crítico"
+            title="Crear sede de la organización"
             ref="modal"
             size="lg"
             centered
@@ -188,31 +118,87 @@
         >
             <form ref="form" @submit.stop.prevent="handleSubmitCreate">
                 <b-form-group
-                    label="Ingrese el título del escenario crítico"
+                    label="Ingrese el título de la sede"
                     label-for="name-input-create"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="crisisState.name"
+                    :state="headquarterState.name"
                 >
                     <b-form-input
                         id="name-input"
-                        v-model="crisisScenario.name"
-                        :state="crisisState.name"
+                        v-model="headquarter.name"
+                        :state="headquarterState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
                 <b-form-group
-                    label="Ingrese la descripción del escenario crítico"
-                    label-for="description-input-create"
+                    label="Seleccione el Estado"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="crisisState.description"
+                    :state="headquarterState.state"
                 >
-                    <b-form-textarea
-                        id="name-input"
-                        v-model="crisisScenario.description"
-                        :state="crisisState.description"
+                    <b-form-select
+                        @change="
+                            getCities(true);
+                            getTownships(true);
+                        "
+                        v-model="stateId"
+                        :options="states"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.state"
                         required
-                        rows="3"
-                    ></b-form-textarea>
+                    ></b-form-select>
+                </b-form-group>
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione la ciudad"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.city"
+                        >
+                            <b-form-select
+                                v-model="headquarter.city"
+                                :options="cities"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.city"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione el municipio"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.township"
+                        >
+                            <b-form-select
+                                @change="getParishes(true)"
+                                v-model="townshipId"
+                                :options="townships"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.township"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-form-group
+                    v-if="townshipId"
+                    label="Seleccione la parroquia"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="headquarterState.parish"
+                >
+                    <b-form-select
+                        v-model="headquarter.parish"
+                        :options="parishes"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.parish"
+                        required
+                    ></b-form-select>
                 </b-form-group>
             </form>
 
@@ -223,7 +209,7 @@
                         class="float-right"
                         @click="handleSubmitCreate"
                     >
-                        Crear escenario crítico
+                        Crear sede
                     </b-button>
                 </div>
             </template>
@@ -234,16 +220,16 @@
         -->
         <b-modal
             id="modal-confirm-create"
-            title="Confirmar crear escenario crítico"
+            title="Confirmar crear sede"
             centered
         >
-            <h4>¿Está seguro de crear este escenario crítico?</h4>
+            <h4>¿Está seguro de crear esta sede de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="success"
                         class="float-right"
-                        @click="createCrisisScenario"
+                        @click="createHeadquarter"
                     >
                         Confirmar
                     </b-button>
@@ -256,38 +242,94 @@
         -->
         <b-modal
             id="modal-update"
-            title="Editar escenario crítico"
+            title="Editar sede de la organización"
             ref="modal"
             size="lg"
             centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
                 <b-form-group
-                    label="Ingrese el título del escenario crítico"
+                    label="Ingrese el título de la sede"
                     label-for="name-input-update"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="crisisState.name"
+                    :state="headquarterState.name"
                 >
                     <b-form-input
                         id="name-input"
-                        v-model="crisisScenario.name"
-                        :state="crisisState.name"
+                        v-model="headquarter.name"
+                        :state="headquarterState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
                 <b-form-group
-                    label="Ingrese la descripción del escenario crítico"
-                    label-for="description-input-update"
+                    label="Seleccione el Estado"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="crisisState.description"
+                    :state="headquarterState.state"
                 >
-                    <b-form-textarea
-                        id="name-input"
-                        v-model="crisisScenario.description"
-                        :state="crisisState.description"
+                    <b-form-select
+                        @change="
+                            getCities(true);
+                            getTownships(true);
+                        "
+                        v-model="stateId"
+                        :options="states"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.state"
                         required
-                        rows="3"
-                    ></b-form-textarea>
+                    ></b-form-select>
+                </b-form-group>
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione la ciudad"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.city"
+                        >
+                            <b-form-select
+                                v-model="headquarter.city"
+                                :options="cities"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.city"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            v-if="stateId"
+                            label="Seleccione el municipio"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="headquarterState.township"
+                        >
+                            <b-form-select
+                                @change="getParishes(true)"
+                                v-model="townshipId"
+                                :options="townships"
+                                value-field="id"
+                                text-field="name"
+                                :state="headquarterState.township"
+                                required
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-form-group
+                    v-if="townshipId"
+                    label="Seleccione la parroquia"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="headquarterState.parish"
+                >
+                    <b-form-select
+                        v-model="headquarter.parish"
+                        :options="parishes"
+                        value-field="id"
+                        text-field="name"
+                        :state="headquarterState.parish"
+                        required
+                    ></b-form-select>
                 </b-form-group>
             </form>
 
@@ -298,7 +340,7 @@
                         class="float-right"
                         @click="handleSubmitUpdate"
                     >
-                        Editar escenario crítico
+                        Editar sede
                     </b-button>
                 </div>
             </template>
@@ -309,16 +351,16 @@
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar editar escenario crítico"
+            title="Confirmar editar sede"
             centered
         >
-            <h4>¿Está seguro de editar este escenario crítico?</h4>
+            <h4>¿Está seguro de editar esta sede de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="warning"
                         class="float-right"
-                        @click="updateCrisisScenario"
+                        @click="updateHeadquarter"
                     >
                         Confirmar
                     </b-button>
@@ -331,95 +373,16 @@
         -->
         <b-modal
             id="modal-confirm-delete"
-            title="Confirmar eliminar escenario crítico"
+            title="Confirmar eliminar sede"
             centered
         >
-            <h4>¿Está seguro de eliminar este escenario crítico?</h4>
+            <h4>¿Está seguro de eliminar esta sede de la organización?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="danger"
                         class="float-right"
-                        @click="deleteCrisisScenario"
-                    >
-                        Confirmar
-                    </b-button>
-                </div>
-            </template>
-        </b-modal>
-
-        <!--
-            Modal de asociar riesgos con escenario crítico  
-        -->
-        <b-modal
-            id="modal-associate-risks"
-            title="Asociar riesgos al escenario crítico"
-            ref="modal"
-            size="lg"
-            centered
-        >
-            <multiselect
-                v-model="selectedRisks"
-                placeholder="Buscar riesgo"
-                label="name"
-                track-by="id"
-                :options="risks"
-                :multiple="true"
-            ></multiselect>
-
-            <b-list-group v-if="selectedRisks.length" class="mt-3">
-                <b-list-group-item
-                    href="#"
-                    class="flex-column align-items-start"
-                    v-for="item in selectedRisks"
-                    :key="item.key"
-                >
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{ item.name }}</h5>
-                        <!--small class="text-muted">3 days ago</small-->
-                    </div>
-                    <p class="mb-1">
-                        {{ item.description }}
-                    </p>
-                </b-list-group-item>
-            </b-list-group>
-
-            <h3 class="mt-3 text-center" v-if="!selectedRisks.length">
-                No existen riesgos asociados a este escenario crítico
-            </h3>
-
-            <template #modal-footer>
-                <div class="w-100">
-                    <b-button
-                        variant="primary"
-                        class="float-right"
-                        @click="show_modal_confirm_association"
-                    >
-                        Asociar riesgos
-                    </b-button>
-                </div>
-            </template>
-        </b-modal>
-
-        <!--
-            Modal de confirmar asociar riesgos  
-        -->
-        <b-modal
-            id="modal-confirm-associate-risks"
-            title="Confirmar asociar riesgos"
-            centered
-        >
-            <h4>
-                ¿Está seguro de asociar estos riesgos al escenario crítico
-                <strong>{{ crisisName }}</strong
-                >?
-            </h4>
-            <template #modal-footer>
-                <div class="w-100">
-                    <b-button
-                        variant="primary"
-                        class="float-right"
-                        @click="associateRisks"
+                        @click="deleteHeadquarter"
                     >
                         Confirmar
                     </b-button>
@@ -428,52 +391,53 @@
         </b-modal>
     </div>
 </template>
+
 <script>
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
-
-import Multiselect from "vue-multiselect";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 
 export default {
-    name: "CrisisScenarios",
-    components: {
-        Multiselect,
-    },
+    name: "Headquarters",
+
     data: () => ({
         loading: false,
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
 
-        // Variables para maanejar los modales
+        // Variables para manejar los modales
         show_modal_create: false,
 
-        crisisScenarios: [],
-        crisisScenarioDetail: {
-            name: "",
-            description: "",
-            _risks: [],
-        },
-        crisisId: 0,
-        crisisName: "",
+        headquarters: [],
+        headquarterId: 0,
 
-        crisisScenario: {
+        headquarter: {
             name: "",
-            description: "",
+            city: 0,
+            parish: 0,
         },
-        crisisState: {
+        headquarterState: {
             name: null,
-            description: null,
+            state: null,
+            city: null,
+            township: null,
+            parish: null,
         },
 
-        // Listas de riesgos para realizar la asociación
-        risks: [],
-        selectedRisks: [],
+        /**
+         * Variables utilizadas para manejo de estados, ciudades, municipios y parroquias
+         */
+        states: [],
+        cities: [],
+        townships: [],
+        parishes: [],
+        stateId: 0,
+        townshipId: 0,
     }),
     mounted() {
-        this.getCrisisScenarios();
+        this.getHeadquarters();
     },
     methods: {
         successMessage(successText) {
@@ -496,23 +460,23 @@ export default {
                 type: "danger",
             });
         },
-        async getCrisisScenarios() {
+        async getHeadquarters() {
             this.loading = true;
-            this.crisisScenarios = [];
+            this.headquarters = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenarios_list/`, {
+                .get(`${SERVER_ADDRESS}/api/config/headquarters/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.crisisScenarios = res.data;
+                    this.headquarters = res.data;
                     this.loading = false;
 
-                    // Mientras tanto vamos cargando la lista de riesgos
-                    this.getRisks();
+                    // Mientras tanto vamos cargando la lista de estados
+                    this.getStates();
                 })
                 .catch((err) => {
                     try {
@@ -545,7 +509,8 @@ export default {
         },
         initFilters1() {
             this.filterGlobal = {
-                global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                value: null,
+                matchMode: FilterMatchMode.CONTAINS,
             };
         },
 
@@ -554,76 +519,50 @@ export default {
          */
         checkFormValidity() {
             let valid = true;
-            if (!this.crisisScenario.name) {
-                this.crisisState.name = false;
+            if (!this.headquarter.name) {
+                this.headquarterState.name = false;
                 valid = false;
             }
-            if (!this.crisisScenario.description) {
-                this.crisisState.description = false;
+            if (this.stateId == 0) {
+                this.headquarterState.state = false;
+                valid = false;
+            }
+            if (this.townshipId == 0) {
+                this.headquarterState.township = false;
+                valid = false;
+            }
+            if (this.headquarter.city == 0) {
+                this.headquarterState.city = false;
+                valid = false;
+            }
+            if (this.headquarter.parish == 0) {
+                this.headquarterState.parish = false;
                 valid = false;
             }
             return valid;
         },
         resetModal() {
-            this.crisisScenario.name = "";
-            this.crisisState.name = null;
-            this.crisisScenario.description = "";
-            this.crisisState.description = null;
-        },
-        /**
-         * Detail
-         */
-        async show_modal_detail(id) {
-            this.crisisScenarioDetail = {
-                name: "",
-                description: "",
-                _risks: [],
-            };
-
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${id}/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
-                .then((res) => {
-                    this.crisisScenarioDetail = res.data;
-
-                    this.$nextTick(() => {
-                        this.$bvModal.show("modal-detail");
-                    });
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
-                        } else {
-                            // Servidor no disponible
-                            this.errorMessage(
-                                "Ups! Ha ocurrido un error en el servidor"
-                            );
-                        }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
+            this.headquarter.name = "";
+            this.headquarterState.name = null;
+            this.stateId = 0;
+            this.headquarterState.state = null;
+            this.townshipId = 0;
+            this.headquarterState.township = null;
+            this.headquarter.city = 0;
+            this.headquarterState.city = null;
+            this.headquarter.parish = 0;
+            this.headquarterState.parish = null;
         },
         /**
          * Create
          */
         handleSubmitCreate() {
             // Inicializamos variables de estados
-            this.crisisState.name = null;
-            this.crisisState.description = null;
+            this.headquarterState.name = null;
+            this.headquarterState.state = null;
+            this.headquarterState.township = null;
+            this.headquarterState.city = null;
+            this.headquarterState.parish = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -635,11 +574,11 @@ export default {
                 this.$bvModal.show("modal-confirm-create");
             });
         },
-        async createCrisisScenario() {
+        async createHeadquarter() {
             axios
                 .post(
-                    `${SERVER_ADDRESS}/api/phase1/crisis_scenarios/`,
-                    this.crisisScenario,
+                    `${SERVER_ADDRESS}/api/config/headquarters/`,
+                    this.headquarter,
                     {
                         withCredentials: true,
                         headers: {
@@ -650,7 +589,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El escenario crítico ha sido creado exitosamente!"
+                        "¡La sede ha sido creada exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -659,8 +598,8 @@ export default {
                         this.$bvModal.hide("modal-create");
                     });
 
-                    // Cargamos de nuevo la tabla de escenarios críticos
-                    this.getCrisisScenarios();
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getHeadquarters();
                 })
                 .catch((err) => {
                     try {
@@ -685,14 +624,16 @@ export default {
                     }
                 });
         },
-
         /**
          * Update
          */
         handleSubmitUpdate() {
             // Inicializamos variables de estados
-            this.crisisState.name = null;
-            this.crisisState.description = null;
+            this.headquarterState.name = null;
+            this.headquarterState.state = null;
+            this.headquarterState.township = null;
+            this.headquarterState.city = null;
+            this.headquarterState.parish = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -705,17 +646,25 @@ export default {
             });
         },
         async show_modal_update(id) {
-            this.crisisId = id;
+            this.headquarterId = id;
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${id}/`, {
+                .get(`${SERVER_ADDRESS}/api/config/headquarter/${id}/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.crisisScenario = res.data;
+                    this.headquarter.name = res.data.name;
+                    this.headquarter.city = res.data.city;
+                    this.headquarter.parish = res.data.parish;
+                    this.stateId = res.data.state;
+                    this.townshipId = res.data.township;
+                    this.getCities(false);
+                    this.getTownships(false);
+                    this.getParishes(false);
+
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -743,11 +692,11 @@ export default {
                     }
                 });
         },
-        async updateCrisisScenario() {
+        async updateHeadquarter() {
             axios
                 .patch(
-                    `${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.crisisId}/`,
-                    this.crisisScenario,
+                    `${SERVER_ADDRESS}/api/config/headquarter/${this.headquarterId}/`,
+                    this.headquarter,
                     {
                         withCredentials: true,
                         headers: {
@@ -758,7 +707,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El escenario crítico ha sido actualizado exitosamente!"
+                        "¡La sede ha sido actualizada exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -767,8 +716,8 @@ export default {
                         this.$bvModal.hide("modal-update");
                     });
 
-                    // Cargamos de nuevo la tabla de escenario crítico
-                    this.getCrisisScenarios();
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getHeadquarters();
                 })
                 .catch((err) => {
                     try {
@@ -797,15 +746,15 @@ export default {
          * Delete
          */
         show_modal_delete(id) {
-            this.crisisId = id;
+            this.headquarterId = id;
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-delete");
             });
         },
-        async deleteCrisisScenario() {
+        async deleteHeadquarter() {
             axios
                 .delete(
-                    `${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.crisisId}/`,
+                    `${SERVER_ADDRESS}/api/config/headquarter/${this.headquarterId}/`,
                     {
                         withCredentials: true,
                         headers: {
@@ -816,7 +765,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El escenario crítico ha sido eliminado exitosamente!"
+                        "¡La sede ha sido eliminada exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -824,8 +773,8 @@ export default {
                         this.$bvModal.hide("modal-confirm-delete");
                     });
 
-                    // Cargamos de nuevo la tabla de escenarios críticos
-                    this.getCrisisScenarios();
+                    // Cargamos de nuevo la tabla de riesgos
+                    this.getHeadquarters();
                 })
                 .catch((err) => {
                     try {
@@ -850,20 +799,22 @@ export default {
                     }
                 });
         },
+
         /**
-         * Associate risks with the crisis scenario
+         * Obtener estados, ciudades, municipios y parroquias
          */
-        async getRisks() {
-            this.risks = [];
+        async getStates() {
+            this.states = [];
+
             axios
-                .get(`${SERVER_ADDRESS}/api/phase1/risks/`, {
+                .get(`${SERVER_ADDRESS}/api/config/states/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.risks = res.data;
+                    this.states = res.data;
                 })
                 .catch((err) => {
                     try {
@@ -888,87 +839,102 @@ export default {
                     }
                 });
         },
-        async show_modal_association(id, name) {
-            this.crisisId = id;
-            this.crisisName = name;
-            this.selectedRisks = [];
-
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenario/${id}/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
-                .then((res) => {
-                    for (let i = 0; i < res.data._risks.length; i++) {
-                        this.selectedRisks.push(res.data._risks[i]);
-                    }
-
-                    this.$nextTick(() => {
-                        this.$bvModal.show("modal-associate-risks");
-                    });
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
-                        } else {
-                            // Servidor no disponible
-                            this.errorMessage(
-                                "Ups! Ha ocurrido un error en el servidor"
-                            );
-                        }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
-        },
-        show_modal_confirm_association() {
-            this.$nextTick(() => {
-                this.$bvModal.show("modal-confirm-associate-risks");
-            });
-        },
-        async associateRisks() {
-            let scenarioRiskIds = [];
-            for (let i = 0; i < this.selectedRisks.length; i++) {
-                scenarioRiskIds.push(this.selectedRisks[i].id);
+        async getCities(reset) {
+            this.cities = [];
+            if (reset) {
+                this.headquarter.city = 0;
             }
-            //Es necesario que el array de IDs tenga este nombre
-            let ids = {
-                risks: scenarioRiskIds,
-            };
 
             axios
-                .patch(
-                    `${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.crisisId}/`,
-                    ids,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
+                .get(`${SERVER_ADDRESS}/api/config/cities/`, {
+                    params: { state_id: this.stateId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
                 .then((res) => {
-                    // Mensaje de éxito
-                    this.successMessage(
-                        "¡Los riesgos fueron asociados al escenario crítico exitosamente!"
-                    );
+                    this.cities = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getTownships(reset) {
+            this.townships = [];
+            if (reset) {
+                this.townshipId = 0;
+            }
 
-                    //Ocultamos los modales
-                    this.$nextTick(() => {
-                        this.$bvModal.hide("modal-confirm-associate-risks");
-                        this.$bvModal.hide("modal-associate-risks");
-                    });
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/townships/`, {
+                    params: { state_id: this.stateId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.townships = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getParishes(reset) {
+            this.parishes = [];
+            if (reset) {
+                this.headquarter.parish = 0;
+            }
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/parishes/`, {
+                    params: { township_id: this.townshipId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.parishes = res.data;
                 })
                 .catch((err) => {
                     try {

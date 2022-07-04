@@ -37,13 +37,8 @@
                 />
                 <sidebar-link
                     to="/layout/servicios-usados"
-                    name="Servicios Contratados"
+                    name="Servicios de Soporte"
                     icon="ti-dropbox"
-                />
-                <sidebar-link
-                    to="/layout/personal"
-                    name="Personal de la Org."
-                    icon="ti-layout-accordion-list"
                 />
                 <!--
                     Encabezado Configuración
@@ -55,10 +50,16 @@
                     icon="ti-menu-alt"
                 />
                 <sidebar-link
+                    to="/layout/cargos"
+                    name="Cargos"
+                    icon="ti-bar-chart"
+                />
+                <sidebar-link
                     to="/layout/escalas"
                     name="Escalas"
                     icon="ti-ruler-alt"
                 />
+                <sidebar-link to="/layout/sedes" name="Sedes" icon="ti-map" />
                 <!--sidebar-link
                     to="/layout/stats"
                     name="User Profile"

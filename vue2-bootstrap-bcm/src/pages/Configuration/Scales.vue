@@ -517,6 +517,28 @@
                         required
                     ></b-form-select>
                 </b-form-group>
+                <p class="mt-3">
+                    <strong>NOTA: </strong>al actualizar las escalas tiene dos
+                    opciones:
+                </p>
+                <b-form-checkbox
+                    v-model="scaleView.option"
+                    value="1"
+                    unchecked-value="2"
+                >
+                    <strong>1. </strong>se colocarán en nulo todas las escalas
+                    de los Servicios de la Organización, Servicios de Soporte y
+                    Actividades de la Organización.
+                </b-form-checkbox>
+                <b-form-checkbox
+                    v-model="scaleView.option"
+                    value="2"
+                    unchecked-value="1"
+                >
+                    <strong>2. </strong>el sistema realizará automáticamente un
+                    ajuste de las escalas de acuerdo a la media entre la escala
+                    actual y la escala a modificar.
+                </b-form-checkbox>
             </form>
 
             <template #modal-footer>
@@ -618,6 +640,7 @@ export default {
         scaleView: {
             name: "",
             scale: 0,
+            option: 0,
         },
         scaleViewState: {
             name: null,
@@ -1007,7 +1030,7 @@ export default {
         /**
          * Validar formularios
          */
-        checkFormValidityScalesView() {
+        checkFormValidityScalesViewCreate() {
             let valid = true;
             if (!this.scaleView.name) {
                 this.scaleViewState.name = false;
@@ -1015,6 +1038,24 @@ export default {
             }
             if (this.scaleView.scale == 0) {
                 this.scaleViewState.scale = false;
+                valid = false;
+            }
+            return valid;
+        },
+        checkFormValidityScalesViewUpdate() {
+            let valid = true;
+            if (!this.scaleView.name) {
+                this.scaleViewState.name = false;
+                valid = false;
+            }
+            if (this.scaleView.scale == 0) {
+                this.scaleViewState.scale = false;
+                valid = false;
+            }
+            if (this.scaleView.option == 0) {
+                this.errorMessage(
+                    "Seleccione una de las opciones antes de actualizar"
+                );
                 valid = false;
             }
             return valid;
@@ -1034,7 +1075,7 @@ export default {
             this.scaleViewState.scale = null;
 
             // Exit when the form isn't valid
-            if (!this.checkFormValidityScalesView()) {
+            if (!this.checkFormValidityScalesViewCreate()) {
                 return;
             }
 
@@ -1120,7 +1161,7 @@ export default {
             this.scaleViewState.scale = null;
 
             // Exit when the form isn't valid
-            if (!this.checkFormValidityScalesView()) {
+            if (!this.checkFormValidityScalesViewUpdate()) {
                 return;
             }
 
@@ -1140,10 +1181,14 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.scaleView = res.data;
-                    this.$nextTick(() => {
-                        this.$bvModal.show("modal-update-scale-view");
-                    });
+                    (this.scaleView = {
+                        name: res.data.name,
+                        scale: res.data.scale,
+                        option: 0,
+                    }),
+                        this.$nextTick(() => {
+                            this.$bvModal.show("modal-update-scale-view");
+                        });
                 })
                 .catch((err) => {
                     try {
