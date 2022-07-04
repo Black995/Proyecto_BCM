@@ -162,6 +162,7 @@ class OrganizationActivityListSerializer(serializers.ModelSerializer):
         fields =[
             'id',
             'name',
+            'description',
             'cost',
             'recovery_time',
             'criticality',
@@ -174,9 +175,9 @@ class OrganizationActivitySerializer(serializers.ModelSerializer):
     scale_min_value = serializers.CharField(read_only=True, source="scale.min_value")
     scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
     
-    services_ofered = serializers.ListField(
+    services_offered = serializers.ListField(
         child=serializers.IntegerField(),required=False,write_only=True)
-    _services_ofered = ServiceOfferedSerializer(many=True,read_only=True)
+    _services_offered = ServiceOfferedSerializer(many=True,read_only=True)
 
     risks = serializers.ListField(
         child=serializers.IntegerField(), required=False, write_only=True)
@@ -195,8 +196,8 @@ class OrganizationActivitySerializer(serializers.ModelSerializer):
             'cost',
             'recovery_time',
             'criticality',
-            'services_ofered',
-            '_services_ofered',
+            'services_offered',
+            '_services_offered',
             'scale',
             'scale_name',
             'scale_min_value',
@@ -207,3 +208,33 @@ class OrganizationActivitySerializer(serializers.ModelSerializer):
             '_headquarters',
 
         ]
+
+
+class InterestedPartyListSerializer(serializers.ModelSerializer):
+    type_name = serializers.SerializerMethodField(read_only = True)
+
+    class Meta:
+        model = InterestedParty
+        fields =[
+            'id',
+            'name',
+            'type',
+            'type_name',
+            'description'
+        ]
+
+class interestedPartySerializer(serializers.ModelSerializer):
+    type_name = serializers.SerializerMethodField(read_only = True)
+    organization_name = serializers.CharField(read_only = True, source="organization.name")
+
+    class Meta:
+        model = InterestedParty
+        fields = [
+            'id',
+            'name',
+            'type',
+            'type_name',
+            'description',
+            'organization',
+            'organization_name'
+        ] 
