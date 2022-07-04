@@ -165,14 +165,15 @@ class OrganizationActivity(models.Model):
     recovery_time = models.DurationField()
     criticality = models.SmallIntegerField(null=True)
 
-    services_offered = models.ManyToManyField(
+    _services_offered = models.ManyToManyField(
         ServiceOffered, related_name='service_offered_organizacion_activity')
     scale = models.ForeignKey(
         Scale, null=True, related_name='scale_organization_activity', on_delete=models.SET_NULL)
-    headquarters = models.ManyToManyField(
+    _headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_organization_activity')
     _risks = models.ManyToManyField(
         Risk, related_name='risk_organizacion_activity')
+    
 
     @property
     def risks(self):
@@ -188,5 +189,23 @@ class OrganizationActivity(models.Model):
                 risk = Risk.objects.filter(id=risk_id).first()
                 if(risk is not None):
                     self._risks.add(risk)
+    
+    @property
+    def services_offered(self):
+        return self._services_offered.values_list(flat=True)
+
+    @services_offered.setter
+    def services_offered(self, services_offered_ids):
+
+        print(services_offered_ids)
+        # Eliminamos los registros anteriores de los servicios ofrecidos
+        self._services_offered.clear()
+        # Guardamos los nuevos registros
+        if(services_offered_ids):
+            for service_id in services_offered_ids:
+                print(service_id)
+                service = ServiceOffered.objects.filter(id=service_id).first()
+                if(service is not None):
+                    self._services_offered.add(service)
 
 

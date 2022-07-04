@@ -1,8 +1,8 @@
 from django.urls import path
 
-from .views import (ServiceOfferedListViewSet, ServiceOfferedViewSet,
+from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, ServiceOfferedListViewSet, ServiceOfferedViewSet,
                     ServiceUsedListViewSet, ServiceUsedViewSet, StaffListViewSet,
-                    StaffViewSet)
+                    StaffViewSet,OrganizationActivityListViewSet,OrganizationActivityViewSet)
 
 
 urlpatterns = [
@@ -30,4 +30,21 @@ urlpatterns = [
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='staff_detail'),
+    path('organizationActivities/', OrganizationActivityListViewSet.as_view({
+        'get':'list',
+        'post':'create'}), name='activity_list'),
+    path('organizationActivity/<int:pk>/', OrganizationActivityViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'}), name='activity_detail'),
+    path('interestedParties/', InterestedPartyListViewSet.as_view({
+        'get':'list',
+        'post':'create'}), name='party_list'),
+    path('interestedParty/<int:id>/', InterestedPartyViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'}), name='party_detail')
+    
 ]
