@@ -3,11 +3,7 @@ import os
 from django.conf import settings
 
 
-def ruta_archivo_org(instance, filename):
-    print('parámetros de la función')
-    print(instance)
-    print(filename)
-    
+def ruta_archivo_org(instance, filename):    
     return os.path.join(settings.STATICFILES_DIRS[0], str(instance.name), str(instance.name) + str(os.path.splitext(filename)[1]))
 
 class Organization(models.Model):

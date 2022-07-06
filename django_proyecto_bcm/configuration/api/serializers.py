@@ -1,7 +1,9 @@
 from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish, Organization
 from rest_framework import serializers
 from django.db.models import F, Q
-
+import base64
+import os
+from django.conf import settings
 
 class AreaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -136,7 +138,10 @@ class ParishSerializer(serializers.ModelSerializer):
         ]
 
 
+
 class OrganizationSerializer(serializers.ModelSerializer):
+    logo_base64 = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Organization
         fields = [
@@ -145,4 +150,14 @@ class OrganizationSerializer(serializers.ModelSerializer):
             'legal_id',
             'description',
             'logo',
+            'logo_base64'
         ]
+
+    def get_logo_base64(self, obj):
+        #return dict(ServiceOffered.TYPE).get(obj.type)
+        path = str(Organization.objects.get(id=obj.id).logo)
+        file_path = os.path.join(settings.STATICFILES_DIRS[0], path)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                return base64.b64encode(fh.read()).decode('utf-8')
+        return None

@@ -3,15 +3,19 @@
         <div class="col-xl-4 col-lg-5 col-md-6">
             <card class="card-user">
                 <div slot="image">
-                    <b-img :src="org.logo" fluid alt="Responsive image"></b-img>
+                    <b-img
+                        :src="'data:image/jpeg;base64,' + org.logo_base64"
+                        fluid
+                        :alt="org.name"
+                    ></b-img>
                 </div>
                 <div>
-                    <p><strong>Imagen de texto:</strong> {{ org.logo }}</p>
                     <h3 class="text-center">
                         {{ org.name }}
                     </h3>
                     <h5 class="text-center">
-                        Número legal: <strong>{{ org.legal_id }}</strong>
+                        Identificación legal:
+                        {{ org.legal_id }}
                     </h5>
                     <p class="description text-center">
                         {{ org.description }}
@@ -20,9 +24,64 @@
             </card>
         </div>
         <div class="col-xl-8 col-lg-7 col-md-6">
-            <card class="card" title="Edit Profile">
+            <card class="card" title="Editar datos de la empresa">
                 <div>
-                    <form @submit.prevent>
+                    <form>
+                        <b-form-group
+                            label="Ingrese el nombre de la empresa"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="orgState.name"
+                        >
+                            <b-form-input
+                                v-model="orgEdit.name"
+                                :state="orgState.name"
+                                required
+                            >
+                            </b-form-input>
+                        </b-form-group>
+                        <b-form-group
+                            label="Ingrese la identificación legal de la empresa"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="orgState.legal_id"
+                        >
+                            <b-form-input
+                                v-model="orgEdit.legal_id"
+                                :state="orgState.legal_id"
+                                required
+                            >
+                            </b-form-input>
+                        </b-form-group>
+                        <b-form-group
+                            label="Ingrese la descripción de la empresa"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="orgState.description"
+                        >
+                            <b-form-textarea
+                                v-model="orgEdit.description"
+                                :state="orgState.description"
+                                required
+                                rows="3"
+                            ></b-form-textarea>
+                        </b-form-group>
+                        <b-form-file
+                            v-model="orgEdit.logo"
+                            :state="orgState.logo"
+                            placeholder="Elija un archivo o arrástrelo aquí"
+                            drop-placeholder="Arrastre el archivo aquí"
+                        ></b-form-file>
+                        <div class="text-center mt-3">
+                            <b-button
+                                variant="info"
+                                round
+                                @click="handleSubmitUpdate(org.id)"
+                            >
+                                Actualizar
+                            </b-button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </form>
+
+                    <!--form @submit.prevent>
                         <div class="row">
                             <div class="col-md-12">
                                 <fg-input
@@ -49,14 +108,40 @@
                             </div>
                         </div>
                         <div class="text-center">
-                            <p-button type="info" round>
-                                Update Profile
+                            <p-button
+                                type="info"
+                                round
+                                @click="handleSubmitUpdate(org.id)"
+                            >
+                                Actualizar
                             </p-button>
                         </div>
                         <div class="clearfix"></div>
-                    </form>
+                    </form-->
                 </div>
             </card>
+
+            <!--
+                Modal confirmar actualizar
+            -->
+            <b-modal
+                id="modal-confirm-update"
+                title="Confirmar editar datos de la empresa"
+                centered
+            >
+                <h4>¿Está seguro de editar los datos de la empresa?</h4>
+                <template #modal-footer>
+                    <div class="w-100">
+                        <b-button
+                            variant="info"
+                            class="float-right"
+                            @click="updateOrg"
+                        >
+                            Confirmar
+                        </b-button>
+                    </div>
+                </template>
+            </b-modal>
         </div>
     </div>
 </template>
@@ -73,28 +158,24 @@ export default {
         orgId: 0,
 
         org: {
+            id: 0,
             name: "",
             legal_id: "",
             description: "",
-            logo: "",
+            logo: null,
+            logo_base64: null,
         },
-        areaState: {
+        orgEdit: {
+            name: "",
+            legal_id: "",
+            description: "",
+            logo: null,
+        },
+        orgState: {
             name: null,
             legal_id: null,
             description: null,
             logo: null,
-        },
-
-        user: {
-            company: "Paper Dashboard",
-            username: "michael23",
-            email: "",
-            firstName: "Chet",
-            lastName: "Faker",
-            address: "Melbourne, Australia",
-            city: "Melbourne",
-            postalCode: "",
-            aboutMe: `We must accept finite disappointment, but hold on to infinite hope.`,
         },
     }),
     mounted() {
@@ -127,7 +208,14 @@ export default {
                 name: "",
                 legal_id: "",
                 description: "",
-                logo: "",
+                logo: null,
+                logo_base64: null,
+            };
+            this.orgEdit = {
+                name: "",
+                legal_id: "",
+                description: "",
+                logo: null,
             };
             axios
                 .get(`${SERVER_ADDRESS}/api/config/organizations/`, {
@@ -138,7 +226,12 @@ export default {
                 })
                 .then((res) => {
                     this.org = res.data[0];
-                    console.log(this.org);
+                    this.orgEdit = {
+                        name: res.data[0].name,
+                        legal_id: res.data[0].legal_id,
+                        description: res.data[0].description,
+                        logo: null,
+                    };
                 })
                 .catch((err) => {
                     try {
@@ -169,22 +262,29 @@ export default {
          */
         checkFormValidity() {
             let valid = true;
-            if (!this.org.name) {
+            if (!this.orgEdit.name) {
                 this.orgState.name = false;
+                valid = false;
+            }
+            if (!this.orgEdit.legal_id) {
+                this.orgState.legal_id = false;
+                valid = false;
+            }
+            if (!this.orgEdit.description) {
+                this.orgState.description = false;
                 valid = false;
             }
             return valid;
         },
-        resetModal() {
-            this.org.name = "";
-            this.orgState.name = null;
-        },
         /**
          * Update
          */
-        handleSubmitUpdate() {
+        handleSubmitUpdate(id) {
+            this.orgId = id;
             // Inicializamos variables de estados
             this.orgState.name = null;
+            this.orgState.legal_id = null;
+            this.orgState.description = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -196,14 +296,23 @@ export default {
                 this.$bvModal.show("modal-confirm-update");
             });
         },
-        async show_modal_update(id) {
-            this.orgId = id;
-        },
         async updateOrg() {
+            let formData = new FormData();
+            formData.append("name", this.orgEdit.name);
+            formData.append("legal_id", this.orgEdit.legal_id);
+            formData.append("description", this.orgEdit.description);
+            if (this.orgEdit.logo) {
+                formData.append(
+                    "logo",
+                    this.orgEdit.logo,
+                    this.orgEdit.logo.name
+                );
+            }
+
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/config/organization/${this.orgId}/`,
-                    this.org,
+                    formData,
                     {
                         withCredentials: true,
                         headers: {
@@ -216,6 +325,10 @@ export default {
                     this.successMessage(
                         "¡Los datos de la empresa han sido actualizados exitosamente!"
                     );
+
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-update");
+                    });
 
                     // Cargamos de nuevo la tabla de riesgos
                     this.getOrganization();
