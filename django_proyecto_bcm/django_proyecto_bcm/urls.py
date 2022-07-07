@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/phase1/',  include('bcm_phase1.api.urls')),
     path('api/phase2/',  include('bcm_phase2.api.urls')),
     path('api/config/',  include('configuration.api.urls')),
+    path('api/users/',  include('users.api.urls')),
 
 
     # URLs de Django REST framework

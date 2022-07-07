@@ -43,7 +43,7 @@ class StaffListViewSet(viewsets.ModelViewSet):
 
 class StaffViewSet(viewsets.ModelViewSet):
     model = Staff
-    queryset = Staff.objects.annotate(user_email=F('user__email'))
+    queryset = Staff.objects.all()
     serializer_class = StaffSerializer
 
 class OrganizationActivityListViewSet(viewsets.ModelViewSet):

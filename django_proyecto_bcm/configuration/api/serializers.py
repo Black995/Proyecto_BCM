@@ -154,7 +154,6 @@ class OrganizationSerializer(serializers.ModelSerializer):
         ]
 
     def get_logo_base64(self, obj):
-        #return dict(ServiceOffered.TYPE).get(obj.type)
         path = str(Organization.objects.get(id=obj.id).logo)
         file_path = os.path.join(settings.STATICFILES_DIRS[0], path)
         if os.path.exists(file_path):

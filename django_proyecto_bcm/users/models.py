@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
+from django.contrib.auth.password_validation import \
+    validate_password as django_validate_password
+from django.core.exceptions import ValidationError
+from bcm_phase2.models import Staff
 
 
 class UserManager(BaseUserManager):
@@ -33,6 +37,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
+    staff = models.OneToOneField(
+        Staff, null=True, related_name='user_staff', on_delete=models.SET_NULL)
 
     # AbstractBaseUser
     is_active = models.BooleanField(default=True)
@@ -63,3 +69,10 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return True
+
+    
+    def validate_password(self, password: str):
+        try:
+            django_validate_password(password, self)
+        except ValidationError as e:
+            raise ValidationError({'password': e.messages})

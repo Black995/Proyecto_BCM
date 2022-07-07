@@ -1,7 +1,3 @@
-import os
-from django.conf import settings
-from django.http import Http404, HttpResponse
-from django.shortcuts import HttpResponse, get_object_or_404
 from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish, Organization
 from bcm_phase2.models import ServiceOffered, ServiceUsed, OrganizationActivity
 from django.shortcuts import get_object_or_404

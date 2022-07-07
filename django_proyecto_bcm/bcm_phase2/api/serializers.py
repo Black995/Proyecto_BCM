@@ -32,7 +32,7 @@ class StaffSerializer(serializers.ModelSerializer):
     area_name = serializers.CharField(read_only=True, source="area.name")
     position_name = serializers.CharField(read_only=True, source="position.name")
     headquarter_name = serializers.CharField(read_only=True, source="headquarter.name")
-    user_email = serializers.CharField(read_only=True)
+    user_email = serializers.CharField(read_only=True, source="user_staff.email")
 
     class Meta:
         model = Staff
@@ -48,7 +48,7 @@ class StaffSerializer(serializers.ModelSerializer):
             'position_name',
             'headquarter',
             'headquarter_name',
-            'user',
+            'user_staff',
             'user_email'
         ]
 
@@ -211,7 +211,7 @@ class StaffSerializer(serializers.ModelSerializer):
     area_name = serializers.CharField(read_only=True, source="area.name")
     position_name = serializers.CharField(read_only=True, source="position.name")
     headquarter_name = serializers.CharField(read_only=True, source="headquarter.name")
-    user_email = serializers.CharField(read_only=True, source="user.email")
+    user_email = serializers.CharField(read_only=True, source="user_staff.email")
 
     class Meta:
         model = Staff
@@ -227,7 +227,6 @@ class StaffSerializer(serializers.ModelSerializer):
             'position_name',
             'headquarter',
             'headquarter_name',
-            'user',
             'user_email'
         ]
 

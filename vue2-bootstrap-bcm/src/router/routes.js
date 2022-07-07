@@ -31,6 +31,7 @@ import Positions from "@/pages/Configuration/Positions.vue";
 import Scales from "@/pages/Configuration/Scales.vue";
 import Headquarters from "@/pages/Configuration/Headquarters.vue";
 import Organization from "@/pages/Configuration/Organization.vue";
+import Users from "@/pages/Configuration/Users.vue";
 
 
 const routes = [
@@ -112,6 +113,11 @@ const routes = [
         path: "sedes",
         name: "Sedes de la Organización",
         component: Headquarters
+      },
+      {
+        path: "usuarios",
+        name: "Usuarios",
+        component: Users
       },
       /**
        * Additional

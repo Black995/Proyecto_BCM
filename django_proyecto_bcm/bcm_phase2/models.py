@@ -1,7 +1,6 @@
 from django.db import models
 from configuration.models import Organization, Headquarter, Area, Scale, Position
 from bcm_phase1.models import Risk
-from users.models import User
 
 
 class InterestedParty(models.Model):
@@ -31,8 +30,6 @@ class Staff(models.Model):
     surnames = models.CharField(max_length=100)
     earnings = models.FloatField()
 
-    user = models.OneToOneField(
-        User, null=True, related_name='user_staff', on_delete=models.SET_NULL)
     headquarter = models.ForeignKey(Headquarter, related_name='headquarter_staff', null=True,
                                     on_delete=models.SET_NULL)
     area = models.ForeignKey(Area, related_name='area_staff', null=True,

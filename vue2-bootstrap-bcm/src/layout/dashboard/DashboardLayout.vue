@@ -71,11 +71,16 @@
                 />
                 <sidebar-link to="/layout/sedes" name="Sedes" icon="ti-map" />
                 <sidebar-link
+                    to="/layout/usuarios"
+                    name="Usuarios"
+                    icon="ti-user"
+                />
+                <!--sidebar-link
                     to="/layout/stats"
                     name="User Profile"
                     icon="ti-user"
                 />
-                <!--sidebar-link
+                <sidebar-link
                     to="/layout/table-list"
                     name="Table List"
                     icon="ti-view-list-alt"
