@@ -69,6 +69,11 @@
                     name="Escalas"
                     icon="ti-ruler-alt"
                 />
+                <sidebar-link
+                    to="/layout/roles"
+                    name="Roles"
+                    icon="ti-layers-alt"
+                />
                 <sidebar-link to="/layout/sedes" name="Sedes" icon="ti-map" />
                 <sidebar-link
                     to="/layout/usuarios"

@@ -6,7 +6,7 @@
                     <div class="card-body table-responsive">
                         <DataTable
                             class="header-table"
-                            :value="areas"
+                            :value="roles"
                             responsiveLayout="scroll"
                             :paginator="true"
                             :rows="10"
@@ -23,9 +23,9 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
-                                            title="Crear área"
+                                            title="Crear rol"
                                             variant="success"
-                                            @click="show_modal_create = true"
+                                            @click="show_modal_create()"
                                         >
                                             <font-awesome-icon
                                                 icon="fa-solid fa-plus"
@@ -49,7 +49,19 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
-                                        title="Editar área"
+                                        title="Detalle del rol"
+                                        pill
+                                        variant="info"
+                                        @click="
+                                            show_modal_detail(slotProps.data.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-search"
+                                        />
+                                    </b-button>
+                                    <b-button
+                                        title="Editar rol"
                                         pill
                                         variant="warning"
                                         @click="
@@ -61,7 +73,7 @@
                                         />
                                     </b-button>
                                     <b-button
-                                        title="Eliminar área"
+                                        title="Eliminar rol"
                                         pill
                                         variant="danger"
                                         @click="
@@ -76,7 +88,7 @@
                             </Column>
 
                             <template #empty>
-                                No hay áreas encontradas.
+                                No hay roles encontrados.
                             </template>
                         </DataTable>
                     </div>
@@ -89,12 +101,53 @@
         <div class="row"></div>
 
         <!--
+            Modal del detalle
+        -->
+        <b-modal
+            id="modal-detail"
+            title="Detalle del rol"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Nombre: </strong>{{ roleDetail.name }}
+                </li>
+            </ul>
+
+            <h4 class="mt-1 text-center font-weight-bold">Permisos del rol</h4>
+            <b-list-group-item
+                class="mt-1 flex-column align-items-start"
+                v-for="item in roleDetail.permissions"
+                :key="item.key"
+            >
+                <h5 class="mb-1">{{ item.name }}</h5>
+                <p class="mb-2">Nombre clave: {{ item.codename }}</p>
+            </b-list-group-item>
+            <h3 class="mt-3 text-center" v-if="!roleDetail.permissions.length">
+                No existen permisos asociados a este rol
+            </h3>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="info"
+                        class="float-right"
+                        @click="$bvModal.hide('modal-detail')"
+                    >
+                        Cerrar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
             Modal de crear  
         -->
         <b-modal
-            v-model="show_modal_create"
             id="modal-create"
-            title="Crear área de la organización"
+            title="Crear rol"
             ref="modal"
             size="lg"
             centered
@@ -102,18 +155,41 @@
         >
             <form ref="form" @submit.stop.prevent="handleSubmitCreate">
                 <b-form-group
-                    label="Ingrese el título del área"
-                    label-for="name-input-create"
+                    label="Ingrese el nombre del rol"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="areaState.name"
+                    :state="roleState.email"
                 >
                     <b-form-input
-                        id="name-input"
-                        v-model="area.name"
-                        :state="areaState.name"
+                        v-model="role.name"
+                        :state="roleState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
+
+                <multiselect
+                    v-model="role.permissions"
+                    placeholder="Buscar permiso"
+                    label="name"
+                    track-by="id"
+                    :options="permissions"
+                    :multiple="true"
+                ></multiselect>
+
+                <b-list-group v-if="role.permissions.length" class="mt-3">
+                    <b-list-group-item
+                        href="#"
+                        class="flex-column align-items-start"
+                        v-for="item in role.permissions"
+                        :key="item.key"
+                    >
+                        <h5 class="mb-1">{{ item.name }}</h5>
+                        <p class="mb-2">Nombre clave: {{ item.codename }}</p>
+                    </b-list-group-item>
+                </b-list-group>
+
+                <h3 class="mt-3 text-center" v-if="!role.permissions.length">
+                    No existen permisos asociados a este rol
+                </h3>
             </form>
 
             <template #modal-footer>
@@ -123,7 +199,7 @@
                         class="float-right"
                         @click="handleSubmitCreate"
                     >
-                        Crear área
+                        Crear rol
                     </b-button>
                 </div>
             </template>
@@ -132,18 +208,14 @@
         <!--
             Modal de confirmar crear  
         -->
-        <b-modal
-            id="modal-confirm-create"
-            title="Confirmar crear área"
-            centered
-        >
-            <h4>¿Está seguro de crear esta área de la organización?</h4>
+        <b-modal id="modal-confirm-create" title="Confirmar crear rol" centered>
+            <h4>¿Está seguro de crear este rol?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="success"
                         class="float-right"
-                        @click="createArea"
+                        @click="createRole"
                     >
                         Confirmar
                     </b-button>
@@ -156,22 +228,20 @@
         -->
         <b-modal
             id="modal-update"
-            title="Editar área de la organización"
+            title="Editar rol"
             ref="modal"
             size="lg"
             centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
                 <b-form-group
-                    label="Ingrese el título del área"
-                    label-for="name-input-update"
+                    label="Ingrese el nombre del rol"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="areaState.name"
+                    :state="roleState.name"
                 >
                     <b-form-input
-                        id="name-input"
-                        v-model="area.name"
-                        :state="areaState.name"
+                        v-model="role.name"
+                        :state="roleState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
@@ -184,7 +254,7 @@
                         class="float-right"
                         @click="handleSubmitUpdate"
                     >
-                        Editar área
+                        Editar rol
                     </b-button>
                 </div>
             </template>
@@ -195,16 +265,16 @@
         -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar editar área"
+            title="Confirmar editar rol"
             centered
         >
-            <h4>¿Está seguro de editar esta área de la organización?</h4>
+            <h4>¿Está seguro de editar este rol?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="warning"
                         class="float-right"
-                        @click="updateArea"
+                        @click="updateRole"
                     >
                         Confirmar
                     </b-button>
@@ -217,16 +287,16 @@
         -->
         <b-modal
             id="modal-confirm-delete"
-            title="Confirmar eliminar área"
+            title="Confirmar eliminar rol"
             centered
         >
-            <h4>¿Está seguro de eliminar esta área de la organización?</h4>
+            <h4>¿Está seguro de eliminar este rol?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="danger"
                         class="float-right"
-                        @click="deleteArea"
+                        @click="deleteRole"
                     >
                         Confirmar
                     </b-button>
@@ -240,32 +310,40 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
+import Multiselect from "vue-multiselect";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 
 export default {
-    name: "Areas",
-
+    name: "Roles",
+    components: {
+        Multiselect,
+    },
     data: () => ({
         loading: false,
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
 
-        // Variables para manejar los modales
-        show_modal_create: false,
-
-        areas: [],
-        areaId: 0,
-
-        area: {
+        roles: [],
+        roleDetail: {
             name: "",
+            permissions: [],
         },
-        areaState: {
+        roleId: 0,
+
+        role: {
+            name: "",
+            permissions: [],
+        },
+        roleState: {
             name: null,
         },
+
+        permissions: [],
     }),
     mounted() {
-        this.getAreas();
+        this.getRoles();
+        this.getPermissions();
     },
     methods: {
         successMessage(successText) {
@@ -288,19 +366,19 @@ export default {
                 type: "danger",
             });
         },
-        async getAreas() {
+        async getRoles() {
             this.loading = true;
-            this.areas = [];
+            this.roles = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/config/areas/`, {
+                .get(`${SERVER_ADDRESS}/api/users/groups/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.areas = res.data;
+                    this.roles = res.data;
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -326,6 +404,43 @@ export default {
                     }
                 });
         },
+        async getPermissions() {
+            this.permissions = [];
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/users/permissions/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.permissions = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
         /**
          * Filtros que se manejan en Prime Vue
          */
@@ -344,36 +459,97 @@ export default {
          */
         checkFormValidity() {
             let valid = true;
-            if (!this.area.name) {
-                this.areaState.name = false;
+            if (!this.role.name) {
+                this.roleState.name = false;
                 valid = false;
             }
+            /**
+             * Validar que se haya elegido al menos 1 permiso
+             */
+            if (!this.role.permissions.length) {
+                this.errorMessage(
+                    "Debe asociar al menos un permiso a este rol"
+                );
+                valid = false;
+            }
+
             return valid;
         },
         resetModal() {
-            this.area.name = "";
-            this.areaState.name = null;
+            this.role.name = "";
+            this.roleState.name = null;
         },
+
+        async show_modal_detail(id) {
+            this.roleDetail = {
+                name: "",
+                permissions: [],
+            };
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/users/group/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.roleDetail = res.data;
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-detail");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
         /**
          * Create
          */
+        async show_modal_create() {
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-create");
+            });
+        },
         handleSubmitCreate() {
             // Inicializamos variables de estados
-            this.areaState.name = null;
+            this.roleState.name = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
                 return;
             }
-
+            console.log("Rol");
+            console.log(this.role);
             // Mostrar modal de confirmar
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-create");
             });
         },
-        async createArea() {
+        async createRole() {
             axios
-                .post(`${SERVER_ADDRESS}/api/config/areas/`, this.area, {
+                .post(`${SERVER_ADDRESS}/api/users/groups/`, this.role, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
@@ -381,9 +557,7 @@ export default {
                 })
                 .then((res) => {
                     // Mensaje de éxito
-                    this.successMessage(
-                        "¡El área ha sido creada exitosamente!"
-                    );
+                    this.successMessage("¡El rol ha sido creado exitosamente!");
 
                     //Ocultamos los modales
                     this.$nextTick(() => {
@@ -391,8 +565,7 @@ export default {
                         this.$bvModal.hide("modal-create");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getAreas();
+                    this.getRoles();
                 })
                 .catch((err) => {
                     try {
@@ -422,7 +595,7 @@ export default {
          */
         handleSubmitUpdate() {
             // Inicializamos variables de estados
-            this.areaState.name = null;
+            this.roleState.name = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -435,17 +608,18 @@ export default {
             });
         },
         async show_modal_update(id) {
-            this.areaId = id;
+            this.roleId = id;
 
             axios
-                .get(`${SERVER_ADDRESS}/api/config/area/${id}/`, {
+                .get(`${SERVER_ADDRESS}/api/users/group/${id}/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.area = res.data;
+                    this.role = res.data;
+
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -473,11 +647,11 @@ export default {
                     }
                 });
         },
-        async updateArea() {
+        async updateRole() {
             axios
                 .patch(
-                    `${SERVER_ADDRESS}/api/config/area/${this.areaId}/`,
-                    this.area,
+                    `${SERVER_ADDRESS}/api/users/group/${this.roleId}/`,
+                    this.role,
                     {
                         withCredentials: true,
                         headers: {
@@ -488,7 +662,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El área ha sido actualizada exitosamente!"
+                        "¡El rol ha sido actualizado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -497,8 +671,7 @@ export default {
                         this.$bvModal.hide("modal-update");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getAreas();
+                    this.getRoles();
                 })
                 .catch((err) => {
                     try {
@@ -527,14 +700,14 @@ export default {
          * Delete
          */
         show_modal_delete(id) {
-            this.areaId = id;
+            this.roleId = id;
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-delete");
             });
         },
-        async deleteArea() {
+        async deleteRole() {
             axios
-                .delete(`${SERVER_ADDRESS}/api/config/area/${this.areaId}/`, {
+                .delete(`${SERVER_ADDRESS}/api/users/group/${this.roleId}/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
@@ -543,7 +716,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡El área ha sido eliminada exitosamente!"
+                        "¡El rol ha sido eliminado exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -551,8 +724,7 @@ export default {
                         this.$bvModal.hide("modal-confirm-delete");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
-                    this.getAreas();
+                    this.getRoles();
                 })
                 .catch((err) => {
                     try {

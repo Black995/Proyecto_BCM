@@ -476,6 +476,7 @@ export default {
             area_name: "",
             position_name: "",
             headquarter_name: "",
+            permissions: [],
         },
         userId: 0,
 
@@ -674,6 +675,7 @@ export default {
                 area_name: "",
                 position_name: "",
                 headquarter_name: "",
+                permissions: [],
             };
 
             axios
@@ -685,6 +687,7 @@ export default {
                 })
                 .then((res) => {
                     this.userDetail = res.data;
+                    console.log(this.userDetail);
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-detail");
@@ -760,7 +763,6 @@ export default {
                         this.$bvModal.hide("modal-create");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
                     this.getUsers();
                 })
                 .catch((err) => {
@@ -871,7 +873,6 @@ export default {
                         this.$bvModal.hide("modal-update");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
                     this.getUsers();
                 })
                 .catch((err) => {
@@ -925,7 +926,6 @@ export default {
                         this.$bvModal.hide("modal-confirm-delete");
                     });
 
-                    // Cargamos de nuevo la tabla de riesgos
                     this.getUsers();
                 })
                 .catch((err) => {
