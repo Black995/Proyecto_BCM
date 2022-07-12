@@ -170,23 +170,17 @@
                 </li>
             </ul>
 
-            <!--h4 class="mt-5 text-center font-weight-bold">
-                Permisos del usuario
-            </h4>
+            <h4 class="mt-5 text-center font-weight-bold">Roles del usuario</h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
-                v-for="item in serviceDetail._risks"
+                v-for="item in userDetail.groups"
                 :key="item.key"
             >
                 <h5 class="mb-1">{{ item.name }}</h5>
-                <p class="mb-1">Descripción: {{ item.description }}</p>
             </b-list-group-item>
-            <h3
-                class="mt-3 text-center"
-                v-if="!serviceDetail._services_offered.length"
-            >
-                No existen riesgos asociados a este servicio de soporte
-            </h3-->
+            <h3 class="mt-3 text-center" v-if="!userDetail.groups.length">
+                Este usuario no posee roles asignados
+            </h3>
 
             <template #modal-footer>
                 <div class="w-100">
@@ -274,6 +268,31 @@
                         Súper usuario
                     </b-form-checkbox>
                 </b-form-group>
+
+                <h5 class="mb-1 text-center">Asignar roles al usuario</h5>
+                <multiselect
+                    v-model="selectedGroups"
+                    placeholder="Buscar rol"
+                    label="name"
+                    track-by="id"
+                    :options="groups"
+                    :multiple="true"
+                ></multiselect>
+
+                <b-list-group v-if="selectedGroups.length" class="mt-3">
+                    <b-list-group-item
+                        href="#"
+                        class="flex-column align-items-start"
+                        v-for="item in selectedGroups"
+                        :key="item.key"
+                    >
+                        <h5 class="mb-1">{{ item.name }}</h5>
+                    </b-list-group-item>
+                </b-list-group>
+
+                <h3 class="mt-3 text-center" v-if="!selectedGroups.length">
+                    Este usuario no posee roles asignados
+                </h3>
             </form>
 
             <template #modal-footer>
@@ -388,6 +407,31 @@
                         Súper usuario
                     </b-form-checkbox>
                 </b-form-group>
+
+                <h5 class="mb-1 text-center">Asignar roles al usuario</h5>
+                <multiselect
+                    v-model="selectedGroups"
+                    placeholder="Buscar rol"
+                    label="name"
+                    track-by="id"
+                    :options="groups"
+                    :multiple="true"
+                ></multiselect>
+
+                <b-list-group v-if="selectedGroups.length" class="mt-3">
+                    <b-list-group-item
+                        href="#"
+                        class="flex-column align-items-start"
+                        v-for="item in selectedGroups"
+                        :key="item.key"
+                    >
+                        <h5 class="mb-1">{{ item.name }}</h5>
+                    </b-list-group-item>
+                </b-list-group>
+
+                <h3 class="mt-3 text-center" v-if="!selectedGroups.length">
+                    Este usuario no posee roles asignados
+                </h3>
             </form>
 
             <template #modal-footer>
@@ -453,11 +497,14 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
+import Multiselect from "vue-multiselect";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 
 export default {
     name: "Users",
-
+    components: {
+        Multiselect,
+    },
     data: () => ({
         loading: false,
         filterGlobal: {
@@ -476,7 +523,7 @@ export default {
             area_name: "",
             position_name: "",
             headquarter_name: "",
-            permissions: [],
+            groups: [],
         },
         userId: 0,
 
@@ -486,6 +533,7 @@ export default {
             is_superuser: false,
             is_active: true,
             staff: 0,
+            _groups: [],
         },
         password2: "",
         userState: {
@@ -496,9 +544,12 @@ export default {
         },
 
         staffsWithoutUser: [],
+        groups: [],
+        selectedGroups: [],
     }),
     mounted() {
         this.getUsers();
+        this.getGroups();
     },
     methods: {
         successMessage(successText) {
@@ -535,6 +586,42 @@ export default {
                 .then((res) => {
                     this.users = res.data;
                     this.loading = false;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getGroups() {
+            this.groups = [];
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/users/groups/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.groups = res.data;
                 })
                 .catch((err) => {
                     try {
@@ -648,6 +735,16 @@ export default {
                 this.userState.staff = false;
                 valid = false;
             }
+            /**
+             * Validar que se haya elegido al menos 1 rol
+             */
+            if (!this.selectedGroups.length) {
+                this.errorMessage(
+                    "Debe asociar al menos un rol a este usuario"
+                );
+                valid = false;
+            }
+
             return valid;
         },
         resetModal() {
@@ -661,6 +758,8 @@ export default {
             this.userState.staff = null;
             this.user.is_superuser = false;
             this.user.is_active = true;
+            this.user._groups = [];
+            this.selectedGroups = [];
         },
 
         async show_modal_detail(id) {
@@ -675,7 +774,7 @@ export default {
                 area_name: "",
                 position_name: "",
                 headquarter_name: "",
-                permissions: [],
+                groups: [],
             };
 
             axios
@@ -744,6 +843,12 @@ export default {
             });
         },
         async createUser() {
+            this.user._groups = [];
+
+            for (let i = 0; i < this.selectedGroups.length; i++) {
+                this.user._groups.push(this.selectedGroups[i].id);
+            }
+
             axios
                 .post(`${SERVER_ADDRESS}/api/users/users/`, this.user, {
                     withCredentials: true,
@@ -767,6 +872,8 @@ export default {
                 })
                 .catch((err) => {
                     try {
+                        console.log("error");
+                        console.log(err);
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
                             for (let e in err.response.data) {
@@ -821,6 +928,12 @@ export default {
                 .then((res) => {
                     this.user = res.data;
                     this.password2 = res.data.password;
+
+                    this.selectedGroups = [];
+                    for (let i = 0; i < res.data.groups.length; i++) {
+                        this.selectedGroups.push(res.data.groups[i]);
+                    }
+
                     this.getStaffsWithoutUser();
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
@@ -850,6 +963,12 @@ export default {
                 });
         },
         async updateUser() {
+            this.user._groups = [];
+
+            for (let i = 0; i < this.selectedGroups.length; i++) {
+                this.user._groups.push(this.selectedGroups[i].id);
+            }
+
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/users/user/${this.userId}/`,

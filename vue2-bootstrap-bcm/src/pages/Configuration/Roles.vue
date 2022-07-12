@@ -167,7 +167,7 @@
                 </b-form-group>
 
                 <multiselect
-                    v-model="role.permissions"
+                    v-model="selectedPermissions"
                     placeholder="Buscar permiso"
                     label="name"
                     track-by="id"
@@ -175,11 +175,11 @@
                     :multiple="true"
                 ></multiselect>
 
-                <b-list-group v-if="role.permissions.length" class="mt-3">
+                <b-list-group v-if="selectedPermissions.length" class="mt-3">
                     <b-list-group-item
                         href="#"
                         class="flex-column align-items-start"
-                        v-for="item in role.permissions"
+                        v-for="item in selectedPermissions"
                         :key="item.key"
                     >
                         <h5 class="mb-1">{{ item.name }}</h5>
@@ -187,7 +187,7 @@
                     </b-list-group-item>
                 </b-list-group>
 
-                <h3 class="mt-3 text-center" v-if="!role.permissions.length">
+                <h3 class="mt-3 text-center" v-if="!selectedPermissions.length">
                     No existen permisos asociados a este rol
                 </h3>
             </form>
@@ -245,6 +245,31 @@
                         required
                     ></b-form-input>
                 </b-form-group>
+
+                <multiselect
+                    v-model="selectedPermissions"
+                    placeholder="Buscar permiso"
+                    label="name"
+                    track-by="id"
+                    :options="permissions"
+                    :multiple="true"
+                ></multiselect>
+
+                <b-list-group v-if="selectedPermissions.length" class="mt-3">
+                    <b-list-group-item
+                        href="#"
+                        class="flex-column align-items-start"
+                        v-for="item in selectedPermissions"
+                        :key="item.key"
+                    >
+                        <h5 class="mb-1">{{ item.name }}</h5>
+                        <p class="mb-2">Nombre clave: {{ item.codename }}</p>
+                    </b-list-group-item>
+                </b-list-group>
+
+                <h3 class="mt-3 text-center" v-if="!selectedPermissions.length">
+                    No existen permisos asociados a este rol
+                </h3>
             </form>
 
             <template #modal-footer>
@@ -333,13 +358,14 @@ export default {
 
         role: {
             name: "",
-            permissions: [],
+            _permissions: [],
         },
         roleState: {
             name: null,
         },
 
         permissions: [],
+        selectedPermissions: [],
     }),
     mounted() {
         this.getRoles();
@@ -466,7 +492,7 @@ export default {
             /**
              * Validar que se haya elegido al menos 1 permiso
              */
-            if (!this.role.permissions.length) {
+            if (!this.selectedPermissions.length) {
                 this.errorMessage(
                     "Debe asociar al menos un permiso a este rol"
                 );
@@ -478,8 +504,9 @@ export default {
         resetModal() {
             this.role.name = "";
             this.roleState.name = null;
+            this.role._permissions = [];
+            this.selectedPermissions = [];
         },
-
         async show_modal_detail(id) {
             this.roleDetail = {
                 name: "",
@@ -540,14 +567,20 @@ export default {
             if (!this.checkFormValidity()) {
                 return;
             }
-            console.log("Rol");
-            console.log(this.role);
             // Mostrar modal de confirmar
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-create");
             });
         },
         async createRole() {
+            this.role._permissions = [];
+
+            for (let i = 0; i < this.selectedPermissions.length; i++) {
+                this.role._permissions.push(
+                    this.selectedPermissions[i].codename
+                );
+            }
+
             axios
                 .post(`${SERVER_ADDRESS}/api/users/groups/`, this.role, {
                     withCredentials: true,
@@ -620,6 +653,11 @@ export default {
                 .then((res) => {
                     this.role = res.data;
 
+                    this.selectedPermissions = [];
+                    for (let i = 0; i < res.data.permissions.length; i++) {
+                        this.selectedPermissions.push(res.data.permissions[i]);
+                    }
+
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -648,6 +686,14 @@ export default {
                 });
         },
         async updateRole() {
+            this.role._permissions = [];
+
+            for (let i = 0; i < this.selectedPermissions.length; i++) {
+                this.role._permissions.push(
+                    this.selectedPermissions[i].codename
+                );
+            }
+
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/users/group/${this.roleId}/`,

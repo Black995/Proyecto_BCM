@@ -1,10 +1,12 @@
 from users.models import User
 from bcm_phase2.models import Staff
 from django.contrib.auth.models import Permission, Group
-from .serializers import UserListSerializer, UserSerializer, StaffsWithoutUserSerializer, GroupListSerializer, GroupSerializer, PermissionSerializer
+from .serializers import UserListSerializer, UserSerializer, StaffsWithoutUserSerializer, GroupListSerializer, GroupSerializer, PermissionSerializer, ChangePasswordSerializer
 from rest_framework import viewsets, serializers, status
 from rest_framework.response import Response
 from django.db.models import Q, F
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
+from rest_framework.decorators import action
 
 
 class UserListViewSet(viewsets.ModelViewSet):
@@ -42,3 +44,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all().order_by('name')
     serializer_class = GroupSerializer
 
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        return super().get_permissions()

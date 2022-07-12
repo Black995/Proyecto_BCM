@@ -198,6 +198,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 ### LDAP Settings ###
+"""
 import ldap
 from django_auth_ldap.config import LDAPSearch
 
@@ -224,4 +225,4 @@ if env('AUTH_LDAP'):
         'django_proyecto_bcm.authenticators_ldap.CustomLDAPBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
-
+"""

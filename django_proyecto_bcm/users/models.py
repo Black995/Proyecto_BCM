@@ -1,11 +1,13 @@
+from telnetlib import STATUS
 from django.db import models
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        Group, PermissionsMixin)
 from django.contrib.auth.password_validation import \
     validate_password as django_validate_password
 from django.core.exceptions import ValidationError
 from bcm_phase2.models import Staff
+from rest_framework.response import Response
+from rest_framework import status
 
 
 class UserManager(BaseUserManager):
@@ -35,7 +37,10 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
+    
+    cleaned_data = {}
+
     email = models.EmailField(unique=True)
     staff = models.OneToOneField(
         Staff, null=True, related_name='user_staff', on_delete=models.SET_NULL)
@@ -64,7 +69,7 @@ class User(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
-
+    
     "All organization member is an staff"
     @property
     def is_staff(self):
@@ -74,5 +79,36 @@ class User(AbstractBaseUser):
     def validate_password(self, password: str):
         try:
             django_validate_password(password, self)
+        #except Exception as e:
+        #    raise Response(data={'password': e}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
             raise ValidationError({'password': e.messages})
+
+    def save(self, **kwargs):
+        if self.password:
+            self.validate_password(self.password)
+            self.set_password(self.password)
+        if self.email:
+            self.email = UserManager.normalize_email(self.email)
+        """
+        if self.is_active:
+            if self.is_active:
+                self.set_group()
+            else:
+                self.groups.clear()
+        """
+        super().save(**kwargs)
+        
+    def is_password_valid(self, password: str) -> bool:
+        try:
+            self.validate_password(password)
+        except ValidationError:
+            return False
+        return True
+
+    def change_password(self, old_password: str, new_password: str):
+        if not self.check_password(old_password):
+            raise ValidationError({'old_password': _('Wrong password')})
+        self.password = new_password
+        self.save(update_fields=['password'])
+

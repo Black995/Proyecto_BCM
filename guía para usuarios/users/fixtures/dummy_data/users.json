@@ -1,0 +1,170 @@
+[
+    {
+        "model": "users.user",
+        "pk": 1,
+        "fields": {
+            "email": "bdeverson0@economist.com",
+            "first_name": "Ann",
+            "second_name": "Barron",
+            "last_name": "Girardi",
+            "second_last_name": "de Verson",
+            "role": 3
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 2,
+        "fields": {
+            "email": "karchbell1@tinyurl.com",
+            "first_name": "Fan",
+            "second_name": "Karine",
+            "last_name": "Dunckley",
+            "second_last_name": "Archbell",
+            "role": 3
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 3,
+        "fields": {
+            "email": "ptallman2@slate.com",
+            "first_name": "Worthington",
+            "second_name": "Petronilla",
+            "last_name": "Wilcott",
+            "second_last_name": "Tallman",
+            "role": 3
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 4,
+        "fields": {
+            "email": "tprudence3@nasa.gov",
+            "first_name": "Celle",
+            "second_name": "Teodoor",
+            "last_name": "Tansley",
+            "second_last_name": "Prudence",
+            "role": 3
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 5,
+        "fields": {
+            "email": "hforri4@ed.gov",
+            "first_name": "Ivan",
+            "second_name": "Hamilton",
+            "last_name": "Terren",
+            "second_last_name": "Forri",
+            "role": 3
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 6,
+        "fields": {
+            "email": "wcartmill5@comcast.net",
+            "first_name": "Dominic",
+            "second_name": "Wandie",
+            "last_name": "Southerton",
+            "second_last_name": "Cartmill",
+            "role": 3
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 7,
+        "fields": {
+            "email": "gponting6@tamu.edu",
+            "first_name": "Darryl",
+            "second_name": "Garvey",
+            "last_name": "Sheaf",
+            "second_last_name": "Ponting",
+            "role": 3
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 8,
+        "fields": {
+            "email": "mtrewhitt0@wsj.com",
+            "first_name": "Marian",
+            "second_name": "Margalit",
+            "last_name": "Cummins",
+            "second_last_name": "Trewhitt",
+            "role": 4
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 9,
+        "fields": {
+            "email": "trabbet1@unesco.org",
+            "first_name": "Rozalin",
+            "second_name": "Tove",
+            "last_name": "MacGhee",
+            "second_last_name": "Rabbet",
+            "role": 4
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 10,
+        "fields": {
+            "email": "mpeile2@google.fr",
+            "first_name": "Virgie",
+            "second_name": "Marcellina",
+            "last_name": "Waddell",
+            "second_last_name": "Peile",
+            "role": 4
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 11,
+        "fields": {
+            "email": "lgallally3@purevolume.com",
+            "first_name": "Celeste",
+            "second_name": "Liz",
+            "last_name": "Gabey",
+            "second_last_name": "Gallally",
+            "role": 4
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 12,
+        "fields": {
+            "email": "cbrydone4@hostgator.com",
+            "first_name": "Freddie",
+            "second_name": "Con",
+            "last_name": "Bon",
+            "second_last_name": "Brydone",
+            "role": 4
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 13,
+        "fields": {
+            "email": "kbigby5@sciencedirect.com",
+            "first_name": "Kristo",
+            "second_name": "Kale",
+            "last_name": "Carl",
+            "second_last_name": "Bigby",
+            "role": 4
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 14,
+        "fields": {
+            "email": "gfilippozzi6@aboutads.info",
+            "first_name": "Ertha",
+            "second_name": "Gabriella",
+            "last_name": "O'Carrol",
+            "second_last_name": "Filippozzi",
+            "role": 4
+        }
+    }
+]

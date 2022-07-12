@@ -3,6 +3,9 @@ from bcm_phase2.models import Staff
 from django.contrib.auth.models import Permission, Group
 from rest_framework import serializers
 from django.db.models import F, Q
+from django.contrib.auth.password_validation import \
+    validate_password as django_validate_password
+from django.core.exceptions import ValidationError
 
 
 
@@ -20,17 +23,37 @@ class PermissionSerializer(serializers.ModelSerializer):
 
 
 class GroupListSerializer(serializers.ModelSerializer):
+    _permissions = serializers.ListField(
+        required=False, child=serializers.CharField(), write_only=True)
     
     class Meta:
         model = Group
         fields = [
             'id',
             'name',
+            '_permissions',
         ]
+        
+    def to_representation(self, instance):
+        instance._permissions = instance.permissions.values_list(
+            'codename', flat=True)
+        return super().to_representation(instance)
+        
+    def create(self, validated_data):
+        permissions = validated_data.pop('_permissions')
+        group = Group.objects.create(**validated_data)
+        if permissions:
+            permissions = Permission.objects.filter(
+                codename__in=permissions).values_list('pk', flat=True)
+            group.permissions.add(*permissions)
+        return group
+
 
 class GroupSerializer(serializers.ModelSerializer):
     # Serializer aninado
     permissions = PermissionSerializer(many=True, read_only=True)
+    _permissions = serializers.ListField(
+        required=False, child=serializers.CharField(), write_only=True)
 
     class Meta:
         model = Group
@@ -38,13 +61,31 @@ class GroupSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'permissions',
+            '_permissions',
         ]
-        
-        
+    
+    def to_representation(self, instance):
+        instance._permissions = instance.permissions.values_list(
+            'codename', flat=True)
+        return super().to_representation(instance)
+
+    def update(self, instance, validated_data):
+        if '_permissions' in validated_data:
+            permissions = validated_data.pop('_permissions')
+            permissions = Permission.objects.filter(
+                codename__in=permissions).values_list('pk', flat=True)
+            instance.permissions.clear()
+            instance.permissions.add(*permissions)
+        return super().update(instance, validated_data)
+
+
+                
 class UserListSerializer(serializers.ModelSerializer):
     staff_number = serializers.CharField(read_only=True, source="staff.staff_number")
     names = serializers.CharField(read_only=True, source="staff.names")
     surnames = serializers.CharField(read_only=True, source="staff.surnames")
+    _groups = serializers.ListField(
+        required=False, child=serializers.IntegerField(), write_only=True)
 
     class Meta:
         model = User
@@ -58,8 +99,36 @@ class UserListSerializer(serializers.ModelSerializer):
             'staff',
             'staff_number',
             'names',
-            'surnames'
+            'surnames',
+            '_groups',
         ]
+
+    def to_representation(self, instance):
+        instance._groups = instance.groups.values_list(
+            'id', flat=True)
+        instance._permissions = instance.groups.values_list(
+            'id', flat=True)
+        return super().to_representation(instance)
+        
+    def create(self, validated_data):
+        groups = validated_data.pop('_groups')
+        user = User.objects.create(**validated_data)
+        # Asociar grupos al usuario
+        if groups:
+            groups = Group.objects.filter(
+                id__in=groups).values_list('pk', flat=True)
+            user.groups.add(*groups)
+            
+            # Asociar permisos de los grupos al usuario
+            user.user_permissions.clear()
+            permission_list = Group.objects.filter(
+                id__in=groups).values_list('permissions', flat=True)
+            permission_ids = []
+            for perm in permission_list:
+                if(not (perm in permission_ids)):
+                    permission_ids.append(perm)
+            user.user_permissions.add(*permission_list)
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -70,7 +139,9 @@ class UserSerializer(serializers.ModelSerializer):
     position_name = serializers.CharField(read_only=True, source="staff.position.name")
     headquarter_name = serializers.CharField(read_only=True, source="staff.headquarter.name")
     # Serializer aninado
-    permissions = PermissionSerializer(many=True, read_only=True)
+    groups = GroupListSerializer(many=True, read_only=True)
+    _groups = serializers.ListField(
+        child=serializers.IntegerField(), required=False, write_only=True)
 
     class Meta:
         model = User
@@ -88,8 +159,35 @@ class UserSerializer(serializers.ModelSerializer):
             'area_name',
             'position_name',
             'headquarter_name',
-            'permissions',
+            'groups',
+            '_groups',
         ]
+            
+    def to_representation(self, instance):
+        instance._groups = instance.groups.values_list(
+            'id', flat=True)
+        return super().to_representation(instance)
+
+    def update(self, instance, validated_data):
+        # Asociar grupos al usuario
+        if '_groups' in validated_data:
+            groups = validated_data.pop('_groups')
+            groups = Group.objects.filter(
+                id__in=groups).values_list('pk', flat=True)
+            instance.groups.clear()
+            instance.groups.add(*groups)
+
+            # Asociar permisos de los grupos al usuario
+            instance.user_permissions.clear()
+            permission_list = Group.objects.filter(
+                id__in=groups).values_list('permissions', flat=True)
+            permission_ids = []
+            for perm in permission_list:
+                if(not (perm in permission_ids)):
+                    permission_ids.append(perm)
+            instance.user_permissions.add(*permission_list)
+        return super().update(instance, validated_data)
+
 
 
 class StaffsWithoutUserSerializer(serializers.ModelSerializer):
@@ -105,5 +203,55 @@ class StaffsWithoutUserSerializer(serializers.ModelSerializer):
             'area_name',
             'position_name',
         ]
-
         
+
+class ProfileSerializer(serializers.ModelSerializer):
+    staff_number = serializers.CharField(read_only=True, source="staff.staff_number")
+    names = serializers.CharField(read_only=True, source="staff.names")
+    surnames = serializers.CharField(read_only=True, source="staff.surnames")
+    area_name = serializers.CharField(read_only=True, source="staff.area.name")
+    position_name = serializers.CharField(read_only=True, source="staff.position.name")
+    headquarter_name = serializers.CharField(read_only=True, source="staff.headquarter.name")
+    # Serializer aninado
+    groups = GroupListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'email',
+            'password',
+            'is_active',
+            'is_admin',
+            'is_superuser',
+            'staff',
+            'staff_number',
+            'names',
+            'surnames',
+            'area_name',
+            'position_name',
+            'headquarter_name',
+            'groups',
+            '_groups',
+        ]
+            
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        user = self.context['request'].user
+        django_validate_password(value, user)
+        return value
+
+    def save(self, **kwargs):
+        try:
+            print('changing password')
+            user = self.context['request'].user
+            old_password = self.validated_data['old_password']
+            new_password = self.validated_data['new_password']
+            user.change_password(old_password, new_password)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message_dict)
+

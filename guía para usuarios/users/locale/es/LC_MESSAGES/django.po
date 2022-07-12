@@ -1,0 +1,113 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-13 21:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# models.py
+# Verbose names
+msgid "user"
+msgstr "usuario"
+
+msgid "users"
+msgstr "usuarios"
+
+msgid "email"
+msgstr "correo electrónico"
+
+msgid "first name"
+msgstr "primer nombre"
+
+msgid "second name"
+msgstr "segundo nombre"
+
+msgid "last name"
+msgstr "primer apellido"
+
+msgid "second last name"
+msgstr "segundo apellido"
+
+msgid "role"
+msgstr "rol"
+
+msgid "substitute"
+msgstr "substituto"
+
+msgid "superuser"
+msgstr "superusuario"
+
+msgid "Wrong password"
+msgstr "Contraseña incorrecta"
+
+msgid "You have requested a password reset for your account. Please click the link {password_reset_link} to reset your password."
+msgstr "Has solicitado un restablecimiento de contraseña para tu cuenta. Por favor, haga clic en el enlace {password_reset_link} para restablecer tu contraseña."
+
+# User.ROLES
+msgid "Member of the Board of Directors"
+msgstr "Miembro de la Junta Directiva"
+
+msgid "President/General Manager/Senior Management"
+msgstr "Presidente/Gerente General/Alta Directiva"
+
+msgid "Vice President/Area Manager"
+msgstr "Vicepresidente/Gerente de área"
+
+msgid "Area ERM Manager"
+msgstr "Responsable ERM de área"
+
+msgid "Area Specialist"
+msgstr "Especialista de área"
+
+msgid "Area Analyst"
+msgstr "Analista de área"
+
+msgid "Internal Auditor"
+msgstr "Auditor Interno"
+
+msgid "Security and Systems"
+msgstr "Seguridad y sistemas"
+
+msgid "Administrator"
+msgstr "Administrador"
+
+msgid "User must have an email address."
+msgstr "El usuario debe tener una dirección de correo."
+
+# api/validators.py
+msgid "The user must have one of the following roles {roles}."
+msgstr "El usuario debe tener uno de los siguientes roles {roles}."
+
+msgid "The password must contain at least 1 digit, 0-9."
+msgstr "La contraseña debe contener al menos 1 dígito, 0-9."
+
+msgid "The password must contain at least 1 uppercase letter, A-Z."
+msgstr "La contraseña debe contener al menos 1 letra mayúscula, A-Z."
+
+msgid "The password must contain at least 1 lowercase letter, a-z."
+msgstr "La contraseña debe contener al menos 1 letra minúscula, a-z."
+
+msgid "The password must contain at least 1 symbol: ()[]{}|\\`~!@#$%^&*_-+=;:'\",<>./?"
+msgstr "La contraseña debe contener al menos 1 símbolo: ()[]{}|\\`~!@#$%^&*_-+=;:'\",<>./?"
+
+# api/views.py
+msgid "Password changed successfully"
+msgstr "Contraseña cambiada correctamente"
+
+msgid "Password recovery email sent"
+msgstr "Correo electrónico de recuperación de contraseña enviado"
+
+msgid "Password reset successfully"
+msgstr "Contraseña restablecida correctamente"
