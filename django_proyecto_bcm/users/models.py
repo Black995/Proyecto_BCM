@@ -79,8 +79,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def validate_password(self, password: str):
         try:
             django_validate_password(password, self)
-        #except Exception as e:
-        #    raise Response(data={'password': e}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
             raise ValidationError({'password': e.messages})
 

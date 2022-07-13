@@ -713,21 +713,21 @@ export default {
         /**
          * Validar formularios
          */
-        checkFormValidity() {
+        checkFormValidity(create) {
             let valid = true;
             if (!this.user.email) {
                 this.userState.email = false;
                 valid = false;
             }
-            if (!this.user.password) {
+            if ((!this.user.password || !this.password2) && create == true) {
                 this.userState.password = false;
-                valid = false;
-            }
-            if (!this.password2) {
                 this.userState.password2 = false;
                 valid = false;
             }
-            if (this.user.password != this.password2) {
+            if (
+                this.user.password != this.password2 &&
+                (this.user.password || this.password2)
+            ) {
                 this.errorMessage("Las contraseñas ingresadas no coinciden");
                 valid = false;
             }
@@ -786,7 +786,6 @@ export default {
                 })
                 .then((res) => {
                     this.userDetail = res.data;
-                    console.log(this.userDetail);
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-detail");
@@ -833,7 +832,7 @@ export default {
             this.userState.password2 = null;
 
             // Exit when the form isn't valid
-            if (!this.checkFormValidity()) {
+            if (!this.checkFormValidity(true)) {
                 return;
             }
 
@@ -906,7 +905,7 @@ export default {
             this.userState.password2 = null;
 
             // Exit when the form isn't valid
-            if (!this.checkFormValidity()) {
+            if (!this.checkFormValidity(false)) {
                 return;
             }
 
@@ -926,8 +925,13 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.user = res.data;
-                    this.password2 = res.data.password;
+                    this.user = {
+                        email: res.data.email,
+                        is_superuser: res.data.is_superuser,
+                        is_active: res.data.is_active,
+                        staff: res.data.staff,
+                    };
+                    this.password2 = "";
 
                     this.selectedGroups = [];
                     for (let i = 0; i < res.data.groups.length; i++) {

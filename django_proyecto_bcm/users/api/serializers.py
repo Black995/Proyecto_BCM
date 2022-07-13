@@ -103,6 +103,13 @@ class UserListSerializer(serializers.ModelSerializer):
             '_groups',
         ]
 
+    def save(self, **kwargs):
+        self.Meta.model.cleaned_data = self.validated_data
+        try:
+            return super().save(**kwargs)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message_dict)
+
     def to_representation(self, instance):
         instance._groups = instance.groups.values_list(
             'id', flat=True)
@@ -163,6 +170,13 @@ class UserSerializer(serializers.ModelSerializer):
             '_groups',
         ]
             
+    def save(self, **kwargs):
+        self.Meta.model.cleaned_data = self.validated_data
+        try:
+            return super().save(**kwargs)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message_dict)
+
     def to_representation(self, instance):
         instance._groups = instance.groups.values_list(
             'id', flat=True)
@@ -209,11 +223,15 @@ class ProfileSerializer(serializers.ModelSerializer):
     staff_number = serializers.CharField(read_only=True, source="staff.staff_number")
     names = serializers.CharField(read_only=True, source="staff.names")
     surnames = serializers.CharField(read_only=True, source="staff.surnames")
+    area = serializers.CharField(read_only=True, source="staff.area.id")
     area_name = serializers.CharField(read_only=True, source="staff.area.name")
+    position = serializers.CharField(read_only=True, source="staff.position.id")
     position_name = serializers.CharField(read_only=True, source="staff.position.name")
+    headquarter = serializers.CharField(read_only=True, source="staff.headquarter.id")
     headquarter_name = serializers.CharField(read_only=True, source="staff.headquarter.name")
     # Serializer aninado
     groups = GroupListSerializer(many=True, read_only=True)
+    permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -228,13 +246,21 @@ class ProfileSerializer(serializers.ModelSerializer):
             'staff_number',
             'names',
             'surnames',
+            'area',
             'area_name',
+            'position',
             'position_name',
+            'headquarter',
             'headquarter_name',
             'groups',
-            '_groups',
+            'permissions'
         ]
             
+    def get_permissions(self, obj):
+        user = User.objects.get(id=obj.id)
+        permissions = user.get_all_permissions()
+        return permissions
+
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)

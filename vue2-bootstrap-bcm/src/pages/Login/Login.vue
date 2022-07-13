@@ -99,8 +99,52 @@ export default {
                         localStorage.setItem("token", res.data.access);
                         localStorage.setItem("isLoggedin", true);
 
-                        this.$router.push("/layout/riesgos");
-                        location.reload();
+                        /**
+                         * Se obtienen los permisos
+                         */
+                        let token = "Bearer " + res.data.access;
+                        axios
+                            .get(`${SERVER_ADDRESS}/api/users/profile/`, {
+                                withCredentials: true,
+                                headers: {
+                                    Authorization: token,
+                                },
+                            })
+                            .then((res) => {
+                                localStorage.setItem(
+                                    "is_superuser",
+                                    res.data.is_superuser
+                                );
+                                localStorage.setItem(
+                                    "permissions",
+                                    res.data.permissions
+                                );
+
+                                this.$router.push("/layout/riesgos");
+                                location.reload();
+                            })
+                            .catch((err) => {
+                                try {
+                                    // Error 400 por unicidad o 500 generico
+                                    if (err.response.status == 400) {
+                                        for (let e in err.response.data) {
+                                            this.errorMessage(
+                                                e + ": " + err.response.data[e]
+                                            );
+                                        }
+                                    } else {
+                                        // Servidor no disponible
+                                        this.errorMessage(
+                                            "Ups! Ha ocurrido un error en el servidor"
+                                        );
+                                    }
+                                } catch {
+                                    // Servidor no disponible
+                                    this.errorMessage(
+                                        "Ups! Ha ocurrido un error en el servidor"
+                                    );
+                                }
+                            });
                     }
                 })
                 .catch((err) => {

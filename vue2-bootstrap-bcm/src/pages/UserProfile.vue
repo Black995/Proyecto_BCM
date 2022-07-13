@@ -1,11 +1,6 @@
 <template>
     <div class="row">
         <div class="col-xl-4 col-lg-5 col-md-6">
-            <b-button v-b-modal.modal-1>Launch demo modal</b-button>
-
-            <b-modal id="modal-1" title="BootstrapVue">
-                <p class="my-4">Hello from modal!</p>
-            </b-modal>
             <user-card> </user-card>
             <members-card> </members-card>
         </div>
@@ -15,9 +10,9 @@
     </div>
 </template>
 <script>
-import EditProfileForm from "./UserProfile/EditProfileForm.vue";
-import UserCard from "./UserProfile/UserCard.vue";
-import MembersCard from "./UserProfile/MembersCard.vue";
+import EditProfileForm from "./UserProfile(template)/EditProfileForm.vue";
+import UserCard from "./UserProfile(template)/UserCard.vue";
+import MembersCard from "./UserProfile(template)/MembersCard.vue";
 export default {
     components: {
         EditProfileForm,

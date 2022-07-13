@@ -5,6 +5,11 @@
                 <!--
                     Encabezado Fase 1
                 -->
+                <sidebar-link
+                    to="/layout/perfil"
+                    name="Perfil"
+                    icon="ti-user"
+                />
                 <sidebar-link to="#1" class="disabled" name="Fase 1" />
                 <sidebar-link
                     to="/layout/riesgos"
@@ -154,6 +159,14 @@ export default {
         TopNavbar,
         DashboardContent,
         MobileMenu,
+    },
+    data: () => ({
+        permissions: [],
+        is_superuser: false,
+    }),
+    mounted() {
+        this.permissions = localStorage.getItem("permissions");
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         toggleSidebar() {

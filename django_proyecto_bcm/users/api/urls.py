@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (UserListViewSet, UserViewSet, StaffsWithoutUserViewSet,
-                    PermissionViewSet, GroupListViewSet, GroupViewSet)
+                    PermissionViewSet, GroupListViewSet, GroupViewSet, ProfileView)
 
 
  
@@ -27,4 +27,5 @@ urlpatterns = [
     path('permissions/', PermissionViewSet.as_view({
         'get': 'list',
         'post': 'create'}), name='permission_list'),
+    path('profile/', ProfileView.as_view(), name='profile_user'),
 ]

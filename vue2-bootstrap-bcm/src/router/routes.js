@@ -14,6 +14,8 @@ import TableList from "@/pages/TableList.vue";
 
 // Stages Pages
 
+// Profile
+import Profile from "@/pages/Profile/Profile.vue";
 // Stage 1
 import Risks from "@/pages/Stage1/Risks.vue";
 import CrisisScenarios from "@/pages/Stage1/CrisisScenarios.vue";
@@ -46,6 +48,14 @@ const routes = [
     component: DashboardLayout,
     redirect: "/dashboard",
     children: [
+      /**
+       * Perfil
+       */
+      {
+        path: "perfil",
+        name: "Perfil",
+        component: Profile
+      },
       /**
        * Stage 1
        */

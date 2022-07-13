@@ -165,8 +165,19 @@
                         required
                     ></b-form-input>
                 </b-form-group>
-
+                <b-row class="text-center">
+                    <b-col>
+                        <b-button
+                            variant="primary"
+                            align-v="center"
+                            @click="addAllRoles"
+                        >
+                            Agregar todos los roles
+                        </b-button>
+                    </b-col>
+                </b-row>
                 <multiselect
+                    class="mt-2"
                     v-model="selectedPermissions"
                     placeholder="Buscar permiso"
                     label="name"
@@ -245,7 +256,17 @@
                         required
                     ></b-form-input>
                 </b-form-group>
-
+                <b-row class="text-center">
+                    <b-col>
+                        <b-button
+                            variant="primary"
+                            align-v="center"
+                            @click="addAllRoles"
+                        >
+                            Agregar todos los roles
+                        </b-button>
+                    </b-col>
+                </b-row>
                 <multiselect
                     v-model="selectedPermissions"
                     placeholder="Buscar permiso"
@@ -794,6 +815,13 @@ export default {
                         );
                     }
                 });
+        },
+        addAllRoles() {
+            this.selectedPermissions = [];
+
+            for (let i = 0; i < this.permissions.length; i++) {
+                this.selectedPermissions.push(this.permissions[i]);
+            }
         },
     },
 };

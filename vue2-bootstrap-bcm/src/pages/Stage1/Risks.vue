@@ -23,6 +23,12 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'bcm_phase1.add_risk'
+                                                )
+                                            "
                                             title="Crear riesgo"
                                             variant="success"
                                             @click="show_modal_create = true"
@@ -53,6 +59,12 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase1.change_risk'
+                                            )
+                                        "
                                         title="Editar riesgo"
                                         pill
                                         variant="warning"
@@ -65,6 +77,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase1.delete_risk'
+                                            )
+                                        "
                                         title="Eliminar riesgo"
                                         pill
                                         variant="danger"
@@ -306,6 +324,8 @@ export default {
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
+        permissions: [],
+        is_superuser: false,
 
         // Variables para manejar los modales
         show_modal_create: false,
@@ -324,6 +344,8 @@ export default {
     }),
     mounted() {
         this.getRisks();
+        this.permissions = localStorage.getItem("permissions");
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         successMessage(successText) {
