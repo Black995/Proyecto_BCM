@@ -120,7 +120,7 @@ export default {
                                     res.data.permissions
                                 );
 
-                                this.$router.push("/layout/riesgos");
+                                this.$router.push("/layout/perfil");
                                 location.reload();
                             })
                             .catch((err) => {

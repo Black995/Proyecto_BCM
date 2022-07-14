@@ -83,6 +83,8 @@ class User(AbstractBaseUser, PermissionsMixin):
             raise ValidationError({'password': e.messages})
 
     def save(self, **kwargs):
+        print('Include password')
+        print(self.password)
         if self.password:
             self.validate_password(self.password)
             self.set_password(self.password)

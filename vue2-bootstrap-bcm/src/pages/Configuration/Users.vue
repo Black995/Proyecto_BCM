@@ -973,10 +973,36 @@ export default {
                 this.user._groups.push(this.selectedGroups[i].id);
             }
 
+            /**
+             * Si la contraseña se mantiene en blanco, entonces no se envía ese campo
+             */
+            let userEdit = {};
+            if (this.user.password) {
+                userEdit = {
+                    email: this.user.email,
+                    password: this.user.password,
+                    is_superuser: this.user.is_superuser,
+                    is_active: this.user.is_active,
+                    staff: this.user.staff,
+                    _groups: this.user._groups,
+                };
+            } else {
+                userEdit = {
+                    email: this.user.email,
+                    is_superuser: this.user.is_superuser,
+                    is_active: this.user.is_active,
+                    staff: this.user.staff,
+                    _groups: this.user._groups,
+                };
+            }
+
+            console.log("usuario a editar");
+            console.log(userEdit);
+
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/users/user/${this.userId}/`,
-                    this.user,
+                    userEdit,
                     {
                         withCredentials: true,
                         headers: {
