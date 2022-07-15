@@ -23,6 +23,12 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'auth.add_group'
+                                                )
+                                            "
                                             title="Crear rol"
                                             variant="success"
                                             @click="show_modal_create()"
@@ -61,6 +67,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'auth.change_group'
+                                            )
+                                        "
                                         title="Editar rol"
                                         pill
                                         variant="warning"
@@ -73,6 +85,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'auth.delete_group'
+                                            )
+                                        "
                                         title="Eliminar rol"
                                         pill
                                         variant="danger"
@@ -369,6 +387,8 @@ export default {
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
+        permissions: [],
+        is_superuser: false,
 
         roles: [],
         roleDetail: {
@@ -391,6 +411,8 @@ export default {
     mounted() {
         this.getRoles();
         this.getPermissions();
+        this.permissions = localStorage.getItem("permissions");
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         successMessage(successText) {

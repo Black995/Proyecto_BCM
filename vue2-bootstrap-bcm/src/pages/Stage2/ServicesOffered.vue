@@ -30,6 +30,12 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'bcm_phase2.add_serviceoffered'
+                                                )
+                                            "
                                             title="Crear servicio de la organización"
                                             variant="success"
                                             @click="show_modal_create = true"
@@ -91,6 +97,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase2.change_serviceoffered'
+                                            )
+                                        "
                                         title="Editar servicio de la organización"
                                         pill
                                         variant="warning"
@@ -106,6 +118,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase2.delete_serviceoffered'
+                                            )
+                                        "
                                         title="Eliminar servicio de la organización"
                                         pill
                                         variant="danger"
@@ -126,6 +144,12 @@
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'bcm_phase2.associate_staffs_to_serviceoffered'
+                                                )
+                                            "
                                             pill
                                             title="Asociar personal de la organización encargado"
                                             variant="primary"
@@ -147,6 +171,12 @@
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'bcm_phase2.associate_risks_to_serviceoffered'
+                                                )
+                                            "
                                             pill
                                             title="Asociar riesgos"
                                             variant="primary"
@@ -996,6 +1026,8 @@ export default {
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
+        permissions: [],
+        is_superuser: false,
 
         // Variables para manejar los modales
         show_modal_create: false,
@@ -1094,6 +1126,8 @@ export default {
         this.getServicesOffered();
         this.getAreas();
         this.getScaleView();
+        this.permissions = localStorage.getItem("permissions");
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         successMessage(successText) {

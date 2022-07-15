@@ -30,6 +30,12 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'bcm_phase2.add_staff'
+                                                )
+                                            "
                                             title="Crear personal"
                                             variant="success"
                                             @click="show_modal_create = true"
@@ -86,6 +92,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase2.change_staff'
+                                            )
+                                        "
                                         title="Editar personal"
                                         pill
                                         variant="warning"
@@ -98,6 +110,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase2.delete_staff'
+                                            )
+                                        "
                                         title="Eliminar personal"
                                         pill
                                         variant="danger"
@@ -545,6 +563,8 @@ export default {
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
+        permissions: [],
+        is_superuser: false,
 
         // Variables para manejar los modales
         show_modal_create: false,
@@ -587,6 +607,8 @@ export default {
     }),
     mounted() {
         this.getStaffs();
+        this.permissions = localStorage.getItem("permissions");
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         successMessage(successText) {

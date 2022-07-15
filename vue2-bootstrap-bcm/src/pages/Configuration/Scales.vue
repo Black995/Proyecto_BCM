@@ -28,6 +28,12 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'configuration.add_scale'
+                                                )
+                                            "
                                             title="Crear escala"
                                             variant="success"
                                             @click="
@@ -65,6 +71,12 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'configuration.change_scale'
+                                            )
+                                        "
                                         title="Editar escala"
                                         pill
                                         variant="warning"
@@ -79,6 +91,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'configuration.delete_scale'
+                                            )
+                                        "
                                         title="Eliminar escala"
                                         pill
                                         variant="danger"
@@ -125,6 +143,12 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'configuration.add_scaleview'
+                                                )
+                                            "
                                             title="Crear escala"
                                             variant="success"
                                             @click="
@@ -161,6 +185,12 @@
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'configuration.change_scaleview'
+                                            )
+                                        "
                                         title="Editar escala"
                                         pill
                                         variant="warning"
@@ -175,7 +205,13 @@
                                         />
                                     </b-button>
                                     <b-button
-                                        v-if="slotProps.data.name != 'default'"
+                                        v-if="
+                                            slotProps.data.name != 'default' &&
+                                            (is_superuser == true ||
+                                                permissions.includes(
+                                                    'configuration.delete_scaleview'
+                                                ))
+                                        "
                                         title="Eliminar escala"
                                         pill
                                         variant="danger"
@@ -618,6 +654,8 @@ export default {
         filterGlobal2: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
+        permissions: [],
+        is_superuser: false,
 
         // Variables para manejar los modales
         show_modal_create_scale: false,
@@ -661,6 +699,8 @@ export default {
     mounted() {
         this.getScales();
         this.getScalesView();
+        this.permissions = localStorage.getItem("permissions");
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         successMessage(successText) {

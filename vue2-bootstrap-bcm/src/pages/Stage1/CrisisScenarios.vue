@@ -112,6 +112,12 @@
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'bcm_phase1.associate_risks_to_crisisscenario'
+                                                )
+                                            "
                                             pill
                                             title="Asociar riesgos"
                                             variant="primary"

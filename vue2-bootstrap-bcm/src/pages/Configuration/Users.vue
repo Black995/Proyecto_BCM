@@ -29,6 +29,12 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'users.add_user'
+                                                )
+                                            "
                                             title="Crear usuario"
                                             variant="success"
                                             @click="show_modal_create()"
@@ -87,6 +93,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'users.change_user'
+                                            )
+                                        "
                                         title="Editar usuario"
                                         pill
                                         variant="warning"
@@ -99,6 +111,12 @@
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'users.delete_user'
+                                            )
+                                        "
                                         title="Eliminar usuario"
                                         pill
                                         variant="danger"
@@ -510,6 +528,8 @@ export default {
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
+        permissions: [],
+        is_superuser: false,
 
         users: [],
         userDetail: {
@@ -550,6 +570,8 @@ export default {
     mounted() {
         this.getUsers();
         this.getGroups();
+        this.permissions = localStorage.getItem("permissions");
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         successMessage(successText) {
@@ -871,8 +893,6 @@ export default {
                 })
                 .catch((err) => {
                     try {
-                        console.log("error");
-                        console.log(err);
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
                             for (let e in err.response.data) {
@@ -995,9 +1015,6 @@ export default {
                     _groups: this.user._groups,
                 };
             }
-
-            console.log("usuario a editar");
-            console.log(userEdit);
 
             axios
                 .patch(
