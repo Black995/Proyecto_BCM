@@ -172,8 +172,10 @@ class UserSerializer(serializers.ModelSerializer):
             
     def save(self, **kwargs):
         self.Meta.model.cleaned_data = self.validated_data
+        print('data a enviar al actualizar')
+        print(self.validated_data)
         try:
-            return super().save(**kwargs)
+            return super().save(update_fields=self.validated_data, **kwargs)
         except ValidationError as e:
             raise serializers.ValidationError(e.message_dict)
 

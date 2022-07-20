@@ -1,4 +1,5 @@
 from telnetlib import STATUS
+from typing import OrderedDict
 from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         Group, PermissionsMixin)
@@ -8,7 +9,8 @@ from django.core.exceptions import ValidationError
 from bcm_phase2.models import Staff
 from rest_framework.response import Response
 from rest_framework import status
-
+from django.contrib.auth.hashers import make_password, check_password
+from django.utils.translation import ugettext_lazy as _
 
 class UserManager(BaseUserManager):
 
@@ -18,9 +20,9 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             email=self.normalize_email(email),
+            password=password,
         )
 
-        user.set_password(password)
         user.save(using=self._db)
         return user
 
@@ -30,6 +32,7 @@ class UserManager(BaseUserManager):
 
         user = self.create_user(
             email=self.normalize_email(email),
+            is_superuser=True,
             password=password,
         )
 
@@ -82,14 +85,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         except ValidationError as e:
             raise ValidationError({'password': e.messages})
 
-    def save(self, **kwargs):
-        print('Include password')
+    def save(self, update_fields: list=[], **kwargs):
+        #if self.email:
+        print(self.pk)
+        print(update_fields)
         print(self.password)
-        if self.password:
+        if self.pk is None or 'email' in update_fields:
+            print('email')
+            self.email = UserManager.normalize_email(self.email)
+        #if self.password:
+        if self.pk is None or 'password' in update_fields:
+            print('password')
             self.validate_password(self.password)
             self.set_password(self.password)
-        if self.email:
-            self.email = UserManager.normalize_email(self.email)
         """
         if self.is_active:
             if self.is_active:
@@ -98,17 +106,11 @@ class User(AbstractBaseUser, PermissionsMixin):
                 self.groups.clear()
         """
         super().save(**kwargs)
-        
-    def is_password_valid(self, password: str) -> bool:
-        try:
-            self.validate_password(password)
-        except ValidationError:
-            return False
-        return True
 
     def change_password(self, old_password: str, new_password: str):
         if not self.check_password(old_password):
-            raise ValidationError({'old_password': _('Wrong password')})
+            raise ValidationError({'old_password': _('La contraseña actual es incorrecta')})
         self.password = new_password
         self.save(update_fields=['password'])
+
 

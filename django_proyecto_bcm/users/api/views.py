@@ -1,7 +1,8 @@
 from users.models import User
 from bcm_phase2.models import Staff
 from django.contrib.auth.models import Permission, Group
-from .serializers import UserListSerializer, UserSerializer, StaffsWithoutUserSerializer, GroupListSerializer, GroupSerializer, PermissionSerializer, ChangePasswordSerializer, ProfileSerializer
+from .serializers import (UserListSerializer, UserSerializer, StaffsWithoutUserSerializer, GroupListSerializer, 
+                            GroupSerializer, PermissionSerializer, ChangePasswordSerializer, ProfileSerializer)
 from rest_framework import viewsets, serializers, status
 from rest_framework.response import Response
 from django.db.models import Q, F
@@ -59,3 +60,13 @@ class ProfileView(RetrieveAPIView):
         self.kwargs['pk'] = request.user.id
         return super().retrieve(request, *args, **kwargs)
 
+
+class ChangePasswordViewSet(viewsets.ModelViewSet):
+    model = User
+    queryset = User.objects.all()
+    serializer_class = ChangePasswordSerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        return super().get_permissions()
