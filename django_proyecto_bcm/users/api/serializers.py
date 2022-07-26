@@ -155,7 +155,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'email',
-            'password',
             'is_active',
             'is_admin',
             'is_superuser',

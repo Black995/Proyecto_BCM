@@ -200,7 +200,7 @@
                     placeholder="Buscar permiso"
                     label="name"
                     track-by="id"
-                    :options="permissions"
+                    :options="permissionsList"
                     :multiple="true"
                 ></multiselect>
 
@@ -290,7 +290,7 @@
                     placeholder="Buscar permiso"
                     label="name"
                     track-by="id"
-                    :options="permissions"
+                    :options="permissionsList"
                     :multiple="true"
                 ></multiselect>
 
@@ -387,7 +387,7 @@ export default {
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
-        permissions: [],
+        permissionsList: [],
         is_superuser: false,
 
         roles: [],
@@ -411,7 +411,7 @@ export default {
     mounted() {
         this.getRoles();
         this.getPermissions();
-        this.permissions = localStorage.getItem("permissions");
+        this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
@@ -474,7 +474,7 @@ export default {
                 });
         },
         async getPermissions() {
-            this.permissions = [];
+            this.permissionsList = [];
 
             axios
                 .get(`${SERVER_ADDRESS}/api/users/permissions/`, {
@@ -484,7 +484,7 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.permissions = res.data;
+                    this.permissionsList = res.data;
                 })
                 .catch((err) => {
                     try {
@@ -841,8 +841,8 @@ export default {
         addAllRoles() {
             this.selectedPermissions = [];
 
-            for (let i = 0; i < this.permissions.length; i++) {
-                this.selectedPermissions.push(this.permissions[i]);
+            for (let i = 0; i < this.permissionsList.length; i++) {
+                this.selectedPermissions.push(this.permissionsList[i]);
             }
         },
     },

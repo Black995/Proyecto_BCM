@@ -371,36 +371,6 @@
                         required
                     ></b-form-input>
                 </b-form-group>
-                <b-row align-v="center">
-                    <b-col>
-                        <b-form-group
-                            label="Ingrese la contraseña del usuario"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="userState.password"
-                        >
-                            <b-form-input
-                                type="password"
-                                v-model="user.password"
-                                :state="userState.password"
-                                required
-                            ></b-form-input>
-                        </b-form-group>
-                    </b-col>
-                    <b-col>
-                        <b-form-group
-                            label="Repita la contraseña"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="userState.password2"
-                        >
-                            <b-form-input
-                                type="password"
-                                v-model="password2"
-                                :state="userState.password2"
-                                required
-                            ></b-form-input>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
                 <b-form-group
                     label="Seleccione el personal asociado a este usuario"
                     invalid-feedback="Este campo es obligatorio"
@@ -570,7 +540,7 @@ export default {
     mounted() {
         this.getUsers();
         this.getGroups();
-        this.permissions = localStorage.getItem("permissions");
+        this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
@@ -755,6 +725,13 @@ export default {
             }
             if (this.user.staff == 0) {
                 this.userState.staff = false;
+                valid = false;
+            }
+            if (
+                this.selectedGroups.length == 0 &&
+                this.user.is_active == true
+            ) {
+                this.errorMessage("Seleccione al menos 1 rol para el usuario");
                 valid = false;
             }
             /**
@@ -996,25 +973,13 @@ export default {
             /**
              * Si la contraseña se mantiene en blanco, entonces no se envía ese campo
              */
-            let userEdit = {};
-            if (this.user.password) {
-                userEdit = {
-                    email: this.user.email,
-                    password: this.user.password,
-                    is_superuser: this.user.is_superuser,
-                    is_active: this.user.is_active,
-                    staff: this.user.staff,
-                    _groups: this.user._groups,
-                };
-            } else {
-                userEdit = {
-                    email: this.user.email,
-                    is_superuser: this.user.is_superuser,
-                    is_active: this.user.is_active,
-                    staff: this.user.staff,
-                    _groups: this.user._groups,
-                };
-            }
+            let userEdit = {
+                email: this.user.email,
+                is_superuser: this.user.is_superuser,
+                is_active: this.user.is_active,
+                staff: this.user.staff,
+                _groups: this.user._groups,
+            };
 
             axios
                 .patch(

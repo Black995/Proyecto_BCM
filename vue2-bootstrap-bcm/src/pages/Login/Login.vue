@@ -117,7 +117,7 @@ export default {
                                 );
                                 localStorage.setItem(
                                     "permissions",
-                                    res.data.permissions
+                                    JSON.stringify(res.data.permissions)
                                 );
 
                                 this.$router.push("/layout/perfil");

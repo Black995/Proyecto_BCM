@@ -87,9 +87,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def save(self, update_fields: list=[], **kwargs):
         #if self.email:
-        print(self.pk)
-        print(update_fields)
-        print(self.password)
         if self.pk is None or 'email' in update_fields:
             print('email')
             self.email = UserManager.normalize_email(self.email)
@@ -98,13 +95,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             print('password')
             self.validate_password(self.password)
             self.set_password(self.password)
-        """
-        if self.is_active:
-            if self.is_active:
-                self.set_group()
-            else:
-                self.groups.clear()
-        """
+        
+        if not self.is_active:
+            self.groups.clear()
+        
         super().save(**kwargs)
 
     def change_password(self, old_password: str, new_password: str):

@@ -344,7 +344,7 @@ export default {
     }),
     mounted() {
         this.getRisks();
-        this.permissions = localStorage.getItem("permissions");
+        this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {

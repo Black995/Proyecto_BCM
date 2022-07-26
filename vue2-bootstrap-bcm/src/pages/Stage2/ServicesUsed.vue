@@ -856,7 +856,7 @@ export default {
     mounted() {
         this.getServicesUsed();
         this.getScaleView();
-        this.permissions = localStorage.getItem("permissions");
+        this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
