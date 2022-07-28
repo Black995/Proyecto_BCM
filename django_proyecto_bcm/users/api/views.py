@@ -3,12 +3,10 @@ from bcm_phase2.models import Staff
 from django.contrib.auth.models import Permission, Group
 from .serializers import (UserListSerializer, UserSerializer, StaffsWithoutUserSerializer, GroupListSerializer, 
                             GroupSerializer, PermissionSerializer, ChangePasswordSerializer, ProfileSerializer)
-from rest_framework import viewsets, serializers, status
-from rest_framework.response import Response
 from django.db.models import Q, F
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
-from rest_framework.decorators import action
 from rest_framework.generics import (RetrieveAPIView)
+from rest_framework import viewsets
 
 
 class UserListViewSet(viewsets.ModelViewSet):

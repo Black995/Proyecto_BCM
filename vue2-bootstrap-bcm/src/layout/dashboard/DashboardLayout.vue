@@ -91,6 +91,27 @@
                     icon="ti-dropbox"
                 />
                 <!--
+                    Encabezado Fase 3
+                -->
+                <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase3.view_incidenthistory')
+                    "
+                    to="#1"
+                    class="disabled"
+                    name="Fase 3"
+                />
+                <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase3.view_incidenthistory')
+                    "
+                    to="/layout/historico-incidentes"
+                    name="Histórico de Incidentes"
+                    icon="ti-exchange-vertical"
+                />
+                <!--
                     Encabezado Configuración
                 -->
                 <sidebar-link

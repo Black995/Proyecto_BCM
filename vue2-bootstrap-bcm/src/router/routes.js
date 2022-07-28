@@ -26,7 +26,7 @@ import ServicesOffered from "@/pages/Stage2/ServicesOffered.vue";
 import ServicesUsed from "@/pages/Stage2/ServicesUsed.vue";
 import Staffs from "@/pages/Stage2/Staffs.vue";
 // Stage 3
-
+import IncidentHistory from "@/pages/Stage3/IncidentHistory.vue";
 // Configuration
 import Areas from "@/pages/Configuration/Areas.vue";
 import Positions from "@/pages/Configuration/Positions.vue";
@@ -96,6 +96,14 @@ const routes = [
         path: "personal",
         name: "Personal de la Organización",
         component: Staffs
+      },
+      /**
+       * Stage 3
+       */
+      {
+        path: "historico-incidentes",
+        name: "Histórico de Incidentes",
+        component: IncidentHistory
       },
       /**
        * Configuration
