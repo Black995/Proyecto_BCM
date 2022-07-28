@@ -197,6 +197,14 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+    os.path.join(BASE_DIR, 'bcm_phase1', 'locale'),
+    os.path.join(BASE_DIR, 'bcm_phase2', 'locale'),
+    os.path.join(BASE_DIR, 'bcm_phase3', 'locale'),
+    os.path.join(BASE_DIR, 'configuration', 'locale'),
+    os.path.join(BASE_DIR, 'users', 'locale'),
+)
 
 ### LDAP Settings ###
 """

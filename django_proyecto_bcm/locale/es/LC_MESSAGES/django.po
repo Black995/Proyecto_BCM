@@ -1,0 +1,329 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-27 18:49-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# User
+msgid "old password"
+msgstr "La contraseña actual es incorrecta"
+
+# Permissions
+msgid "Can add area"
+msgstr "Puede agregar área"
+
+msgid "Can view area"
+msgstr "Puede ver área"
+
+msgid "Can change area"
+msgstr "Puede actualizar área"
+
+msgid "Can delete area"
+msgstr "Puede eliminar área"
+
+msgid "Can add service used"
+msgstr "Puede agregar servicio de soporte"
+
+msgid "Can view service used"
+msgstr "Puede ver servicio de soporte"
+
+msgid "Can change service used"
+msgstr "Puede actualizar servicio de soporte"
+
+msgid "Can delete service used"
+msgstr "Puede eliminar servicio de soporte"
+
+msgid "Can add service offered"
+msgstr "Puede agregar servicio de la organización"
+
+msgid "Can view service offered"
+msgstr "Puede ver servicio de la organización"
+
+msgid "Can change service offered"
+msgstr "Puede actualizar servicio de la organización"
+
+msgid "Can delete service offered"
+msgstr "Puede eliminar servicio de la organización"
+
+msgid "Can add risk"
+msgstr "Puede agregar riesgo"
+
+msgid "Can view risk"
+msgstr "Puede ver riesgo"
+
+msgid "Can change risk"
+msgstr "Puede actualizar riesgo"
+
+msgid "Can delete risk"
+msgstr "Puede eliminar riesgo"
+
+msgid "Can add crisis scenario"
+msgstr "Puede agregar escenario crítico"
+
+msgid "Can view crisis scenario"
+msgstr "Puede ver escenario crítico"
+
+msgid "Can change crisis scenario"
+msgstr "Puede actualizar escenario crítico"
+
+msgid "Can delete crisis scenario"
+msgstr "Puede eliminar escenario crítico"
+
+msgid "Can add organization activity"
+msgstr "Puede agregar actividad de la organización"
+
+msgid "Can view organization activity"
+msgstr "Puede ver actividad de la organización"
+
+msgid "Can change organization activity"
+msgstr "Puede actualizar actividad de la organización"
+
+msgid "Can delete organization activity"
+msgstr "Puede eliminar actividad de la organización"
+
+msgid "Can add organization"
+msgstr "Puede agregar organización"
+
+msgid "Can view organization"
+msgstr "Puede ver organización"
+
+msgid "Can change organization"
+msgstr "Puede actualizar organización"
+
+msgid "Can delete organization"
+msgstr "Puede eliminar organización"
+
+msgid "Can add interested party"
+msgstr "Puede agregar parte interesada"
+
+msgid "Can view interested party"
+msgstr "Puede ver parte interesada"
+
+msgid "Can change interested party"
+msgstr "Puede actualizar parte interesada"
+
+msgid "Can delete interested party"
+msgstr "Puede eliminar parte interesada"
+
+msgid "Can add staff"
+msgstr "Puede agregar personal de la organización"
+
+msgid "Can view staff"
+msgstr "Puede ver personal de la organización"
+
+msgid "Can change staff"
+msgstr "Puede actualizar personal de la organización"
+
+msgid "Can delete staff"
+msgstr "Puede eliminar personal de la organización"
+
+msgid "Can add position"
+msgstr "Puede agregar cargo"
+
+msgid "Can view position"
+msgstr "Puede ver cargo"
+
+msgid "Can change position"
+msgstr "Puede actualizar cargo"
+
+msgid "Can delete position"
+msgstr "Puede eliminar cargo"
+
+msgid "Can add scale"
+msgstr "Puede agregar escala"
+
+msgid "Can view scale"
+msgstr "Puede ver escala"
+
+msgid "Can change scale"
+msgstr "Puede actualizar escala"
+
+msgid "Can delete scale"
+msgstr "Puede eliminar escala"
+
+msgid "Can add scale view"
+msgstr "Puede agregar vista de la escala"
+
+msgid "Can view scale view"
+msgstr "Puede ver vista de la escala"
+
+msgid "Can change scale view"
+msgstr "Puede actualizar vista de la escala"
+
+msgid "Can delete scale view"
+msgstr "Puede eliminar vista de la escala"
+
+msgid "Can add group"
+msgstr "Puede agregar rol"
+
+msgid "Can view group"
+msgstr "Puede ver rol"
+
+msgid "Can change group"
+msgstr "Puede actualizar rol"
+
+msgid "Can delete group"
+msgstr "Puede eliminar rol"
+
+msgid "Can add user"
+msgstr "Puede agregar usuario"
+
+msgid "Can view user"
+msgstr "Puede ver usuario"
+
+msgid "Can change user"
+msgstr "Puede actualizar usuario"
+
+msgid "Can delete user"
+msgstr "Puede eliminar usuario"
+
+msgid "Can add log entry"
+msgstr "Puede agregar entrada de registro"
+
+msgid "Can view log entry"
+msgstr "Puede ver entrada de registro"
+
+msgid "Can change log entry"
+msgstr "Puede actualizar entrada de registro"
+
+msgid "Can delete log entry"
+msgstr "Puede eliminar entrada de registro"
+
+msgid "Can add permission"
+msgstr "Puede agregar permiso"
+
+msgid "Can view permission"
+msgstr "Puede ver permiso"
+
+msgid "Can change permission"
+msgstr "Puede actualizar permiso"
+
+msgid "Can delete permission"
+msgstr "Puede eliminar permiso"
+
+
+# Permisos personalizados
+
+msgid "Can associate risks to crisis scenarios"
+msgstr "Puede asociar riesgos a escenarios críticos"
+
+msgid "Can associate risks to services offered"
+msgstr "Puede asociar riesgos a servicios de la organización"
+
+msgid "Can associate risks to services used"
+msgstr "Puede asociar riesgos a servicios de soporte"
+
+msgid "Can associate services offered to services used"
+msgstr "Puede asociar servicios de la organización a servicios de soporte"
+
+msgid "Can associate staffs to services offered"
+msgstr "Puede asociar personal de la organización a servicios de la organización"
+
+msgid "Can add incident history"
+msgstr "Puede agregar historial de incidentes"
+
+msgid "Can view incident history"
+msgstr "Puede ver historial de incidentes"
+
+msgid "Can change incident history"
+msgstr "Puede actualizar historial de incidentes"
+
+msgid "Can delete incident history"
+msgstr "Puede eliminar historial de incidentes"
+
+msgid "Can add city"
+msgstr "Puede agregar ciudad"
+
+msgid "Can view city"
+msgstr "Puede ver ciudad"
+
+msgid "Can change city"
+msgstr "Puede actualizar ciudad"
+
+msgid "Can delete city"
+msgstr "Puede eliminar ciudad"
+
+msgid "Can add parish"
+msgstr "Puede agregar parroquia"
+
+msgid "Can view parish"
+msgstr "Puede ver parroquia"
+
+msgid "Can change parish"
+msgstr "Puede actualizar parroquia"
+
+msgid "Can delete parish"
+msgstr "Puede eliminar parroquia"
+
+msgid "Can add headquarter"
+msgstr "Puede agregar sede"
+
+msgid "Can view headquarter"
+msgstr "Puede ver sede"
+
+msgid "Can change headquarter"
+msgstr "Puede actualizar sede"
+
+msgid "Can delete headquarter"
+msgstr "Puede eliminar sede"
+
+msgid "Can add state"
+msgstr "Puede agregar estado"
+
+msgid "Can view state"
+msgstr "Puede ver estado"
+
+msgid "Can change state"
+msgstr "Puede actualizar estado"
+
+msgid "Can delete state"
+msgstr "Puede eliminar estado"
+
+msgid "Can add township"
+msgstr "Puede agregar municipio"
+
+msgid "Can view township"
+msgstr "Puede ver municipio"
+
+msgid "Can change township"
+msgstr "Puede actualizar municipio"
+
+msgid "Can delete township"
+msgstr "Puede eliminar municipio"
+
+msgid "Can add content type"
+msgstr "Puede agregar content type"
+
+msgid "Can view content type"
+msgstr "Puede ver content type"
+
+msgid "Can change content type"
+msgstr "Puede actualizar content type"
+
+msgid "Can delete content type"
+msgstr "Puede eliminar content type"
+
+msgid "Can add session"
+msgstr "Puede agregar sesión"
+
+msgid "Can view session"
+msgstr "Puede ver sesión"
+
+msgid "Can change session"
+msgstr "Puede actualizar sesión"
+
+msgid "Can delete session"
+msgstr "Puede eliminar sesión"

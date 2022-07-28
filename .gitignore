@@ -348,7 +348,7 @@ yarn-error.log
 
 #Django Migrations
 
-*/migrations/*
+**/migrations/**
 
 !**/migrations
 

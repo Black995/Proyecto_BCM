@@ -6,11 +6,13 @@ from django.db.models import F, Q
 from django.contrib.auth.password_validation import \
     validate_password as django_validate_password
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 
 
 
 class PermissionSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Permission
@@ -20,6 +22,9 @@ class PermissionSerializer(serializers.ModelSerializer):
             'content_type_id',
             'codename',
         ]
+
+    def get_name(self, obj):
+        return _(obj.name)
 
 
 class GroupListSerializer(serializers.ModelSerializer):

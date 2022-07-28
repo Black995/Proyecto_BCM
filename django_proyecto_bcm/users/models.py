@@ -103,7 +103,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def change_password(self, old_password: str, new_password: str):
         if not self.check_password(old_password):
-            raise ValidationError({'old_password': _('La contraseña actual es incorrecta')})
+            raise ValidationError({'old_password': _('old password')})
         self.password = new_password
         self.save(update_fields=['password'])
 
