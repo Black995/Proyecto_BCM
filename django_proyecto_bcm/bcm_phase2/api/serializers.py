@@ -300,7 +300,6 @@ class InterestedPartyListSerializer(serializers.ModelSerializer):
 
 class interestedPartySerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only = True)
-    organization_name = serializers.CharField(read_only = True, source="organization.name")
 
     class Meta:
         model = InterestedParty
@@ -310,6 +309,4 @@ class interestedPartySerializer(serializers.ModelSerializer):
             'type',
             'type_name',
             'description',
-            'organization',
-            'organization_name'
         ] 

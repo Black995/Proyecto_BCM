@@ -52,6 +52,8 @@ class ScaleViewSerializer(serializers.ModelSerializer):
             'scale_name',
             'scale_min_value',
             'scale_max_value',
+            'minimum_recovery_time',
+            'minimum_scale_value'
         ]
 
 
@@ -61,7 +63,7 @@ class PositionSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-            'relevant'
+            #'relevant'
         ]
         
 

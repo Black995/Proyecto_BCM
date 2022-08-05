@@ -68,5 +68,5 @@ class InterestedPartyListViewSet(viewsets.ModelViewSet):
 
 class InterestedPartyViewSet(viewsets.ModelViewSet):
     model = InterestedParty
-    queryset = InterestedParty.objects.annotate(organization_name=F('organization__name'))
+    queryset = InterestedParty.objects.all()
     serializer_class = interestedPartySerializer

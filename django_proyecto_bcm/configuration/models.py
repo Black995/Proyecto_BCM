@@ -63,7 +63,7 @@ class Headquarter(models.Model):
 
 class Position(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    relevant = models.BooleanField(default=False)
+    #relevant = models.BooleanField(default=False)
 
 
 class Area(models.Model):
@@ -85,4 +85,6 @@ class ScaleView(models.Model):
 
     scale = models.ForeignKey(
         Scale, related_name='scale_view', on_delete=models.CASCADE)
+    minimum_recovery_time = models.DurationField(null=True)
+    minimum_scale_value = models.SmallIntegerField(null=True)
 

@@ -61,9 +61,14 @@
                                 header="Fecha de inicio"
                             ></Column>
                             <Column
+                                field="start_hour"
+                                header="Hora de inicio"
+                            ></Column>
+                            <Column
                                 field="end_date"
                                 header="Fecha fin"
                             ></Column>
+                            <Column field="end_hour" header="Hora fin"></Column>
                             <Column
                                 field="description"
                                 header="Descripción del incidente"
@@ -260,6 +265,161 @@
                 </div>
             </template>
         </b-modal>
+
+        <!--
+            Modal de editar
+        -->
+        <b-modal
+            id="modal-update"
+            title="Editar incidente"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese la fecha de inicio del incidente"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="incidentState.start_date"
+                        >
+                            <b-form-datepicker
+                                v-model="startDateTime.date"
+                                :state="incidentState.start_date"
+                                locale="es"
+                            ></b-form-datepicker>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese la hora de inicio del incidente"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="incidentState.start_date"
+                        >
+                            <b-form-timepicker
+                                v-model="startDateTime.time"
+                                :state="incidentState.start_time"
+                                now-button
+                                reset-button
+                                locale="es"
+                            ></b-form-timepicker>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese la fecha fin del incidente"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="incidentState.end_date"
+                        >
+                            <b-form-datepicker
+                                v-model="endDateTime.date"
+                                :state="incidentState.end_date"
+                                locale="es"
+                            ></b-form-datepicker>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese la hora fin del incidente"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="incidentState.end_date"
+                        >
+                            <b-form-timepicker
+                                v-model="endDateTime.time"
+                                :state="incidentState.end_time"
+                                now-button
+                                reset-button
+                                locale="es"
+                            ></b-form-timepicker>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-form-group
+                    label="Seleccione el escenario crítico que ocasionará la incidencia"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="incidentState.crisis_scenario"
+                >
+                    <b-form-select
+                        v-model="incident.crisis_scenario"
+                        :options="crisisScenarios"
+                        value-field="id"
+                        text-field="name"
+                        :state="incidentState.crisis_scenario"
+                        required
+                    ></b-form-select>
+                </b-form-group>
+                <b-form-group
+                    label="Ingrese la descripción del incidente"
+                    :state="incidentState.description"
+                >
+                    <b-form-textarea
+                        v-model="incident.description"
+                        :state="incidentState.description"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+            </form>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="handleSubmitUpdate"
+                    >
+                        Editar incidente
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar editar  
+        -->
+        <b-modal
+            id="modal-confirm-update"
+            title="Confirmar editar servicio de la organización"
+            centered
+        >
+            <h4>¿Está seguro de editar este incidente?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="updateIncident"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar eliminar  
+        -->
+        <b-modal
+            id="modal-confirm-delete"
+            title="Confirmar eliminar incidente"
+            centered
+        >
+            <h4>¿Está seguro de eliminar este incidente?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="danger"
+                        class="float-right"
+                        @click="deleteIncident"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </div>
 </template>
 
@@ -351,7 +511,19 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.incidents = res.data;
+                    for (var i = 0; i < res.data.length; i++) {
+                        let inc = {
+                            id: res.data[i].id,
+                            start_date: res.data[i].start_date.slice(0, 10),
+                            start_hour: res.data[i].start_date.slice(11, 16),
+                            end_date: res.data[i].end_date.slice(0, 10),
+                            end_hour: res.data[i].end_date.slice(11, 16),
+                            description: res.data[i].description,
+                            crisis_scenario_name:
+                                res.data[i].crisis_scenario_name,
+                        };
+                        this.incidents.push(inc);
+                    }
                     this.loading = false;
 
                     this.getCrisisScenarios();
@@ -494,8 +666,6 @@ export default {
             this.incident.end_date =
                 this.endDateTime.date + " " + this.endDateTime.time;
 
-            console.log("Incidente:");
-            console.log(this.incident);
             axios
                 .post(
                     `${SERVER_ADDRESS}/api/phase3/incident-histories/`,
@@ -545,9 +715,192 @@ export default {
                 });
         },
 
-        show_modal_update(id) {},
+        /**
+         * Update
+         */
+        handleSubmitUpdate() {
+            // Inicializamos variables de estados
+            this.incidentState.start_date = null;
+            this.incidentState.end_date = null;
+            this.incidentState.description = null;
+            this.incidentState.crisis_scenario = null;
 
-        show_modal_delete(id) {},
+            // Exit when the form isn't valid
+            if (!this.checkFormValidity()) {
+                return;
+            }
+
+            // Mostrar modal de confirmar
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-update");
+            });
+        },
+        show_modal_update(id) {
+            this.incidentId = id;
+
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase3/incident-history/${this.incidentId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    this.incident = {
+                        description: res.data.description,
+                        crisis_scenario: res.data.crisis_scenario,
+                    };
+                    this.startDateTime = {
+                        date: res.data.start_date.slice(0, 10),
+                        time: res.data.start_date.slice(11, 16),
+                    };
+                    this.endDateTime = {
+                        date: res.data.end_date.slice(0, 10),
+                        time: res.data.end_date.slice(11, 16),
+                    };
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-update");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async updateIncident() {
+            this.incident.start_date =
+                this.startDateTime.date + " " + this.startDateTime.time;
+            this.incident.end_date =
+                this.endDateTime.date + " " + this.endDateTime.time;
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase3/incident-history/${this.incidentId}/`,
+                    this.incident,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+
+                    this.successMessage(
+                        "¡El incidente ha sido actualizado exitosamente!"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-update");
+                        this.$bvModal.hide("modal-update");
+                    });
+
+                    // Cargamos de nuevo la tabla de escenario crítico
+                    this.getIncidents();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Delete
+         */
+        show_modal_delete(id) {
+            this.incidentId = id;
+
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-delete");
+            });
+        },
+        async deleteIncident() {
+            axios
+                .delete(
+                    `${SERVER_ADDRESS}/api/phase3/incident-history/${this.incidentId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡El incidente ha sido eliminado exitosamente!"
+                    );
+                    this.getIncidents();
+
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-delete");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
     },
 };
 </script>

@@ -182,6 +182,14 @@
                                 field="scale_name"
                                 header="Nombre de la escala"
                             ></Column>
+                            <Column
+                                field="minimum_recovery_time"
+                                header="Mínimo RTO para considerarse crítico"
+                            ></Column>
+                            <Column
+                                field="minimum_scale_value"
+                                header="Valor mínimo de la escala para considerar crítico el RTO"
+                            ></Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
@@ -553,6 +561,73 @@
                         required
                     ></b-form-select>
                 </b-form-group>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Mínimo tiempo de recuperación (RTO) para considerarse crítico"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="scaleViewState.minimum_recovery_time"
+                        >
+                            <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
+                                <b-col>
+                                    <b-form-group label="Días">
+                                        <b-form-input
+                                            type="number"
+                                            v-model.number="
+                                                minimumRecoveryTimeScaleDuration.days
+                                            "
+                                            :state="
+                                                scaleViewState.minimum_recovery_time
+                                            "
+                                        ></b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group label="Horas">
+                                        <b-form-select
+                                            v-model="
+                                                minimumRecoveryTimeScaleDuration.hours
+                                            "
+                                            :options="hours"
+                                            label="Horas"
+                                            :state="
+                                                scaleViewState.minimum_recovery_time
+                                            "
+                                        ></b-form-select>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group label="Minutos">
+                                        <b-form-select
+                                            v-model="
+                                                minimumRecoveryTimeScaleDuration.minutes
+                                            "
+                                            :options="minutes"
+                                            label="Minutos"
+                                            :state="
+                                                scaleViewState.minimum_recovery_time
+                                            "
+                                        ></b-form-select>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese el valor mínimo de la escala para considerar crítico el RTO"
+                            invalid-feedback="La escala mínima para el RTO tiene que estar en el rango de la escala seleccionada"
+                            :state="scaleViewState.minimum_scale_value"
+                        >
+                            <b-form-input
+                                type="number"
+                                v-model.number="scaleView.minimum_scale_value"
+                                :state="scaleViewState.minimum_scale_value"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
                 <p class="mt-3">
                     <strong>NOTA: </strong>al actualizar las escalas tiene dos
                     opciones:
@@ -641,6 +716,11 @@ import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
+import {
+    getRecoveryTimeText,
+    getRecoveryTime,
+    setRecoveryTime,
+} from "../../helpers/helpers";
 
 export default {
     name: "Scales",
@@ -679,11 +759,25 @@ export default {
             name: "",
             scale: 0,
             option: 0,
+            minimum_recovery_time: "",
+            minimum_scale_value: 0,
         },
         scaleViewState: {
             name: null,
             scale: null,
+            minimum_recovery_time: null,
+            minimum_scale_value: null,
         },
+        minimumRecoveryTimeScaleDuration: {
+            days: 0,
+            hours: 0,
+            minutes: 0,
+        },
+        hours: [
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+            19, 20, 21, 22, 23,
+        ],
+        minutes: [0, 15, 30, 45],
 
         /**
          * Lista de todas las vistas del sistema en la que se utilizan escalas
@@ -795,6 +889,10 @@ export default {
                 this.errorMessage(
                     "La escala mínima no puede ser mayor o igual a la escala máxima"
                 );
+                valid = false;
+            }
+            if (this.scale.max_value > 10) {
+                this.errorMessage("La escala máxima no puede ser mayor a 10");
                 valid = false;
             }
             return valid;
@@ -1032,7 +1130,13 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.scalesView = res.data;
+                    for (var i = 0; i < res.data.length; i++) {
+                        //Convertimos en texto la duración
+                        res.data[i].minimum_recovery_time = getRecoveryTimeText(
+                            res.data[i].minimum_recovery_time
+                        );
+                        this.scalesView.push(res.data[i]);
+                    }
                     this.loading2 = false;
                 })
                 .catch((err) => {
@@ -1080,6 +1184,7 @@ export default {
                 this.scaleViewState.scale = false;
                 valid = false;
             }
+
             return valid;
         },
         checkFormValidityScalesViewUpdate() {
@@ -1090,6 +1195,41 @@ export default {
             }
             if (this.scaleView.scale == 0) {
                 this.scaleViewState.scale = false;
+                valid = false;
+            }
+            /**
+             * Si la escala fue seleccionada, entonces verificamos que el mínimo valor de la
+             * escala para el rto (minimum_scale_value) no sea menor o igual que el mínimo
+             * valor de la escala (scale.min_value)
+             */
+            for (var i = 0; i < this.scales.length; i++) {
+                if (
+                    this.scales[i].id == this.scaleView.scale &&
+                    this.scales[i].min_value >=
+                        this.scaleView.minimum_scale_value
+                ) {
+                    this.errorMessage(
+                        "El valor mínimo de la escala para el RTO no puede ser menor al valor mínimo disponible para la escala"
+                    );
+                    valid = false;
+                }
+                if (
+                    this.scales[i].id == this.scaleView.scale &&
+                    (this.scaleView.minimum_scale_value <
+                        this.scales[i].min_value ||
+                        this.scaleView.minimum_scale_value >
+                            this.scales[i].max_value)
+                ) {
+                    this.scaleViewState.minimum_scale_value = false;
+                    valid = false;
+                }
+            }
+            if (
+                this.minimumRecoveryTimeScaleDuration.days == 0 &&
+                this.minimumRecoveryTimeScaleDuration.hours == 0 &&
+                this.minimumRecoveryTimeScaleDuration.minutes == 0
+            ) {
+                this.scaleViewState.minimum_recovery_time = false;
                 valid = false;
             }
             if (this.scaleView.option == 0) {
@@ -1199,6 +1339,8 @@ export default {
             // Inicializamos variables de estados
             this.scaleViewState.name = null;
             this.scaleViewState.scale = null;
+            this.scaleViewState.minimum_recovery_time = null;
+            this.scaleViewState.minimum_scale_value = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidityScalesViewUpdate()) {
@@ -1221,14 +1363,19 @@ export default {
                     },
                 })
                 .then((res) => {
-                    (this.scaleView = {
+                    this.scaleView = {
                         name: res.data.name,
                         scale: res.data.scale,
+                        minimum_scale_value: res.data.minimum_scale_value,
                         option: 0,
-                    }),
-                        this.$nextTick(() => {
-                            this.$bvModal.show("modal-update-scale-view");
-                        });
+                    };
+                    this.minimumRecoveryTimeScaleDuration = getRecoveryTime(
+                        res.data.minimum_recovery_time
+                    );
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-update-scale-view");
+                    });
                 })
                 .catch((err) => {
                     try {
@@ -1250,6 +1397,10 @@ export default {
                 });
         },
         async updateScaleView() {
+            this.scaleView.minimum_recovery_time = setRecoveryTime(
+                this.minimumRecoveryTimeScaleDuration
+            );
+
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/config/scale/view/${this.scaleViewId}/`,

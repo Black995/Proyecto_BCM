@@ -1,27 +1,7 @@
 from django.db import models
-from configuration.models import Organization, Headquarter, Area, Scale, Position
+from configuration.models import Headquarter, Area, Scale, Position
 from bcm_phase1.models import Risk
 
-
-class InterestedParty(models.Model):
-
-    SUPPLIER = 1
-    INVESTOR = 2
-    CUSTOMER = 3
-    STAKEHOLDER = 3
-    TYPE = (
-        (SUPPLIER, 'Proveedor'),
-        (INVESTOR, 'Inversionista'),
-        (CUSTOMER, 'Cliente'),
-        (STAKEHOLDER, 'Accionista'),
-    )
-
-    name = models.CharField(max_length=100, unique=True)
-    type = models.SmallIntegerField(choices=TYPE)
-    description = models.CharField(max_length=200)
-
-    organization = models.ForeignKey(
-        Organization, related_name='organization_interested_party', on_delete=models.CASCADE)
 
 
 class Staff(models.Model):
@@ -97,6 +77,53 @@ class ServiceOffered(models.Model):
                 risk = Risk.objects.filter(id=risk_id).first()
                 if(risk is not None):
                     self._risks.add(risk)
+
+
+
+
+class SO_S(models.Model):
+
+    relevant = models.BooleanField(default=False)
+    
+    staff = models.ForeignKey(Staff, related_name='staff_so_s',
+                             on_delete=models.CASCADE)
+    service_offered = models.ForeignKey(ServiceOffered, related_name='service_offered_so_s',
+                              on_delete=models.CASCADE)
+
+
+class InterestedParty(models.Model):
+
+    SUPPLIER = 1
+    INVESTOR = 2
+    CUSTOMER = 3
+    STAKEHOLDER = 3
+    TYPE = (
+        (SUPPLIER, 'Proveedor'),
+        (INVESTOR, 'Inversionista'),
+        (CUSTOMER, 'Cliente'),
+        (STAKEHOLDER, 'Accionista'),
+    )
+
+    name = models.CharField(max_length=100, unique=True)
+    type = models.SmallIntegerField(choices=TYPE)
+    description = models.CharField(max_length=200)
+    _services_offered = models.ManyToManyField(
+        ServiceOffered, related_name='service_offered_interested_party')
+
+    @property
+    def services_offered(self):
+        return self._services_offered.values_list(flat=True)
+
+    @services_offered.setter
+    def services_offered(self, services_offered_ids):
+        # Eliminamos los registros anteriores de los servicios ofrecidos
+        self._services_offered.clear()
+        # Guardamos los nuevos registros
+        if(services_offered_ids):
+            for service_id in services_offered_ids:
+                service = ServiceOffered.objects.filter(id=service_id).first()
+                if(service is not None):
+                    self._services_offered.add(service)
 
 
 
@@ -206,3 +233,17 @@ class OrganizationActivity(models.Model):
                     self._services_offered.add(service)
     
 
+
+
+class Ressource(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, null=True)
+    amount = models.PositiveIntegerField(default=0)
+
+
+class R_SO(models.Model):
+    amount = models.PositiveIntegerField(default=0)
+    ressource = models.ForeignKey(
+        Ressource, related_name='ressource_r_so', on_delete=models.CASCADE)
+    service_offered = models.ForeignKey(
+        ServiceOffered, related_name='service_offered_r_so', on_delete=models.CASCADE)

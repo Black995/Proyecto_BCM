@@ -1316,6 +1316,7 @@ export default {
                 this.serviceState.criticality = false;
                 valid = false;
             }
+
             return valid;
         },
         resetModal() {

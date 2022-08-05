@@ -52,14 +52,14 @@
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
-                            <Column field="relevant" header="Relevancia">
+                            <!--Column field="relevant" header="Relevancia">
                                 <template #body="slotProps">
                                     <div v-if="slotProps.data.relevant">Sí</div>
                                     <div v-if="!slotProps.data.relevant">
                                         No
                                     </div>
                                 </template>
-                            </Column>
+                            </Column-->
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
@@ -140,11 +140,11 @@
                         required
                     ></b-form-input>
                 </b-form-group>
-                <b-form-group>
+                <!--b-form-group>
                     <b-form-checkbox v-model="position.relevant">
                         El cargo es relevante
                     </b-form-checkbox>
-                </b-form-group>
+                </b-form-group-->
             </form>
 
             <template #modal-footer>
@@ -206,11 +206,11 @@
                         required
                     ></b-form-input>
                 </b-form-group>
-                <b-form-group>
+                <!--b-form-group>
                     <b-form-checkbox v-model="position.relevant">
                         El cargo es relevante
                     </b-form-checkbox>
-                </b-form-group>
+                </b-form-group-->
             </form>
 
             <template #modal-footer>
@@ -297,11 +297,10 @@ export default {
 
         position: {
             name: "",
-            relevant: false,
+            //relevant: false,
         },
         positionState: {
             name: null,
-            relevant: null,
         },
     }),
     mounted() {
@@ -395,8 +394,6 @@ export default {
         resetModal() {
             this.position.name = "";
             this.positionState.name = null;
-            this.position.relevant = false;
-            this.positionState.relevant = null;
         },
         /**
          * Create
@@ -404,7 +401,6 @@ export default {
         handleSubmitCreate() {
             // Inicializamos variables de estados
             this.positionState.name = null;
-            this.positionState.relevant = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -472,7 +468,6 @@ export default {
         handleSubmitUpdate() {
             // Inicializamos variables de estados
             this.positionState.name = null;
-            this.positionState.relevant = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
