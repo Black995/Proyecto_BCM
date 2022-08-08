@@ -39,9 +39,9 @@ class ScaleSerializer(serializers.ModelSerializer):
 
 
 class ScaleViewSerializer(serializers.ModelSerializer):
-    scale_name = serializers.CharField(read_only=True)
-    scale_min_value = serializers.CharField(read_only=True)
-    scale_max_value = serializers.CharField(read_only=True)
+    scale_name = serializers.CharField(read_only=True, source="scale.name")
+    scale_min_value = serializers.CharField(read_only=True, source="scale.min_value")
+    scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
 
     class Meta:
         model = ScaleView

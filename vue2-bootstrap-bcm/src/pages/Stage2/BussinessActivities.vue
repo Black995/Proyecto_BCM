@@ -55,7 +55,9 @@
 
                             <Column field="cost" header="Costo">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.cost }}$
+                                    <div v-if="slotProps.data.cost > 0">
+                                        {{ slotProps.data.cost }}$
+                                    </div>
                                 </template>
                             </Column>
                             <Column
@@ -357,7 +359,7 @@
                     <b-col>
                         <b-form-group
                             label="Ingrese el costo (en dolares)"
-                            invalid-feedback="El costo no puede ser negativo ni cero"
+                            invalid-feedback="El costo no puede ser negativo"
                         >
                             <b-form-input
                                 type="number"
@@ -496,7 +498,7 @@
                     <b-col>
                         <b-form-group
                             label="Ingrese el costo (en dolares)"
-                            invalid-feedback="El costo no puede ser negativo ni cero"
+                            invalid-feedback="El costo no puede ser negativo"
                         >
                             <b-form-input
                                 type="number"
@@ -963,12 +965,10 @@ export default {
                 this.activityState.description = false;
             }
             // Los costos son opcionales
-            /*
-            if (this.activity.cost <= 0) {
+            if (this.activity.cost < 0) {
                 valid = false;
                 this.activityState.cost = false;
             }
-            */
             if (
                 this.activity.criticality < this.scaleView.scale_min_value ||
                 this.activity.criticality > this.scaleView.scale_max_value

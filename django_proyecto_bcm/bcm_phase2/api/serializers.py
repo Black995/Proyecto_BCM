@@ -1,4 +1,5 @@
-from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity
+from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity, SO_S
+from configuration.models import ScaleView
 from rest_framework import serializers
 from django.db.models import F, Q
 from bcm_phase1.api.serializers import RiskSerializer
@@ -52,6 +53,7 @@ class StaffSerializer(serializers.ModelSerializer):
             'user_email'
         ]
 
+
 class ServiceOfferedListSerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only=True)
     area_name = serializers.CharField(read_only=True)
@@ -77,6 +79,22 @@ class ServiceOfferedListSerializer(serializers.ModelSerializer):
 
     def get_type_name(self, obj):
         return dict(ServiceOffered.TYPE).get(obj.type)
+    
+    def validate(self, attrs):
+        # Se trae la escala de la vista para validar el mínimo RTO para la criticidad
+        scale_view = ScaleView.objects.filter(name="Servicios de la Organización").first() if ScaleView.objects.filter(name="Servicios de la Organización") else None
+
+        recovery_time = attrs.get('recovery_time')
+        criticality = attrs.get('criticality')
+
+        if(scale_view):
+            if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
+                raise serializers.ValidationError( 
+                    'La criticidad ingresada es superior al mínimo tolerable para el RTO ingresado')
+            else:
+                return super().validate(attrs)
+        else:
+            return super().validate(attrs)
 
 
 class ServiceOfferedSerializer(serializers.ModelSerializer):
@@ -124,6 +142,22 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
 
     def get_type_name(self, obj):
         return dict(ServiceOffered.TYPE).get(obj.type)
+    
+    def validate(self, attrs):
+        # Se trae la escala de la vista para validar el mínimo RTO para la criticidad
+        scale_view = ScaleView.objects.filter(name="Servicios de la Organización").first() if ScaleView.objects.filter(name="Servicios de la Organización") else None
+
+        recovery_time = attrs.get('recovery_time')
+        criticality = attrs.get('criticality')
+
+        if(scale_view):
+            if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
+                raise serializers.ValidationError( 
+                    'La criticidad ingresada es superior al mínimo tolerable para el RTO ingresado')
+            else:
+                return super().validate(attrs)
+        else:
+            return super().validate(attrs)
 
 
 class ServiceUsedListSerializer(serializers.ModelSerializer):
@@ -310,3 +344,53 @@ class interestedPartySerializer(serializers.ModelSerializer):
             'type_name',
             'description',
         ] 
+
+
+class SO_SSerializer(serializers.ModelSerializer):
+    staff_number = serializers.CharField(read_only=True, source="staff.staff_number")
+    staff_names = serializers.CharField(read_only=True, source="staff.names")
+    staff_surnames = serializers.CharField(read_only=True, source="staff.surnames")
+    staff_area_name = serializers.CharField(read_only=True, source="staff.area_name")
+    staff_position_name = serializers.CharField(read_only=True, source="staff.position_name")
+    staff_headquarter_name = serializers.CharField(read_only=True, source="staff.headquarter_name")
+
+    class Meta:
+        model = SO_S
+        fields = [
+            'id',
+            'relevant',
+            'service_offered',
+            'staff',
+            'staff_number',
+            'staff_names',
+            'staff_surnames',
+            'staff_area_name',
+            'staff_position_name',
+            'staff_headquarter_name',
+        ] 
+
+
+    def create(self, instance, validated_data):
+        simcard_nueva = validated_data.get('simcard', instance.simcard)
+        numero_cuenta_nuevo = validated_data.get(
+            "numero_cuenta", instance.numero_cuenta)
+
+        if instance.simcard != simcard_nueva:
+            Hist_Simcard.objects.create(tipo=3, simcard=simcard_nueva)
+
+
+        instance.simcard = simcard_nueva
+        instance.numero_cuenta = numero_cuenta_nuevo
+
+        if instance.numero_cuenta:
+            if instance.cliente:
+                instance.cuenta, created = Cuenta.objects.get_or_create(
+                    numero=instance.numero_cuenta)
+            else:
+                raise serializers.ValidationError(
+                    {"numero_cuenta": "El Pos debe estar asignado a un cliente"})
+
+        instance.save()
+
+        return instance
+

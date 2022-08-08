@@ -1,6 +1,10 @@
-from bcm_phase2.models import InterestedParty, ServiceOffered, ServiceUsed, Staff, OrganizationActivity
+from bcm_phase2.models import (InterestedParty, ServiceOffered, ServiceUsed, Staff, 
+                                OrganizationActivity, SO_S)
 from django.shortcuts import get_object_or_404
-from .serializers import InterestedPartyListSerializer, OrganizationActivityListSerializer, OrganizationActivitySerializer, ServiceOfferedListSerializer, ServiceOfferedSerializer, ServiceUsedListSerializer, ServiceUsedSerializer, StaffListSerializer, StaffSerializer, interestedPartySerializer
+from .serializers import (InterestedPartyListSerializer, OrganizationActivityListSerializer, OrganizationActivitySerializer, 
+                            ServiceOfferedListSerializer, ServiceOfferedSerializer, ServiceUsedListSerializer, 
+                            ServiceUsedSerializer, StaffListSerializer, StaffSerializer, interestedPartySerializer,
+                            SO_SSerializer)
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q, F
@@ -15,8 +19,7 @@ class ServiceOfferedListViewSet(viewsets.ModelViewSet):
 
 class ServiceOfferedViewSet(viewsets.ModelViewSet):
     model = ServiceOffered
-    queryset = ServiceOffered.objects.annotate(area_name=F('area__name'), scale_name=F('scale__name'), scale_min_value=F(
-        'scale__min_value'), scale_max_value=F('scale__max_value'))
+    queryset = ServiceOffered.objects.all()
     serializer_class = ServiceOfferedSerializer
 
 
@@ -70,3 +73,11 @@ class InterestedPartyViewSet(viewsets.ModelViewSet):
     model = InterestedParty
     queryset = InterestedParty.objects.all()
     serializer_class = interestedPartySerializer
+
+
+class SO_SViewSet(viewsets.ModelViewSet):
+    model = SO_S
+    queryset = SO_S.objects.all()
+    serializer_class = SO_SSerializer
+
+    

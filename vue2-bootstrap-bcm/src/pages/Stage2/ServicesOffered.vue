@@ -66,7 +66,9 @@
                             ></Column>
                             <Column field="profit" header="Ganancia">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.profit }}$
+                                    <div v-if="slotProps.data.profit > 0">
+                                        {{ slotProps.data.profit }}$
+                                    </div>
                                 </template>
                             </Column>
                             <Column field="criticality" header="Criticidad">
@@ -225,9 +227,12 @@
                 <li class="list-group-item">
                     <strong>Tipo: </strong>{{ serviceDetail.type_name }}
                 </li>
-                <li class="list-group-item">
+                <li v-if="serviceDetail.profit" class="list-group-item">
                     <strong>Ganancia promedio: </strong
                     >{{ serviceDetail.profit }}$
+                </li>
+                <li v-if="!serviceDetail.profit" class="list-group-item">
+                    <strong>Ganancia promedio: </strong>no aplica
                 </li>
                 <li class="list-group-item">
                     <strong>Tiempo de recuperación (RTO): </strong
@@ -353,7 +358,7 @@
                     <b-col>
                         <b-form-group
                             label="Ingrese la ganacia (en dólares)"
-                            invalid-feedback="La ganancia no puede ser negativa ni cero"
+                            invalid-feedback="La ganancia no puede ser negativa"
                             :state="serviceState.profit"
                         >
                             <b-form-input
@@ -370,6 +375,7 @@
                         <b-form-group
                             label="Tiempo de recuperación (RTO)"
                             invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.recovery_time"
                         >
                             <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
                                 <b-col>
@@ -379,6 +385,7 @@
                                             v-model.number="
                                                 recoveryTimeDuration.days
                                             "
+                                            :state="serviceState.recovery_time"
                                         ></b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -386,6 +393,7 @@
                                     <b-form-group label="Horas">
                                         <b-form-select
                                             v-model="recoveryTimeDuration.hours"
+                                            :state="serviceState.recovery_time"
                                             :options="hours"
                                             label="Horas"
                                         ></b-form-select>
@@ -397,6 +405,7 @@
                                             v-model="
                                                 recoveryTimeDuration.minutes
                                             "
+                                            :state="serviceState.recovery_time"
                                             :options="minutes"
                                             label="Minutos"
                                         ></b-form-select>
@@ -425,7 +434,9 @@
                 <b-row align-v="center">
                     <b-col>
                         <b-form-group
-                            label="Punto de recuperación (RPO) (opcional)"
+                            label="Punto de recuperación (RPO)"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.recovery_point"
                         >
                             <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
                                 <b-col>
@@ -435,6 +446,7 @@
                                             v-model.number="
                                                 recoveryPointDuration.days
                                             "
+                                            :state="serviceState.recovery_point"
                                         ></b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -444,6 +456,7 @@
                                             v-model="
                                                 recoveryPointDuration.hours
                                             "
+                                            :state="serviceState.recovery_point"
                                             :options="hours"
                                             label="Horas"
                                         ></b-form-select>
@@ -455,6 +468,7 @@
                                             v-model="
                                                 recoveryPointDuration.minutes
                                             "
+                                            :state="serviceState.recovery_point"
                                             :options="minutes"
                                             label="Minutos"
                                         ></b-form-select>
@@ -466,7 +480,6 @@
                     <b-col>
                         <b-form-group
                             label="Máximo tiempo de recuperación (MTPD) (opcional)"
-                            invalid-feedback="Este campo es obligatorio"
                         >
                             <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
                                 <b-col>
@@ -566,7 +579,6 @@
         <!--
             Modal de editar  
         -->
-
         <b-modal
             id="modal-update"
             title="Editar servicio de la organización"
@@ -623,6 +635,7 @@
                         <b-form-group
                             label="Tiempo de recuperación (RTO)"
                             invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.recovery_time"
                         >
                             <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
                                 <b-col>
@@ -632,6 +645,7 @@
                                             v-model.number="
                                                 recoveryTimeDuration.days
                                             "
+                                            :state="serviceState.recovery_time"
                                         ></b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -639,6 +653,7 @@
                                     <b-form-group label="Horas">
                                         <b-form-select
                                             v-model="recoveryTimeDuration.hours"
+                                            :state="serviceState.recovery_time"
                                             :options="hours"
                                             label="Horas"
                                         ></b-form-select>
@@ -650,6 +665,7 @@
                                             v-model="
                                                 recoveryTimeDuration.minutes
                                             "
+                                            :state="serviceState.recovery_time"
                                             :options="minutes"
                                             label="Minutos"
                                         ></b-form-select>
@@ -678,7 +694,9 @@
                 <b-row align-v="center">
                     <b-col>
                         <b-form-group
-                            label="Punto de recuperación (RPO) (opcional)"
+                            label="Punto de recuperación (RPO)"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="serviceState.recovery_point"
                         >
                             <b-row cols="1" cols-sm="3" cols-md="3" cols-lg="3">
                                 <b-col>
@@ -688,6 +706,7 @@
                                             v-model.number="
                                                 recoveryPointDuration.days
                                             "
+                                            :state="serviceState.recovery_point"
                                         ></b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -697,6 +716,7 @@
                                             v-model="
                                                 recoveryPointDuration.hours
                                             "
+                                            :state="serviceState.recovery_point"
                                             :options="hours"
                                             label="Horas"
                                         ></b-form-select>
@@ -708,6 +728,7 @@
                                             v-model="
                                                 recoveryPointDuration.minutes
                                             "
+                                            :state="serviceState.recovery_point"
                                             :options="minutes"
                                             label="Minutos"
                                         ></b-form-select>
@@ -1069,6 +1090,8 @@ export default {
             profit: null,
             area: null,
             criticality: null,
+            recovery_time: null,
+            recovery_point: null,
         },
         recoveryTimeDuration: {
             days: 0,
@@ -1113,6 +1136,8 @@ export default {
             scale_name: "",
             scale_min_value: 0,
             scale_max_value: 0,
+            minimum_recovery_time: "",
+            minimum_scale_value: "",
         },
 
         // Lista de staffs de la organización para realizar la asociación
@@ -1203,6 +1228,9 @@ export default {
                         this.scaleView.scale_max_value
                     );
                     this.service.criticality = res.data[0].scale_min_value;
+
+                    console.log("Escala de la vista");
+                    console.log(this.scaleView);
                 })
                 .catch((err) => {
                     try {
@@ -1305,7 +1333,7 @@ export default {
                 this.serviceState.type = false;
                 valid = false;
             }
-            if (this.service.profit <= 0) {
+            if (this.service.profit < 0) {
                 this.serviceState.profit = false;
                 valid = false;
             }
@@ -1314,6 +1342,22 @@ export default {
                 this.service.criticality > this.scaleView.scale_max_value
             ) {
                 this.serviceState.criticality = false;
+                valid = false;
+            }
+            if (
+                this.recoveryTimeDuration.days == 0 &&
+                this.recoveryTimeDuration.hours == 0 &&
+                this.recoveryTimeDuration.minutes == 0
+            ) {
+                this.serviceState.recovery_time = false;
+                valid = false;
+            }
+            if (
+                this.recoveryPointDuration.days == 0 &&
+                this.recoveryPointDuration.hours == 0 &&
+                this.recoveryPointDuration.minutes == 0
+            ) {
+                this.serviceState.recovery_point = false;
                 valid = false;
             }
 
@@ -1330,6 +1374,8 @@ export default {
             this.serviceState.area = null;
             this.serviceState.criticality = null;
             this.service.criticality = this.scaleView.scale_min_value;
+            this.serviceState.recovery_time = null;
+            this.serviceState.recovery_point = null;
 
             this.recoveryTimeDuration.days = 0;
             this.recoveryTimeDuration.hours = 0;
@@ -1418,6 +1464,8 @@ export default {
             this.serviceState.profit = null;
             this.serviceState.area = null;
             this.serviceState.criticality = null;
+            this.serviceState.recovery_time = null;
+            this.serviceState.recovery_point = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -1528,6 +1576,8 @@ export default {
             this.serviceState.profit = null;
             this.serviceState.area = null;
             this.serviceState.criticality = null;
+            this.serviceState.recovery_time = null;
+            this.serviceState.recovery_point = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {

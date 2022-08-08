@@ -23,8 +23,7 @@ class ScaleViewSet(viewsets.ModelViewSet):
 
 class ScaleviewViewSet(viewsets.ModelViewSet):
     model = ScaleView
-    queryset = ScaleView.objects.annotate(scale_name=F('scale__name'), scale_min_value=F(
-        'scale__min_value'), scale_max_value=F('scale__max_value')).order_by('name')
+    queryset = ScaleView.objects.all().order_by('name')
     serializer_class = ScaleViewSerializer
     filter_backends = [ScaleViewFilterBackend, ]
 

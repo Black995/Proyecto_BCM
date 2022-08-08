@@ -8,7 +8,7 @@ class Staff(models.Model):
     staff_number = models.CharField(max_length=30, unique=True)
     names = models.CharField(max_length=100)
     surnames = models.CharField(max_length=100)
-    earnings = models.FloatField()
+    earnings = models.FloatField(default=0)
 
     headquarter = models.ForeignKey(Headquarter, related_name='headquarter_staff', null=True,
                                     on_delete=models.SET_NULL)

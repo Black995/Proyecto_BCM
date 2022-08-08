@@ -69,7 +69,9 @@
                             ></Column>
                             <Column field="earnings" header="Ingreso promedio">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.earnings }}$
+                                    <div v-if="slotProps.data.earnings > 0">
+                                        {{ slotProps.data.earnings }}$
+                                    </div>
                                 </template>
                             </Column>
                             <Column field="area_name" header="Area"></Column>
@@ -173,9 +175,12 @@
                     <strong>Número de Identificación: </strong
                     >{{ staffDetail.staff_number }}
                 </li>
-                <li class="list-group-item">
+                <li v-if="staffDetail.earnings" class="list-group-item">
                     <strong>Ingreso promedio: </strong
                     >{{ staffDetail.earnings }}
+                </li>
+                <li v-if="!staffDetail.earnings" class="list-group-item">
+                    <strong>Ingreso promedio: </strong>no aplica
                 </li>
                 <li class="list-group-item">
                     <strong>Area: </strong>{{ staffDetail.area_name }}
@@ -283,7 +288,7 @@
                     <b-col>
                         <b-form-group
                             label="Ingrese el ingreso promedio personal (en dólares)"
-                            invalid-feedback="Este campo no puede ser negativo ni cero"
+                            invalid-feedback="Este campo no puede ser negativo"
                             :state="staffState.earnings"
                         >
                             <b-form-input
@@ -443,7 +448,7 @@
                     <b-col>
                         <b-form-group
                             label="Ingrese el ingreso promedio personal (en dólares)"
-                            invalid-feedback="Este campo no puede ser negativo ni cero"
+                            invalid-feedback="Este campo no puede ser negativo"
                             :state="staffState.earnings"
                         >
                             <b-form-input
@@ -809,7 +814,7 @@ export default {
                 this.staffState.staff_number = false;
                 valid = false;
             }
-            if (this.staff.earnings <= 0) {
+            if (this.staff.earnings < 0) {
                 this.staffState.earnings = false;
                 valid = false;
             }
@@ -921,6 +926,10 @@ export default {
             });
         },
         async createStaff() {
+            // Validar de que si se dejó vacío el campo de ganancia entonces se coloca cero
+            if (!this.staff.earnings) {
+                this.staff.earnings = 0;
+            }
             axios
                 .post(`${SERVER_ADDRESS}/api/phase2/staffs/`, this.staff, {
                     withCredentials: true,
@@ -1030,6 +1039,10 @@ export default {
                 });
         },
         async updateStaff() {
+            // Validar de que si se dejó vacío el campo de ganancia entonces se coloca cero
+            if (!this.staff.earnings) {
+                this.staff.earnings = 0;
+            }
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/phase2/staff/${this.staffId}/`,

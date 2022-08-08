@@ -54,11 +54,21 @@
                     name="Fase 2"
                 />
                 <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes(
+                            'bcm_phase2.view_organizationactivity'
+                        )
+                    "
                     to="/layout/actividades-de-negocio"
                     name="Act. del Negocio"
                     icon="ti-desktop"
                 />
                 <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase2.view_interestedparty')
+                    "
                     to="/layout/partes-interesadas"
                     name="Partes Interesadas"
                     icon="ti-desktop"
@@ -274,7 +284,7 @@ export default {
     },
     data: () => ({
         permissions: [],
-        is_superuser: false,
+        is_superuser: true,
     }),
     mounted() {
         this.permissions = JSON.parse(localStorage.getItem("permissions"));

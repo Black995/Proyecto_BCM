@@ -60,7 +60,9 @@
                             <Column field="type_name" header="Tipo"></Column>
                             <Column field="spending" header="Gasto">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.spending }}$
+                                    <div v-if="slotProps.data.spending > 0">
+                                        {{ slotProps.data.spending }}$
+                                    </div>
                                 </template>
                             </Column>
                             <Column field="criticality" header="Criticidad">
@@ -212,9 +214,12 @@
                 <li class="list-group-item">
                     <strong>Tipo: </strong>{{ serviceDetail.type_name }}
                 </li>
-                <li class="list-group-item">
+                <li v-if="serviceDetail.spending" class="list-group-item">
                     <strong>Costo promedio: </strong
                     >{{ serviceDetail.spending }}$
+                </li>
+                <li v-if="!serviceDetail.spending" class="list-group-item">
+                    <strong>Costo promedio: </strong>no aplica
                 </li>
                 <li class="list-group-item">
                     <div v-if="serviceDetail.type == 1">
@@ -344,7 +349,7 @@
                     <b-col>
                         <b-form-group
                             label="Ingrese el costo (en dólares)"
-                            invalid-feedback="El costo no puede ser negativa ni cero"
+                            invalid-feedback="El costo no puede ser negativo"
                             :state="serviceState.spending"
                         >
                             <b-form-input
@@ -484,7 +489,7 @@
                     <b-col>
                         <b-form-group
                             label="Ingrese el costo (en dólares)"
-                            invalid-feedback="El costo no puede ser negativa ni cero"
+                            invalid-feedback="El costo no puede ser negativo"
                             :state="serviceState.spending"
                         >
                             <b-form-input
@@ -990,7 +995,7 @@ export default {
                 this.serviceState.type = false;
                 valid = false;
             }
-            if (this.service.spending <= 0) {
+            if (this.service.spending < 0) {
                 this.serviceState.spending = false;
                 valid = false;
             }

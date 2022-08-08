@@ -184,11 +184,11 @@
                             ></Column>
                             <Column
                                 field="minimum_recovery_time"
-                                header="Mínimo RTO para considerarse crítico"
+                                header="Máximo RTO para criticidad"
                             ></Column>
                             <Column
                                 field="minimum_scale_value"
-                                header="Valor mínimo de la escala para considerar crítico el RTO"
+                                header="Máxima criticidad para el RTO"
                             ></Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
