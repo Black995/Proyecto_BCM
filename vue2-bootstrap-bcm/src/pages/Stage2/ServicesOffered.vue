@@ -264,27 +264,33 @@
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
                 Personal de la organización encargado en el servicio
+                <h1>{{ serviceDetail._staffs_json }}</h1>
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
-                v-for="item in serviceDetail._staffs"
+                v-for="item in serviceDetail._staffs_json"
                 :key="item.key"
             >
                 <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">{{ item.names }} {{ item.surnames }}</h5>
+                    <h5 class="mb-1">
+                        {{ item.staff_names }} {{ item.staff_surnames }}
+                    </h5>
                     <small class="text-muted"
                         >Número de staff: {{ item.staff_number }}
                     </small>
                 </div>
                 <div class="mb-1 d-flex w-100 justify-content-between">
-                    <div>Area: {{ item.area_name }}</div>
-                    <div>Cargo: {{ item.position_name }}</div>
-                    <div>Sede: {{ item.headquarter_name }}</div>
+                    <div>Area: {{ item.staff_area_name }}</div>
+                    <div>Cargo: {{ item.staff_position_name }}</div>
+                    <div>Sede: {{ item.staff_headquarter_name }}</div>
                 </div>
             </b-list-group-item>
-            <h3 class="mt-3 text-center" v-if="!serviceDetail._staffs.length">
+            <!--h3
+                class="mt-3 text-center"
+                v-if="!serviceDetail._staffs_json.length"
+            >
                 No existe personal de la organización encargado en este servicio
-            </h3>
+            </h3-->
 
             <h4 class="mt-5 text-center font-weight-bold">
                 Riesgos del servicios de la organización
@@ -878,13 +884,45 @@
                 :multiple="true"
             ></multiselect>
 
+            <!--div class="card">
+                <div class="card-body table-responsive">
+                    <DataTable
+                        class="header-table"
+                        :value="selectedStaffs"
+                        responsiveLayout="scroll"
+                        :resizableColumns="true"
+                        :autoLayout="true"
+                        :responsive="true"
+                        :reorderableColumns="true"
+                    >
+                        <Column field="names" header="Nombres"></Column>
+                        <Column
+                            field="staff_number"
+                            header="Número de Staff"
+                        ></Column>
+                        <Column field="area_name" header="Area"></Column>
+                        <Column field="position_name" header="Cargo"></Column>
+                        <Column field="headquarter_name" header="Sede"></Column>
+
+                        <template #empty>
+                            No existe personal de la organización encargado e
+                            este servicio de la organización
+                        </template>
+                    </DataTable>
+                </div>
+            </div-->
+
             <b-list-group v-if="selectedStaffs.length" class="mt-3">
                 <b-list-group-item
-                    href="#"
                     class="flex-column align-items-start"
                     v-for="item in selectedStaffs"
                     :key="item.key"
                 >
+                    <b-form-group>
+                        <b-form-checkbox v-model="item.relevant">
+                            Este personal es relevante para el servicio
+                        </b-form-checkbox>
+                    </b-form-group>
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">
                             {{ item.names }}
@@ -1066,7 +1104,7 @@ export default {
             scale_name: "",
             scale_min_value: 0,
             scale_max_value: 0,
-            _staffs: [],
+            _staffs_json: [],
             _risks: [],
         },
         serviceId: 0,
@@ -1228,9 +1266,6 @@ export default {
                         this.scaleView.scale_max_value
                     );
                     this.service.criticality = res.data[0].scale_min_value;
-
-                    console.log("Escala de la vista");
-                    console.log(this.scaleView);
                 })
                 .catch((err) => {
                     try {
@@ -1402,7 +1437,7 @@ export default {
                 scale_name: "",
                 scale_min_value: 0,
                 scale_max_value: 0,
-                _staffs: [],
+                _staffs_json: [],
                 _risks: [],
             };
 
@@ -1414,7 +1449,19 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.serviceDetail = res.data;
+                    this.serviceDetail = {
+                        name: res.data.name,
+                        type_name: res.data.type_name,
+                        profit: res.data.profit,
+                        recovery_time: res.data.recovery_time,
+                        criticality: res.data.criticality,
+                        area_name: res.data.area_name,
+                        scale_name: res.data.scale_name,
+                        scale_min_value: res.data.scale_min_value,
+                        scale_max_value: res.data.scale_max_value,
+                        _risks: res.data._risks,
+                    };
+
                     this.serviceDetail.recovery_time = getRecoveryTimeText(
                         this.serviceDetail.recovery_time
                     );
@@ -1425,6 +1472,51 @@ export default {
                         getRecoveryTimeText(
                             this.serviceDetail.maximum_recovery_time
                         );
+
+                    this.getStaffsServiceDetail(id);
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getStaffsServiceDetail(id) {
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/service_offered_staffs/`, {
+                    params: { service_id: id },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    /*
+                    for (var i = 0; i < res.data.length; i++) {
+                        this.serviceDetail._staffs_json.push(res.data[i]);
+                    }
+                    */
+                    console.log(res.data);
+                    this.serviceDetail._staffs_json = res.data;
+
+                    console.log(this.serviceDetail);
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-detail");
@@ -1807,11 +1899,19 @@ export default {
                 })
                 .then((res) => {
                     for (let i = 0; i < res.data.length; i++) {
-                        res.data[i].names =
-                            res.data[i].names + " " + res.data[i].surnames;
-                        this.staffs.push(res.data);
+                        let staff = {
+                            id: res.data[i].id,
+                            names:
+                                res.data[i].names + " " + res.data[i].surnames,
+                            area_name: res.data[i].area_name,
+                            headquarter_name: res.data[i].headquarter_name,
+                            position_name: res.data[i].position_name,
+                            staff_number: res.data[i].staff_number,
+                            relevant: false,
+                        };
+                        this.staffs.push(staff);
                     }
-                    this.staffs = res.data;
+                    //this.staffs = res.data;
                 })
                 .catch((err) => {
                     try {
@@ -1842,19 +1942,30 @@ export default {
             this.selectedStaffs = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/service/offered/${id}/`, {
+                .get(`${SERVER_ADDRESS}/api/phase2/service_offered_staffs/`, {
+                    params: { service_id: this.serviceId },
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    for (let i = 0; i < res.data._staffs.length; i++) {
-                        res.data._staffs[i].names =
-                            res.data._staffs[i].names +
-                            " " +
-                            res.data._staffs[i].surnames;
-                        this.selectedStaffs.push(res.data._staffs[i]);
+                    for (let i = 0; i < res.data.length; i++) {
+                        let staff = {
+                            id: res.data[i].staff,
+                            names:
+                                res.data[i].staff_names +
+                                " " +
+                                res.data[i].staff_surnames,
+                            area_name: res.data[i].staff_area_name,
+                            headquarter_name:
+                                res.data[i].staff_headquarter_name,
+                            position_name: res.data[i].staff_position_name,
+                            staff_number: res.data[i].staff_number,
+                            relevant: res.data[i].relevant,
+                        };
+
+                        this.selectedStaffs.push(staff);
                     }
 
                     this.$nextTick(() => {
@@ -1885,6 +1996,7 @@ export default {
                 });
         },
         show_modal_confirm_association_staffs() {
+            console.log(this.selectedStaffs);
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-staffs");
             });
@@ -1892,12 +2004,17 @@ export default {
         async associateStaffs() {
             let staffsIds = [];
             for (let i = 0; i < this.selectedStaffs.length; i++) {
-                staffsIds.push(this.selectedStaffs[i].id);
+                let staff = {
+                    staff: this.selectedStaffs[i].id,
+                    relevant: this.selectedStaffs[i].relevant,
+                };
+                staffsIds.push(staff);
             }
             //Es necesario que el array de IDs tenga este nombre
             let ids = {
-                staffs: staffsIds,
+                staffs_json: staffsIds,
             };
+            console.log(ids);
 
             axios
                 .patch(

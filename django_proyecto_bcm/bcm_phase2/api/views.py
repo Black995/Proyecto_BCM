@@ -8,6 +8,7 @@ from .serializers import (InterestedPartyListSerializer, OrganizationActivityLis
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q, F
+from bcm_phase2.api.filters import (SO_SFilterBackend)
 
 
 class ServiceOfferedListViewSet(viewsets.ModelViewSet):
@@ -79,5 +80,6 @@ class SO_SViewSet(viewsets.ModelViewSet):
     model = SO_S
     queryset = SO_S.objects.all()
     serializer_class = SO_SSerializer
+    filter_backends = [SO_SFilterBackend, ]
 
     

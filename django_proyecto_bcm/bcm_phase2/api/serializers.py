@@ -1,3 +1,5 @@
+from wsgiref.simple_server import server_version
+from numpy import delete
 from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity, SO_S
 from configuration.models import ScaleView
 from rest_framework import serializers
@@ -54,6 +56,30 @@ class StaffSerializer(serializers.ModelSerializer):
         ]
 
 
+class SO_SSerializer(serializers.ModelSerializer):
+    staff_number = serializers.CharField(read_only=True, source="staff.staff_number")
+    staff_names = serializers.CharField(read_only=True, source="staff.names")
+    staff_surnames = serializers.CharField(read_only=True, source="staff.surnames")
+    staff_area_name = serializers.CharField(read_only=True, source="staff.area.name")
+    staff_position_name = serializers.CharField(read_only=True, source="staff.position.name")
+    staff_headquarter_name = serializers.CharField(read_only=True, source="staff.headquarter.name")
+
+    class Meta:
+        model = SO_S
+        fields = [
+            'id',
+            'relevant',
+            'service_offered',
+            'staff',
+            'staff_number',
+            'staff_names',
+            'staff_surnames',
+            'staff_area_name',
+            'staff_position_name',
+            'staff_headquarter_name',
+        ] 
+
+
 class ServiceOfferedListSerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only=True)
     area_name = serializers.CharField(read_only=True)
@@ -106,15 +132,17 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
     scale_max_value = serializers.CharField(
         read_only=True, source="scale.max_value")
     # El staffs funciona para llenar los elementos del many to many
-    staffs = serializers.ListField(
-        child=serializers.IntegerField(), required=False, write_only=True)
+    #staffs = serializers.ListField(
+    #    child=serializers.IntegerField(), required=False, write_only=True)
     # Serializer aninado
-    _staffs = StaffSerializer(many=True, read_only=True)
+    #_staffs = StaffSerializer(many=True, read_only=True)
     # El risks funciona para llenar los elementos del many to many
     risks = serializers.ListField(
         child=serializers.IntegerField(), required=False, write_only=True)
     # Serializer aninado
     _risks = RiskSerializer(many=True, read_only=True)
+    staffs_json = serializers.ListField(
+        child=serializers.JSONField(), required=False)
 
     class Meta:
         model = ServiceOffered
@@ -134,10 +162,11 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
             'scale_name',
             'scale_min_value',
             'scale_max_value',
-            'staffs',
-            '_staffs',
+            #'staffs',
+            #'_staffs',
             'risks',
-            '_risks'
+            '_risks',
+            'staffs_json'
         ]
 
     def get_type_name(self, obj):
@@ -150,7 +179,7 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
         recovery_time = attrs.get('recovery_time')
         criticality = attrs.get('criticality')
 
-        if(scale_view):
+        if(scale_view and recovery_time and criticality):
             if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
                 raise serializers.ValidationError( 
                     'La criticidad ingresada es superior al mínimo tolerable para el RTO ingresado')
@@ -158,6 +187,32 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
                 return super().validate(attrs)
         else:
             return super().validate(attrs)
+
+    
+    def update(self, instance, validated_data):
+        id_service = validated_data.get('id', instance.id)
+        staffs_json = validated_data.get('staffs_json')
+        service = ServiceOffered.objects.get(id=id_service)
+
+        """
+            Si se envía el campo staff_json entonces se procede a crear los registros en 
+            el modelo SO_S
+        """
+        if staffs_json is not None:
+            SO_S.objects.filter(service_offered=service).delete()
+
+            for s in staffs_json:
+                staff = Staff.objects.get(id=s['staff'])
+
+                SO_S.objects.create(
+                    relevant=s['relevant'],
+                    service_offered=service,
+                    staff=staff
+                )
+                
+        instance.save()
+        return instance
+
 
 
 class ServiceUsedListSerializer(serializers.ModelSerializer):
@@ -344,53 +399,4 @@ class interestedPartySerializer(serializers.ModelSerializer):
             'type_name',
             'description',
         ] 
-
-
-class SO_SSerializer(serializers.ModelSerializer):
-    staff_number = serializers.CharField(read_only=True, source="staff.staff_number")
-    staff_names = serializers.CharField(read_only=True, source="staff.names")
-    staff_surnames = serializers.CharField(read_only=True, source="staff.surnames")
-    staff_area_name = serializers.CharField(read_only=True, source="staff.area_name")
-    staff_position_name = serializers.CharField(read_only=True, source="staff.position_name")
-    staff_headquarter_name = serializers.CharField(read_only=True, source="staff.headquarter_name")
-
-    class Meta:
-        model = SO_S
-        fields = [
-            'id',
-            'relevant',
-            'service_offered',
-            'staff',
-            'staff_number',
-            'staff_names',
-            'staff_surnames',
-            'staff_area_name',
-            'staff_position_name',
-            'staff_headquarter_name',
-        ] 
-
-
-    def create(self, instance, validated_data):
-        simcard_nueva = validated_data.get('simcard', instance.simcard)
-        numero_cuenta_nuevo = validated_data.get(
-            "numero_cuenta", instance.numero_cuenta)
-
-        if instance.simcard != simcard_nueva:
-            Hist_Simcard.objects.create(tipo=3, simcard=simcard_nueva)
-
-
-        instance.simcard = simcard_nueva
-        instance.numero_cuenta = numero_cuenta_nuevo
-
-        if instance.numero_cuenta:
-            if instance.cliente:
-                instance.cuenta, created = Cuenta.objects.get_or_create(
-                    numero=instance.numero_cuenta)
-            else:
-                raise serializers.ValidationError(
-                    {"numero_cuenta": "El Pos debe estar asignado a un cliente"})
-
-        instance.save()
-
-        return instance
 
