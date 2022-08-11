@@ -70,12 +70,12 @@
                             ></Column>
                             <Column field="end_hour" header="Hora fin"></Column>
                             <Column
-                                field="description"
-                                header="Descripción del incidente"
-                            ></Column>
-                            <Column
                                 field="crisis_scenario_name"
                                 header="Nombre del escenario crítico"
+                            ></Column>
+                            <Column
+                                field="description"
+                                header="Descripción del incidente"
                             ></Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
