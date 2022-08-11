@@ -43,25 +43,8 @@ class ServiceOffered(models.Model):
                               on_delete=models.SET_NULL)
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_service_offered')
-    _staffs = models.ManyToManyField(
-        Staff, related_name='staff_service_offered')
     _risks = models.ManyToManyField(
         Risk, related_name='risk_service_offered')
-
-    @property
-    def staffs(self):
-        return self._staffs.values_list(flat=True)
-
-    @staffs.setter
-    def staffs(self, staffs_ids):
-        # Eliminamos los registros anteriores de los servicios ofrecidos
-        self._staffs.clear()
-        # Guardamos los nuevos registros
-        if(staffs_ids):
-            for staff_id in staffs_ids:
-                staff = Staff.objects.filter(id=staff_id).first()
-                if(staff is not None):
-                    self._staffs.add(staff)
 
     @property
     def risks(self):

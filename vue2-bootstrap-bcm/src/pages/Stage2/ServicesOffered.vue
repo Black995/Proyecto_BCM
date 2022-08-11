@@ -264,11 +264,10 @@
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
                 Personal de la organización encargado en el servicio
-                <h1>{{ serviceDetail._staffs_json }}</h1>
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
-                v-for="item in serviceDetail._staffs_json"
+                v-for="item in staffs_detail"
                 :key="item.key"
             >
                 <div class="d-flex w-100 justify-content-between">
@@ -279,18 +278,25 @@
                         >Número de staff: {{ item.staff_number }}
                     </small>
                 </div>
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 v-if="item.relevant" class="mb-1">
+                        Este personal es relevante para el servicio:
+                        <strong>sí</strong>
+                    </h6>
+                    <h6 v-if="!item.relevant" class="mb-1">
+                        Este personal es relevante para el servicio:
+                        <strong>no</strong>
+                    </h6>
+                </div>
                 <div class="mb-1 d-flex w-100 justify-content-between">
                     <div>Area: {{ item.staff_area_name }}</div>
                     <div>Cargo: {{ item.staff_position_name }}</div>
                     <div>Sede: {{ item.staff_headquarter_name }}</div>
                 </div>
             </b-list-group-item>
-            <!--h3
-                class="mt-3 text-center"
-                v-if="!serviceDetail._staffs_json.length"
-            >
+            <h3 class="mt-3 text-center" v-if="!staffs_detail.length">
                 No existe personal de la organización encargado en este servicio
-            </h3-->
+            </h3>
 
             <h4 class="mt-5 text-center font-weight-bold">
                 Riesgos del servicios de la organización
@@ -1107,6 +1113,7 @@ export default {
             _staffs_json: [],
             _risks: [],
         },
+        staffs_detail: [],
         serviceId: 0,
         serviceName: "",
         type: "",
@@ -1449,7 +1456,9 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.serviceDetail = {
+                    this.serviceDetail = res.data;
+                    /*
+                    {
                         name: res.data.name,
                         type_name: res.data.type_name,
                         profit: res.data.profit,
@@ -1461,6 +1470,7 @@ export default {
                         scale_max_value: res.data.scale_max_value,
                         _risks: res.data._risks,
                     };
+                    */
 
                     this.serviceDetail.recovery_time = getRecoveryTimeText(
                         this.serviceDetail.recovery_time
@@ -1499,6 +1509,8 @@ export default {
                 });
         },
         async getStaffsServiceDetail(id) {
+            this.staffs_detail = [];
+
             axios
                 .get(`${SERVER_ADDRESS}/api/phase2/service_offered_staffs/`, {
                     params: { service_id: id },
@@ -1508,15 +1520,7 @@ export default {
                     },
                 })
                 .then((res) => {
-                    /*
-                    for (var i = 0; i < res.data.length; i++) {
-                        this.serviceDetail._staffs_json.push(res.data[i]);
-                    }
-                    */
-                    console.log(res.data);
-                    this.serviceDetail._staffs_json = res.data;
-
-                    console.log(this.serviceDetail);
+                    this.staffs_detail = res.data;
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-detail");
@@ -1996,7 +2000,6 @@ export default {
                 });
         },
         show_modal_confirm_association_staffs() {
-            console.log(this.selectedStaffs);
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-staffs");
             });
@@ -2014,11 +2017,10 @@ export default {
             let ids = {
                 staffs_json: staffsIds,
             };
-            console.log(ids);
 
             axios
                 .patch(
-                    `${SERVER_ADDRESS}/api/phase2/service/offered/${this.serviceId}/`,
+                    `${SERVER_ADDRESS}/api/phase2/service-offered/staffs/${this.serviceId}/`,
                     ids,
                     {
                         withCredentials: true,
@@ -2030,7 +2032,7 @@ export default {
                 .then((res) => {
                     // Mensaje de éxito
                     this.successMessage(
-                        "¡Los servicios de la organización fueron asociados al servicio contratado exitosamente!"
+                        "¡El personal de la organización fue asociado al servicio de la organización exitosamente!"
                     );
 
                     //Ocultamos los modales
@@ -2154,6 +2156,7 @@ export default {
                 });
         },
         show_modal_confirm_association_risks() {
+            console.log(this.selectedRisks);
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-risks");
             });
@@ -2163,10 +2166,13 @@ export default {
             for (let i = 0; i < this.selectedRisks.length; i++) {
                 risksIds.push(this.selectedRisks[i].id);
             }
+            console.log(risksIds);
             //Es necesario que el array de IDs tenga este nombre
             let ids = {
                 risks: risksIds,
             };
+
+            console.log(ids);
 
             axios
                 .patch(

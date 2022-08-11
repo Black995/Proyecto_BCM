@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, ServiceOfferedListViewSet, ServiceOfferedViewSet,
                     ServiceUsedListViewSet, ServiceUsedViewSet, StaffListViewSet,
                     StaffViewSet,OrganizationActivityListViewSet,OrganizationActivityViewSet, 
-                    SO_SViewSet)
+                    SO_SViewSet, ServiceOfferedWithStaffsViewSet)
 
 
 urlpatterns = [
@@ -15,6 +15,10 @@ urlpatterns = [
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='service_offered_detail'),
+    path('service-offered/staffs/<int:pk>/', ServiceOfferedWithStaffsViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update'}), name='service_offered_with_staffs'),
     path('services/used/', ServiceUsedListViewSet.as_view({
         'get': 'list',
         'post': 'create'}), name='service_used_list'),

@@ -85,6 +85,6 @@ class ScaleView(models.Model):
 
     scale = models.ForeignKey(
         Scale, related_name='scale_view', on_delete=models.CASCADE)
-    minimum_recovery_time = models.DurationField(null=True)
-    minimum_scale_value = models.SmallIntegerField(null=True)
+    minimum_recovery_time = models.DurationField(blank=True, null=True)
+    minimum_scale_value = models.SmallIntegerField(blank=True, null=True)
 

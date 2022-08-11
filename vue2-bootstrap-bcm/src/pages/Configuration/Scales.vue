@@ -561,7 +561,16 @@
                         required
                     ></b-form-select>
                 </b-form-group>
-                <b-row>
+                <!--
+                    Hasta los momentos, estas son las 2 vistas que funcionan con RTO y escala
+                -->
+                <b-row
+                    align-v="center"
+                    v-if="
+                        scaleView.name == 'Actividades de la Organización' ||
+                        scaleView.name == 'Servicios de la Organización'
+                    "
+                >
                     <b-col>
                         <b-form-group
                             label="Mínimo tiempo de recuperación (RTO) para considerarse crítico"

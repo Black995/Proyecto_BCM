@@ -131,11 +131,6 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
         read_only=True, source="scale.min_value")
     scale_max_value = serializers.CharField(
         read_only=True, source="scale.max_value")
-    # El staffs funciona para llenar los elementos del many to many
-    #staffs = serializers.ListField(
-    #    child=serializers.IntegerField(), required=False, write_only=True)
-    # Serializer aninado
-    #_staffs = StaffSerializer(many=True, read_only=True)
     # El risks funciona para llenar los elementos del many to many
     risks = serializers.ListField(
         child=serializers.IntegerField(), required=False, write_only=True)
@@ -162,8 +157,6 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
             'scale_name',
             'scale_min_value',
             'scale_max_value',
-            #'staffs',
-            #'_staffs',
             'risks',
             '_risks',
             'staffs_json'
@@ -187,6 +180,19 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
                 return super().validate(attrs)
         else:
             return super().validate(attrs)
+
+
+class ServiceOfferedWithStaffsSerializer(serializers.ModelSerializer):
+    
+    staffs_json = serializers.ListField(
+        child=serializers.JSONField(), required=False)
+
+    class Meta:
+        model = ServiceOffered
+        fields = [
+            'id',
+            'staffs_json'
+        ]
 
     
     def update(self, instance, validated_data):
@@ -212,7 +218,6 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
                 
         instance.save()
         return instance
-
 
 
 class ServiceUsedListSerializer(serializers.ModelSerializer):
@@ -334,6 +339,23 @@ class OrganizationActivityListSerializer(serializers.ModelSerializer):
             'scale',
             'scale_max_value'
         ]
+            
+    def validate(self, attrs):
+        # Se trae la escala de la vista para validar el mínimo RTO para la criticidad
+        scale_view = ScaleView.objects.filter(name="Servicios de Soporte").first() if ScaleView.objects.filter(name="Servicios de Soporte") else None
+
+        recovery_time = attrs.get('recovery_time')
+        criticality = attrs.get('criticality')
+
+        if(scale_view and recovery_time and criticality):
+            if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
+                raise serializers.ValidationError( 
+                    'La criticidad ingresada es superior al mínimo tolerable para el RTO ingresado')
+            else:
+                return super().validate(attrs)
+        else:
+            return super().validate(attrs)
+
 
 class OrganizationActivitySerializer(serializers.ModelSerializer):
     scale_name = serializers.CharField(read_only=True)
@@ -372,6 +394,22 @@ class OrganizationActivitySerializer(serializers.ModelSerializer):
             'headquarters',
             '_headquarters',
         ]
+
+    def validate(self, attrs):
+        # Se trae la escala de la vista para validar el mínimo RTO para la criticidad
+        scale_view = ScaleView.objects.filter(name="Actividades de la Organización").first() if ScaleView.objects.filter(name="Actividades de la Organización") else None
+
+        recovery_time = attrs.get('recovery_time')
+        criticality = attrs.get('criticality')
+
+        if(scale_view and recovery_time and criticality):
+            if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
+                raise serializers.ValidationError( 
+                    'La criticidad ingresada es superior al mínimo tolerable para el RTO ingresado')
+            else:
+                return super().validate(attrs)
+        else:
+            return super().validate(attrs)
 
 
 class InterestedPartyListSerializer(serializers.ModelSerializer):

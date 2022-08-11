@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from .serializers import (InterestedPartyListSerializer, OrganizationActivityListSerializer, OrganizationActivitySerializer, 
                             ServiceOfferedListSerializer, ServiceOfferedSerializer, ServiceUsedListSerializer, 
                             ServiceUsedSerializer, StaffListSerializer, StaffSerializer, interestedPartySerializer,
-                            SO_SSerializer)
+                            SO_SSerializer, ServiceOfferedWithStaffsSerializer)
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q, F
@@ -22,6 +22,13 @@ class ServiceOfferedViewSet(viewsets.ModelViewSet):
     model = ServiceOffered
     queryset = ServiceOffered.objects.all()
     serializer_class = ServiceOfferedSerializer
+
+
+class ServiceOfferedWithStaffsViewSet(viewsets.ModelViewSet):
+    model = ServiceOffered
+    queryset = ServiceOffered.objects.all()
+    serializer_class = ServiceOfferedWithStaffsSerializer
+
 
 
 class ServiceUsedListViewSet(viewsets.ModelViewSet):
