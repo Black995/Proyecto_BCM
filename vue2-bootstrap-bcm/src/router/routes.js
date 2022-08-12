@@ -27,6 +27,7 @@ import ServicesUsed from "@/pages/Stage2/ServicesUsed.vue";
 import Staffs from "@/pages/Stage2/Staffs.vue";
 // Stage 3
 import IncidentHistory from "@/pages/Stage3/IncidentHistory.vue";
+import IncidentImpact from "@/pages/Stage3/IncidentImpact.vue";
 // Configuration
 import Areas from "@/pages/Configuration/Areas.vue";
 import Positions from "@/pages/Configuration/Positions.vue";
@@ -104,6 +105,11 @@ const routes = [
         path: "historico-incidentes",
         name: "Histórico de Incidentes",
         component: IncidentHistory
+      },
+      {
+        path: "impacto-incidente",
+        name: "Impacto del Incidente",
+        component: IncidentImpact
       },
       /**
        * Configuration

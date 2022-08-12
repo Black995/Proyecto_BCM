@@ -13,8 +13,7 @@ from bcm_phase2.api.filters import (SO_SFilterBackend)
 
 class ServiceOfferedListViewSet(viewsets.ModelViewSet):
     model = ServiceOffered
-    queryset = ServiceOffered.objects.annotate(area_name=F(
-        'area__name'), scale_max_value=F('scale__max_value')).order_by('name')
+    queryset = ServiceOffered.objects.all().order_by('name')
     serializer_class = ServiceOfferedListSerializer
 
 
@@ -33,22 +32,19 @@ class ServiceOfferedWithStaffsViewSet(viewsets.ModelViewSet):
 
 class ServiceUsedListViewSet(viewsets.ModelViewSet):
     model = ServiceUsed
-    queryset = ServiceUsed.objects.annotate(
-        scale_max_value=F('scale__max_value')).order_by('name')
+    queryset = ServiceUsed.objects.all().order_by('name')
     serializer_class = ServiceUsedListSerializer
 
 
 class ServiceUsedViewSet(viewsets.ModelViewSet):
     model = ServiceUsed
-    queryset = ServiceUsed.objects.annotate(scale_name=F('scale__name'), scale_min_value=F(
-        'scale__min_value'), scale_max_value=F('scale__max_value'))
+    queryset = ServiceUsed.objects.all()
     serializer_class = ServiceUsedSerializer
 
 
 class StaffListViewSet(viewsets.ModelViewSet):
     model = Staff
-    queryset = Staff.objects.annotate(area_name=F('area__name'), 
-        position_name=F('position__name')).order_by('staff_number')
+    queryset = Staff.objects.all().order_by('staff_number')
     serializer_class = StaffListSerializer
 
 
@@ -59,14 +55,12 @@ class StaffViewSet(viewsets.ModelViewSet):
 
 class OrganizationActivityListViewSet(viewsets.ModelViewSet):
     model = OrganizationActivity
-    queryset = OrganizationActivity.objects.annotate(
-        scale_max_value=F('scale__max_value')).order_by('name')
+    queryset = OrganizationActivity.objects.all().order_by('name')
     serializer_class = OrganizationActivityListSerializer
 
 class OrganizationActivityViewSet(viewsets.ModelViewSet):
     model = OrganizationActivity
-    queryset = OrganizationActivity.objects.annotate(scale_name=F('scale__name'), scale_min_value=F(
-        'scale__min_value'), scale_max_value=F('scale__max_value'))
+    queryset = OrganizationActivity.objects.all()
 
     serializer_class = OrganizationActivitySerializer
 

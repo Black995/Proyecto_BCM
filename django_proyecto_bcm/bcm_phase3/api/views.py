@@ -1,6 +1,7 @@
 from bcm_phase3.models import IncidentHistory
 from .serializers import (IncidentHistoryListSerializer, IncidentHistorySerializer,
-                            ServicesOfferedAffectedByIncidentSerializer)
+                            ServicesOfferedAffectedByIncidentSerializer, RisksAffectedByIncidentSerializer,
+                            ServicesUsedAffectedByIncidentSerializer, OrganizationActivitiesAffectedByIncidentSerializer)
 from django.db.models import Q, F
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework import viewsets
@@ -18,10 +19,26 @@ class IncidentHistoryViewSet(viewsets.ModelViewSet):
     serializer_class = IncidentHistorySerializer 
 
 
+class RisksAffectedByIncidentViewSet(viewsets.ModelViewSet):
+    model = IncidentHistory
+    queryset = IncidentHistory.objects.all()
+    serializer_class = RisksAffectedByIncidentSerializer 
+
+
 class ServicesOfferedAffectedByIncidentViewSet(viewsets.ModelViewSet):
     model = IncidentHistory
     queryset = IncidentHistory.objects.all()
     serializer_class = ServicesOfferedAffectedByIncidentSerializer 
 
 
+class ServicesUsedAffectedByIncidentViewSet(viewsets.ModelViewSet):
+    model = IncidentHistory
+    queryset = IncidentHistory.objects.all()
+    serializer_class = ServicesUsedAffectedByIncidentSerializer 
+
+
+class OrganizationActivitiesAffectedByIncidentViewSet(viewsets.ModelViewSet):
+    model = IncidentHistory
+    queryset = IncidentHistory.objects.all()
+    serializer_class = OrganizationActivitiesAffectedByIncidentSerializer 
 

@@ -3,7 +3,9 @@ from bcm_phase1.models import CrisisScenario, Risk
 from rest_framework import serializers
 from django.db.models import F, Q
 from django.core.exceptions import ValidationError
-from bcm_phase1.api.serializers import RiskSerializer
+from django.http import JsonResponse
+from bcm_phase1.api.serializers import (RiskSerializer, ServicesOfferedRiskSerializer, 
+                                        ServicesUsedRiskSerializer, OrganizationActivitiesRiskSerializer)
 
 
 
@@ -40,8 +42,10 @@ class IncidentHistorySerializer(serializers.ModelSerializer):
         ]
 
 
-class ServicesOfferedAffectedByIncidentSerializer(serializers.ModelSerializer):
-    risks_incident = serializers.SerializerMethodField(read_only=True)
+class RisksAffectedByIncidentSerializer(serializers.ModelSerializer):
+    crisis_scenario_name = serializers.CharField(read_only=True, source="crisis_scenario.name")
+    # Serializer aninado
+    risks_incident = RiskSerializer(many=True, read_only=True, source='crisis_scenario._risks')
     
     class Meta:
         model = IncidentHistory
@@ -49,9 +53,54 @@ class ServicesOfferedAffectedByIncidentSerializer(serializers.ModelSerializer):
             'id',
             'start_date',
             'end_date',
-            'description',
+            'crisis_scenario_name',
             'risks_incident'
         ]
 
-    def get_risks_incident(self, obj):
-        return Risk.objects.filter(crisis_scenario_risk=obj.id)
+
+class ServicesOfferedAffectedByIncidentSerializer(serializers.ModelSerializer):
+    crisis_scenario_name = serializers.CharField(read_only=True, source="crisis_scenario.name")
+    # Serializer aninado
+    risks_incident = ServicesOfferedRiskSerializer(many=True, read_only=True, source='crisis_scenario._risks')
+    
+    class Meta:
+        model = IncidentHistory
+        fields = [
+            'id',
+            'start_date',
+            'end_date',
+            'crisis_scenario_name',
+            'risks_incident'
+        ]
+
+
+class ServicesUsedAffectedByIncidentSerializer(serializers.ModelSerializer):
+    crisis_scenario_name = serializers.CharField(read_only=True, source="crisis_scenario.name")
+    # Serializer aninado
+    risks_incident = ServicesUsedRiskSerializer(many=True, read_only=True, source='crisis_scenario._risks')
+    
+    class Meta:
+        model = IncidentHistory
+        fields = [
+            'id',
+            'start_date',
+            'end_date',
+            'crisis_scenario_name',
+            'risks_incident'
+        ]
+
+
+class OrganizationActivitiesAffectedByIncidentSerializer(serializers.ModelSerializer):
+    crisis_scenario_name = serializers.CharField(read_only=True, source="crisis_scenario.name")
+    # Serializer aninado
+    risks_incident = OrganizationActivitiesRiskSerializer(many=True, read_only=True, source='crisis_scenario._risks')
+    
+    class Meta:
+        model = IncidentHistory
+        fields = [
+            'id',
+            'start_date',
+            'end_date',
+            'crisis_scenario_name',
+            'risks_incident'
+        ]

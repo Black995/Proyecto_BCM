@@ -28,21 +28,3 @@ class CrisisScenarioListRisksViewSet(viewsets.ModelViewSet):
     queryset = CrisisScenario.objects.all()
     serializer_class = CrisisScenarioSerializer
 
-
-
-
-# Ejemplo de ViewSet (no de ModelViewSet)
-"""
-class RiskViewSet(viewsets.ViewSet):
-    model = Risk
-    queryset = Risk.objects.all()
-    serializer_class = RiskSerializer
-
-    def list(self, request):
-        queryset = Risk.objects.all()
-        serializer = RiskSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def create(self, serializer):
-        serializer.save()
-"""

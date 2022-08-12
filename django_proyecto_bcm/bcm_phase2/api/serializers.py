@@ -82,8 +82,8 @@ class SO_SSerializer(serializers.ModelSerializer):
 
 class ServiceOfferedListSerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only=True)
-    area_name = serializers.CharField(read_only=True)
-    scale_max_value = serializers.CharField(read_only=True)
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
 
     class Meta:
         model = ServiceOffered
@@ -222,7 +222,7 @@ class ServiceOfferedWithStaffsSerializer(serializers.ModelSerializer):
 
 class ServiceUsedListSerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only=True)
-    scale_max_value = serializers.CharField(read_only=True)
+    scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
 
     class Meta:
         model = ServiceUsed
@@ -244,9 +244,9 @@ class ServiceUsedListSerializer(serializers.ModelSerializer):
 
 class ServiceUsedSerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only=True)
-    scale_name = serializers.CharField(read_only=True)
-    scale_min_value = serializers.CharField(read_only=True)
-    scale_max_value = serializers.CharField(read_only=True)
+    scale_name = serializers.CharField(read_only=True, source="scale.name")
+    scale_min_value = serializers.CharField(read_only=True, source="scale.min_value")
+    scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
     # El service_offered funciona para llenar los elementos del many to many
     services_offered = serializers.ListField(
         child=serializers.IntegerField(), required=False, write_only=True)
@@ -282,8 +282,8 @@ class ServiceUsedSerializer(serializers.ModelSerializer):
         return dict(ServiceUsed.TYPE).get(obj.type)
 
 class StaffListSerializer(serializers.ModelSerializer):
-    area_name = serializers.CharField(read_only=True)
-    position_name = serializers.CharField(read_only=True)
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    position_name = serializers.CharField(read_only=True, source="position.name")
 
     class Meta:
         model = Staff
@@ -325,7 +325,7 @@ class StaffSerializer(serializers.ModelSerializer):
         ]
 
 class OrganizationActivityListSerializer(serializers.ModelSerializer):
-    scale_max_value = serializers.CharField(read_only=True)
+    scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
 
     class Meta:
         model = OrganizationActivity
@@ -358,7 +358,7 @@ class OrganizationActivityListSerializer(serializers.ModelSerializer):
 
 
 class OrganizationActivitySerializer(serializers.ModelSerializer):
-    scale_name = serializers.CharField(read_only=True)
+    scale_name = serializers.CharField(read_only=True, source="scale.name")
     scale_min_value = serializers.CharField(read_only=True, source="scale.min_value")
     scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
     

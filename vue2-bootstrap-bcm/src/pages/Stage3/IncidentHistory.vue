@@ -565,7 +565,6 @@ export default {
         },
 
         async getCrisisScenarios() {
-            this.loading = true;
             this.crisisScenarios = [];
 
             axios
@@ -577,7 +576,6 @@ export default {
                 })
                 .then((res) => {
                     this.crisisScenarios = res.data;
-                    this.loading = false;
                 })
                 .catch((err) => {
                     try {

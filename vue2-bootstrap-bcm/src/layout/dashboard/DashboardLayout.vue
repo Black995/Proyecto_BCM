@@ -121,6 +121,15 @@
                     name="Histórico de Incidentes"
                     icon="ti-exchange-vertical"
                 />
+                <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase3.view_incidenthistory')
+                    "
+                    to="/layout/impacto-incidente"
+                    name="Impacto del Incidente"
+                    icon="ti-blackboard"
+                />
                 <!--
                     Encabezado Configuración
                 -->

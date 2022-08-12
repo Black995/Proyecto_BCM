@@ -868,7 +868,9 @@ export default {
             });
         },
         async getBussinesActivities() {
+            this.loading = true;
             this.activities = [];
+
             axios
                 .get(`${SERVER_ADDRESS}/api/phase2/organizationActivities/`, {
                     withCredentials: true,
