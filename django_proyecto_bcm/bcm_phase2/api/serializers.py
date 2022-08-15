@@ -1,3 +1,4 @@
+from curses.ascii import SO
 from wsgiref.simple_server import server_version
 from numpy import delete
 from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity, SO_S
@@ -425,6 +426,7 @@ class InterestedPartyListSerializer(serializers.ModelSerializer):
             'description'
         ]
 
+
 class interestedPartySerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only = True)
 
@@ -438,3 +440,27 @@ class interestedPartySerializer(serializers.ModelSerializer):
             'description',
         ] 
 
+
+class ServiceOfferedStaffSerializer(serializers.ModelSerializer):
+    type_name = serializers.SerializerMethodField(read_only=True)
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    # Serializer aninado
+    staffs_service = SO_SSerializer(many=True, read_only=True, source="service_offered_so_s")
+
+    class Meta:
+        model = ServiceOffered
+        fields = [
+            'id',
+            'name',
+            'type_name',
+            'profit',
+            'recovery_time',
+            'recovery_point',
+            'maximum_recovery_time',
+            'criticality',
+            'area_name',
+            'staffs_service'
+        ]
+
+    def get_type_name(self, obj):
+        return dict(ServiceOffered.TYPE).get(obj.type)

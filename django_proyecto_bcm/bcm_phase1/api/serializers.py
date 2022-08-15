@@ -6,9 +6,9 @@ from django.db.models import F, Q
     Funciones utilizadas para el importe de los serializers con el fin de evitar
     problemas de recursividad de archivos
 """
-def service_offered_list_serializer():
-    from bcm_phase2.api.serializers import ServiceOfferedListSerializer
-    return ServiceOfferedListSerializer
+def service_offered_staffs_serializer():
+    from bcm_phase2.api.serializers import ServiceOfferedStaffSerializer
+    return ServiceOfferedStaffSerializer
 
 def service_used_list_serializer():
     from bcm_phase2.api.serializers import ServiceUsedListSerializer
@@ -67,7 +67,7 @@ class CrisisScenarioListSerializer(serializers.ModelSerializer):
 
 class ServicesOfferedRiskSerializer(serializers.ModelSerializer):
     # Serializer aninado
-    services_offered_risk = service_offered_list_serializer()(many=True, read_only=True, source='risk_service_offered')
+    services_offered_risk = service_offered_staffs_serializer()(many=True, read_only=True, source='risk_service_offered')
 
     class Meta:
         model = Risk

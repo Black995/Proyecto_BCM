@@ -20,7 +20,7 @@
         <b-row class="mt-3" align-v="center">
             <b-col>
                 <h5 v-if="loadingServicesOffered" class="text-center">
-                    Criticidad de los servicios de la organización
+                    Criticidad de los servicios de la organización afectados
                 </h5>
                 <div v-if="loadingServicesOffered" id="services-offered">
                     <apexchart
@@ -33,7 +33,7 @@
             </b-col>
             <b-col>
                 <h5 v-if="loadingServicesUsed" class="text-center">
-                    Criticidad de los servicios de soporte
+                    Criticidad de los servicios de soporte afectados
                 </h5>
                 <div v-if="loadingServicesUsed" id="services-used">
                     <apexchart
@@ -48,7 +48,7 @@
         <b-row class="mt-3" align-v="center">
             <b-col>
                 <h5 v-if="loadingOrgActivities" class="text-center">
-                    Criticidad de las actividades del negocio
+                    Criticidad de las actividades del negocio afectadas
                 </h5>
                 <div v-if="loadingOrgActivities" id="organization-activities">
                     <apexchart
@@ -59,7 +59,19 @@
                     ></apexchart>
                 </div>
             </b-col>
-            <b-col> </b-col>
+            <b-col>
+                <h5 v-if="loadingStaffsArea" class="text-center">
+                    Cantidad del personal afectado por área
+                </h5>
+                <div v-if="loadingStaffsArea" id="staffs-area">
+                    <apexchart
+                        type="polarArea"
+                        height="500"
+                        :options="chartOptionsStaffsArea"
+                        :series="seriesStaffsArea"
+                    ></apexchart>
+                </div>
+            </b-col>
         </b-row>
     </div>
 </template>
@@ -88,6 +100,8 @@ export default {
         servicesOffered: [],
         servicesUsed: [],
         organizationActivities: [],
+        staffs: [],
+        staffsArea: [],
 
         /**
          * Variables a utilizar para las gráficas de ApexChart
@@ -156,7 +170,7 @@ export default {
                     breakpoint: 480,
                     options: {
                         chart: {
-                            width: 200,
+                            width: 350,
                         },
                         legend: {
                             position: "bottom",
@@ -240,7 +254,7 @@ export default {
                     breakpoint: 480,
                     options: {
                         chart: {
-                            width: 200,
+                            width: 350,
                         },
                         legend: {
                             position: "bottom",
@@ -313,7 +327,47 @@ export default {
                     breakpoint: 480,
                     options: {
                         chart: {
-                            width: 200,
+                            width: 350,
+                        },
+                        legend: {
+                            position: "bottom",
+                        },
+                    },
+                },
+            ],
+        },
+        loadingStaffsArea: false,
+        seriesStaffsArea: [],
+        chartOptionsStaffsArea: {
+            chart: {
+                id: "staffs-area",
+                height: 200,
+                width: 400,
+                type: "radialBar",
+            },
+            stroke: {
+                colors: ["#fff"],
+            },
+            fill: {
+                opacity: 0.8,
+            },
+            yaxis: {
+                labels: {
+                    rotate: 0,
+                    rotateAlways: false,
+                    formatter: function (val) {
+                        return val.toFixed(0);
+                    },
+                },
+                decimalsInFloat: 0,
+            },
+            labels: [],
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 350,
                         },
                         legend: {
                             position: "bottom",
@@ -532,9 +586,54 @@ export default {
         },
         changeIncident() {
             this.getRisks();
-            this.getServicesOffered();
+            this.getServicesOfferedStaff();
             this.getServicesUsed();
             this.getOrganizationActivities();
+        },
+        countStaffsArea() {
+            console.log("Función para contar personal por área");
+            this.staffsArea = [];
+
+            this.staffs.forEach((x) => {
+                // Checking if there is any object in arr2
+                // which contains the key value
+                if (
+                    this.staffsArea.some((val) => {
+                        return val.staff_area_name == x.staff_area_name;
+                    })
+                ) {
+                    // If yes! then increase the occurrence by 1
+                    this.staffsArea.forEach((k) => {
+                        if (k.staff_area_name === x.staff_area_name) {
+                            k["occurrence"]++;
+                        }
+                    });
+                } else {
+                    // If not! Then create a new object initialize
+                    // it with the present iteration key's value and
+                    // set the occurrence to 1
+                    let a = {};
+                    a = {
+                        staff_area_name: x.staff_area_name,
+                        occurrence: 1,
+                    };
+                    this.staffsArea.push(a);
+                }
+            });
+
+            console.log("Cantidad de staffs por área");
+            console.log(this.staffsArea);
+
+            for (var i = 0; i < this.staffsArea.length; i++) {
+                this.chartOptionsStaffsArea.labels.push(
+                    this.staffsArea[i].staff_area_name
+                );
+                this.seriesStaffsArea.push(this.staffsArea[i].occurrence);
+            }
+            console.log("Elementos para la gráfica del personal");
+            console.log(this.seriesStaffsArea);
+            console.log(this.chartOptionsStaffsArea.labels);
+            this.loadingStaffsArea = true;
         },
         getRisks() {
             this.risks = [];
@@ -575,11 +674,15 @@ export default {
                     }
                 });
         },
-        getServicesOffered() {
+        getServicesOfferedStaff() {
+            this.loadingServicesOffered = false;
+            this.loadingStaffsArea = false;
             this.servicesOffered = [];
+            this.staffs = [];
             this.chartOptionsServicesOffered.xaxis.categories = [];
             this.seriesServicesOffered[0].data = [];
-            this.loadingServicesOffered = false;
+            this.chartOptionsStaffsArea.labels = [];
+            this.seriesStaffsArea = [];
 
             axios
                 .get(
@@ -600,10 +703,11 @@ export default {
                                 .length;
                             j++
                         ) {
+                            // Servicios de la org.
                             if (
                                 !this.servicesOffered.find(
-                                    (k) =>
-                                        k.id ===
+                                    (x) =>
+                                        x.id ===
                                         res.data.risks_incident[i]
                                             .services_offered_risk[j].id
                                 )
@@ -624,10 +728,77 @@ export default {
                                         .services_offered_risk[j].criticality
                                 );
                             }
+                            // Staffs
+                            for (
+                                var k = 0;
+                                k <
+                                res.data.risks_incident[i]
+                                    .services_offered_risk[j].staffs_service
+                                    .length;
+                                k++
+                            ) {
+                                // En caso de que no esté el objeto en el array
+                                if (
+                                    !this.staffs.find(
+                                        (x) =>
+                                            x.staff ===
+                                            res.data.risks_incident[i]
+                                                .services_offered_risk[j]
+                                                .staffs_service[k].staff
+                                    )
+                                ) {
+                                    this.staffs.push(
+                                        res.data.risks_incident[i]
+                                            .services_offered_risk[j]
+                                            .staffs_service[k]
+                                    );
+                                }
+                                // En caso de que sí esté el objeto en el array,
+                                // entonces verificamos si aparece como relevante
+                                else {
+                                    if (
+                                        !this.staffs.find(
+                                            (x) =>
+                                                x.staff ===
+                                                    res.data.risks_incident[i]
+                                                        .services_offered_risk[
+                                                        j
+                                                    ].staffs_service[k].staff &&
+                                                res.data.risks_incident[i]
+                                                    .services_offered_risk[j]
+                                                    .staffs_service[k]
+                                                    .relevant === true
+                                        )
+                                    ) {
+                                        for (var z = 0; z < this.staffs; z++) {
+                                            if (
+                                                this.staffs[z].staff ==
+                                                res.data.risks_incident[i]
+                                                    .services_offered_risk[j]
+                                                    .staffs_service[k].staff
+                                            ) {
+                                                this.staffs[z] = objArr.slice(
+                                                    0,
+                                                    z
+                                                );
+                                                this.staffs.push(
+                                                    res.data.risks_incident[i]
+                                                        .services_offered_risk[
+                                                        j
+                                                    ].staffs_service[k]
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     //console.log("Servicios de la organización:");
                     //console.log(this.servicesOffered);
+                    //console.log("Staffs:");
+                    //console.log(this.staffs);
+                    this.countStaffsArea();
                     this.loadingServicesOffered = true;
                 })
                 .catch((err) => {
