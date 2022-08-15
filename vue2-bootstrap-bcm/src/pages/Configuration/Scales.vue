@@ -1211,29 +1211,39 @@ export default {
              * escala para el rto (minimum_scale_value) no sea menor o igual que el mínimo
              * valor de la escala (scale.min_value)
              */
-            for (var i = 0; i < this.scales.length; i++) {
-                if (
-                    this.scales[i].id == this.scaleView.scale &&
-                    this.scales[i].min_value >=
-                        this.scaleView.minimum_scale_value
-                ) {
-                    this.errorMessage(
-                        "El valor mínimo de la escala para el RTO no puede ser menor al valor mínimo disponible para la escala"
-                    );
-                    valid = false;
-                }
-                if (
-                    this.scales[i].id == this.scaleView.scale &&
-                    (this.scaleView.minimum_scale_value <
-                        this.scales[i].min_value ||
-                        this.scaleView.minimum_scale_value >
-                            this.scales[i].max_value)
-                ) {
-                    this.scaleViewState.minimum_scale_value = false;
-                    valid = false;
+            console.log("Escala de las vistas");
+            console.log(this.scaleView);
+            console.log(this.scaleView.name);
+            if (
+                this.scaleView.name == "Actividades de la Organización" ||
+                this.scaleView.name == "Servicios de la Organización"
+            ) {
+                for (var i = 0; i < this.scales.length; i++) {
+                    if (
+                        this.scales[i].id == this.scaleView.scale &&
+                        this.scales[i].min_value >=
+                            this.scaleView.minimum_scale_value
+                    ) {
+                        this.errorMessage(
+                            "El valor mínimo de la escala para el RTO no puede ser menor al valor mínimo disponible para la escala"
+                        );
+                        valid = false;
+                    }
+                    if (
+                        this.scales[i].id == this.scaleView.scale &&
+                        (this.scaleView.minimum_scale_value <
+                            this.scales[i].min_value ||
+                            this.scaleView.minimum_scale_value >
+                                this.scales[i].max_value)
+                    ) {
+                        this.scaleViewState.minimum_scale_value = false;
+                        valid = false;
+                    }
                 }
             }
             if (
+                (this.scaleView.name == "Actividades de la Organización" ||
+                    this.scaleView.name == "Servicios de la Organización") &&
                 this.minimumRecoveryTimeScaleDuration.days == 0 &&
                 this.minimumRecoveryTimeScaleDuration.hours == 0 &&
                 this.minimumRecoveryTimeScaleDuration.minutes == 0
@@ -1247,6 +1257,8 @@ export default {
                 );
                 valid = false;
             }
+            console.log("VALIDO");
+            console.log(valid);
             return valid;
         },
         resetModalScaleView() {
