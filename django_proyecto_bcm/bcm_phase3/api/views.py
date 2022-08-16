@@ -1,7 +1,8 @@
 from bcm_phase3.models import IncidentHistory
 from .serializers import (IncidentHistoryListSerializer, IncidentHistorySerializer,
                             ServicesOfferedAffectedByIncidentSerializer, RisksAffectedByIncidentSerializer,
-                            ServicesUsedAffectedByIncidentSerializer, OrganizationActivitiesAffectedByIncidentSerializer)
+                            ServicesUsedAffectedByIncidentSerializer, OrganizationActivitiesAffectedByIncidentSerializer,
+                            )
 from django.db.models import Q, F
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework import viewsets

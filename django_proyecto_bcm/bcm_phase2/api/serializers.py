@@ -464,3 +464,4 @@ class ServiceOfferedStaffSerializer(serializers.ModelSerializer):
 
     def get_type_name(self, obj):
         return dict(ServiceOffered.TYPE).get(obj.type)
+

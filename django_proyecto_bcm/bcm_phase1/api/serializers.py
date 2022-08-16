@@ -18,6 +18,8 @@ def organization_activity_list_serializer():
     from bcm_phase2.api.serializers import OrganizationActivityListSerializer
     return OrganizationActivityListSerializer
 
+    
+
 
 class RiskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -100,4 +102,5 @@ class OrganizationActivitiesRiskSerializer(serializers.ModelSerializer):
             'name',
             'organization_activities_risk'
         ]
+
 

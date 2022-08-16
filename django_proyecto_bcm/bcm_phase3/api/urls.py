@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (IncidentHistoryListViewSet, IncidentHistoryViewSet, 
                     RisksAffectedByIncidentViewSet, ServicesOfferedAffectedByIncidentViewSet,
-                    ServicesUsedAffectedByIncidentViewSet, OrganizationActivitiesAffectedByIncidentViewSet)
+                    ServicesUsedAffectedByIncidentViewSet, OrganizationActivitiesAffectedByIncidentViewSet,
+                    )
 
  
 
@@ -21,5 +22,5 @@ urlpatterns = [
     path('incident-history/services-used/<int:pk>/', ServicesUsedAffectedByIncidentViewSet.as_view({
         'get': 'retrieve'}), name='incident_history_services_used'),
     path('incident-history/organization-activities/<int:pk>/', OrganizationActivitiesAffectedByIncidentViewSet.as_view({
-        'get': 'retrieve'}), name='incident_history_organization_activities'),        
+        'get': 'retrieve'}), name='incident_history_organization_activities'),
 ]
