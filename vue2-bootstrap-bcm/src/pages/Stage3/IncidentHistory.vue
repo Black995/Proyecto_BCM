@@ -512,12 +512,18 @@ export default {
                 })
                 .then((res) => {
                     for (var i = 0; i < res.data.length; i++) {
+                        let end_date = "";
+                        let end_hour = "";
+                        if (res.data[i].end_date) {
+                            end_date = res.data[i].end_date.slice(0, 10);
+                            end_hour = res.data[i].end_date.slice(11, 16);
+                        }
                         let inc = {
                             id: res.data[i].id,
                             start_date: res.data[i].start_date.slice(0, 10),
                             start_hour: res.data[i].start_date.slice(11, 16),
-                            end_date: res.data[i].end_date.slice(0, 10),
-                            end_hour: res.data[i].end_date.slice(11, 16),
+                            end_date: end_date,
+                            end_hour: end_hour,
                             description: res.data[i].description,
                             crisis_scenario_name:
                                 res.data[i].crisis_scenario_name,
@@ -614,6 +620,15 @@ export default {
                 this.incidentState.start_time = false;
                 valid = false;
             }
+            if (this.endDateTime.date && !this.endDateTime.time) {
+                this.incidentState.end_time = false;
+                valid = false;
+            }
+            if (!this.endDateTime.date && this.endDateTime.time) {
+                this.incidentState.end_date = false;
+                valid = false;
+            }
+            /*
             if (!this.endDateTime.date) {
                 this.incidentState.end_date = false;
                 valid = false;
@@ -622,6 +637,7 @@ export default {
                 this.incidentState.end_time = false;
                 valid = false;
             }
+            */
             if (!this.incident.crisis_scenario) {
                 this.incidentState.crisis_scenario = false;
                 valid = false;
@@ -644,7 +660,9 @@ export default {
         handleSubmitCreate() {
             // Inicializamos variables de estados
             this.incidentState.start_date = null;
+            this.incidentState.start_time = null;
             this.incidentState.end_date = null;
+            this.incidentState.end_time = null;
             this.incidentState.description = null;
             this.incidentState.crisis_scenario = null;
 
@@ -661,8 +679,13 @@ export default {
         async createIncident() {
             this.incident.start_date =
                 this.startDateTime.date + " " + this.startDateTime.time;
-            this.incident.end_date =
-                this.endDateTime.date + " " + this.endDateTime.time;
+
+            if (this.endDateTime.date && this.endDateTime.time) {
+                this.incident.end_date =
+                    this.endDateTime.date + " " + this.endDateTime.time;
+            } else {
+                this.incident.end_date = null;
+            }
 
             axios
                 .post(
@@ -719,7 +742,9 @@ export default {
         handleSubmitUpdate() {
             // Inicializamos variables de estados
             this.incidentState.start_date = null;
+            this.incidentState.start_time = null;
             this.incidentState.end_date = null;
+            this.incidentState.end_time = null;
             this.incidentState.description = null;
             this.incidentState.crisis_scenario = null;
 
@@ -755,10 +780,12 @@ export default {
                         date: res.data.start_date.slice(0, 10),
                         time: res.data.start_date.slice(11, 16),
                     };
-                    this.endDateTime = {
-                        date: res.data.end_date.slice(0, 10),
-                        time: res.data.end_date.slice(11, 16),
-                    };
+                    if (res.date.end_date) {
+                        this.endDateTime = {
+                            date: res.data.end_date.slice(0, 10),
+                            time: res.data.end_date.slice(11, 16),
+                        };
+                    }
 
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
@@ -790,8 +817,13 @@ export default {
         async updateIncident() {
             this.incident.start_date =
                 this.startDateTime.date + " " + this.startDateTime.time;
-            this.incident.end_date =
-                this.endDateTime.date + " " + this.endDateTime.time;
+
+            if (this.endDateTime.date && this.endDateTime.time) {
+                this.incident.end_date =
+                    this.endDateTime.date + " " + this.endDateTime.time;
+            } else {
+                this.incident.end_date = null;
+            }
 
             axios
                 .patch(

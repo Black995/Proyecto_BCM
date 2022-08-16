@@ -626,9 +626,9 @@ export default {
                 })
                 .then((res) => {
                     for (var i = 0; i < res.data.length; i++) {
-                        let inc = {
-                            id: res.data[i].id,
-                            name:
+                        let name = "";
+                        if (res.data[i].end_date) {
+                            name =
                                 res.data[i].crisis_scenario_name +
                                 " (Fecha de inicio: " +
                                 res.data[i].start_date.slice(0, 10) +
@@ -638,7 +638,19 @@ export default {
                                 res.data[i].end_date.slice(0, 10) +
                                 " " +
                                 res.data[i].end_date.slice(11, 16) +
-                                ")",
+                                ")";
+                        } else {
+                            name =
+                                res.data[i].crisis_scenario_name +
+                                " (Fecha de inicio: " +
+                                res.data[i].start_date.slice(0, 10) +
+                                " " +
+                                res.data[i].start_date.slice(11, 16) +
+                                " - Fecha fin: - )";
+                        }
+                        let inc = {
+                            id: res.data[i].id,
+                            name: name,
                             description: res.data[i].description,
                         };
                         this.incidents.push(inc);
@@ -942,15 +954,17 @@ export default {
                     }
                 )
                 .then((res) => {
-                    let start_date_incident = new Date(
-                        res.data.start_date
-                    ).getTime();
-                    let end_date_incident = new Date(
-                        res.data.end_date
-                    ).getTime();
-                    // Duración del incidente en milisegundos
-                    this.incidentDurationTime =
-                        end_date_incident - start_date_incident;
+                    if (res.data.end_date) {
+                        let start_date_incident = new Date(
+                            res.data.start_date
+                        ).getTime();
+                        let end_date_incident = new Date(
+                            res.data.end_date
+                        ).getTime();
+                        // Duración del incidente en milisegundos
+                        this.incidentDurationTime =
+                            end_date_incident - start_date_incident;
+                    }
 
                     for (var i = 0; i < res.data.risks_incident.length; i++) {
                         for (
@@ -976,45 +990,52 @@ export default {
                                 /**
                                  * Cálculo del RTO del servicio con la duración de
                                  * la incidencia
+                                 *
+                                 * SÓLO SE APLICA SI EXISTE LA FECHA FINAL DE LA INCIDENCIA
                                  */
-                                let hours = parseInt(
-                                    res.data.risks_incident[
-                                        i
-                                    ].services_offered_risk[
-                                        j
-                                    ].recovery_time.slice(0, 2)
-                                );
-                                let minutes = parseInt(
-                                    res.data.risks_incident[
-                                        i
-                                    ].services_offered_risk[
-                                        j
-                                    ].recovery_time.slice(3, 5)
-                                );
-                                let recovery_time_service =
-                                    hours * 3600000 + minutes * 60000;
                                 let exceed_recovery_time = false;
-                                if (
-                                    this.incidentDurationTime <=
-                                    recovery_time_service
-                                ) {
-                                    exceed_recovery_time = true;
+                                if (res.data.end_date) {
+                                    let hours = parseInt(
+                                        res.data.risks_incident[
+                                            i
+                                        ].services_offered_risk[
+                                            j
+                                        ].recovery_time.slice(0, 2)
+                                    );
+                                    let minutes = parseInt(
+                                        res.data.risks_incident[
+                                            i
+                                        ].services_offered_risk[
+                                            j
+                                        ].recovery_time.slice(3, 5)
+                                    );
+                                    let recovery_time_service =
+                                        hours * 3600000 + minutes * 60000;
+                                    if (
+                                        this.incidentDurationTime <=
+                                        recovery_time_service
+                                    ) {
+                                        exceed_recovery_time = true;
+                                    }
+                                    let serviceByRTO = {
+                                        id: res.data.risks_incident[i]
+                                            .services_offered_risk[j].id,
+                                        area_name:
+                                            res.data.risks_incident[i]
+                                                .services_offered_risk[j]
+                                                .area_name,
+                                        name: res.data.risks_incident[i]
+                                            .services_offered_risk[j].name,
+                                        type_name:
+                                            res.data.risks_incident[i]
+                                                .services_offered_risk[j]
+                                                .type_name,
+                                        recovery_time: recovery_time_service,
+                                        exceed_recovery_time:
+                                            exceed_recovery_time,
+                                    };
+                                    this.servicesByRTO.push(serviceByRTO);
                                 }
-                                let serviceByRTO = {
-                                    id: res.data.risks_incident[i]
-                                        .services_offered_risk[j].id,
-                                    area_name:
-                                        res.data.risks_incident[i]
-                                            .services_offered_risk[j].area_name,
-                                    name: res.data.risks_incident[i]
-                                        .services_offered_risk[j].name,
-                                    type_name:
-                                        res.data.risks_incident[i]
-                                            .services_offered_risk[j].type_name,
-                                    recovery_time: recovery_time_service,
-                                    exceed_recovery_time: exceed_recovery_time,
-                                };
-                                this.servicesByRTO.push(serviceByRTO);
                                 /**
                                  * Variables para la gráfica de servicios de la org.
                                  */
@@ -1114,9 +1135,12 @@ export default {
                     //console.log("RTO de los servicios");
                     //console.log(this.servicesByRTO);
                     this.countStaffsArea();
-                    this.countServicesMinimumRTO();
                     this.loadingServicesOffered = true;
-                    this.loadingServicesOnlyMinimumRTO = true;
+
+                    if (res.data.end_date) {
+                        this.countServicesMinimumRTO();
+                        this.loadingServicesOnlyMinimumRTO = true;
+                    }
                 })
                 .catch((err) => {
                     try {

@@ -5,7 +5,7 @@ from bcm_phase1.models import CrisisScenario
 
 class IncidentHistory(models.Model):
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True, blank=True)
     description = models.CharField(max_length=200, null=True, blank=True)
 
     crisis_scenario = models.ForeignKey(
