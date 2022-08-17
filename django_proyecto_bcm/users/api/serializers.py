@@ -13,14 +13,15 @@ from django.utils.translation import ugettext_lazy as _
 
 class PermissionSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
+    model_name = serializers.CharField(read_only=True, source="content_type.model")
 
     class Meta:
         model = Permission
         fields = [
             'id',
             'name',
-            'content_type_id',
             'codename',
+            'model_name',
         ]
 
     def get_name(self, obj):

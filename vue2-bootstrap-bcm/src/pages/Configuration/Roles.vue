@@ -204,17 +204,31 @@
                     :multiple="true"
                 ></multiselect>
 
-                <b-list-group v-if="selectedPermissions.length" class="mt-3">
-                    <b-list-group-item
-                        href="#"
-                        class="flex-column align-items-start"
-                        v-for="item in selectedPermissions"
-                        :key="item.key"
-                    >
-                        <h5 class="mb-1">{{ item.name }}</h5>
-                        <p class="mb-2">Nombre clave: {{ item.codename }}</p>
-                    </b-list-group-item>
-                </b-list-group>
+                <div v-if="selectedPermissions.length" class="mt-5">
+                    <h3 class="text-center">Permisos separados por tablas</h3>
+                    <div v-for="title in modelsList" :key="title">
+                        <b-card header-tag="header" footer-tag="footer">
+                            <template #header>
+                                <h5>{{ title }}</h5>
+                            </template>
+                            <div
+                                v-for="item in selectedPermissions"
+                                :key="item.key"
+                            >
+                                <b-list-group-item
+                                    v-if="title == item.model_name"
+                                    href="#"
+                                    class="flex-column align-items-start"
+                                >
+                                    <h5 class="mb-1">{{ item.name }}</h5>
+                                    <p class="mb-2">
+                                        Nombre clave: {{ item.codename }}
+                                    </p>
+                                </b-list-group-item>
+                            </div>
+                        </b-card>
+                    </div>
+                </div>
 
                 <h3 class="mt-3 text-center" v-if="!selectedPermissions.length">
                     No existen permisos asociados a este rol
@@ -294,17 +308,31 @@
                     :multiple="true"
                 ></multiselect>
 
-                <b-list-group v-if="selectedPermissions.length" class="mt-3">
-                    <b-list-group-item
-                        href="#"
-                        class="flex-column align-items-start"
-                        v-for="item in selectedPermissions"
-                        :key="item.key"
-                    >
-                        <h5 class="mb-1">{{ item.name }}</h5>
-                        <p class="mb-2">Nombre clave: {{ item.codename }}</p>
-                    </b-list-group-item>
-                </b-list-group>
+                <div v-if="selectedPermissions.length" class="mt-5">
+                    <h3 class="text-center">Permisos separados por tablas</h3>
+                    <div v-for="title in modelsList" :key="title">
+                        <b-card header-tag="header" footer-tag="footer">
+                            <template #header>
+                                <h5>{{ title }}</h5>
+                            </template>
+                            <div
+                                v-for="item in selectedPermissions"
+                                :key="item.key"
+                            >
+                                <b-list-group-item
+                                    v-if="title == item.model_name"
+                                    href="#"
+                                    class="flex-column align-items-start"
+                                >
+                                    <h5 class="mb-1">{{ item.name }}</h5>
+                                    <p class="mb-2">
+                                        Nombre clave: {{ item.codename }}
+                                    </p>
+                                </b-list-group-item>
+                            </div>
+                        </b-card>
+                    </div>
+                </div>
 
                 <h3 class="mt-3 text-center" v-if="!selectedPermissions.length">
                     No existen permisos asociados a este rol
@@ -388,6 +416,7 @@ export default {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
         permissionsList: [],
+        modelsList: [],
         is_superuser: false,
 
         roles: [],
@@ -475,6 +504,7 @@ export default {
         },
         async getPermissions() {
             this.permissionsList = [];
+            this.modelsList = [];
 
             axios
                 .get(`${SERVER_ADDRESS}/api/users/permissions/`, {
@@ -485,6 +515,13 @@ export default {
                 })
                 .then((res) => {
                     this.permissionsList = res.data;
+
+                    // Guardar solamente los nombres de los modelos
+                    this.permissionsList.forEach((x) => {
+                        if (!this.modelsList.includes(x.model_name)) {
+                            this.modelsList.push(x.model_name);
+                        }
+                    });
                 })
                 .catch((err) => {
                     try {

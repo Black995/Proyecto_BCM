@@ -327,3 +327,15 @@ msgstr "Puede actualizar sesión"
 
 msgid "Can delete session"
 msgstr "Puede eliminar sesión"
+
+msgid "Can add s o_s"
+msgstr "Puede agregar relevancia al staff de acuerdo al servicio"
+
+msgid "Can view s o_s"
+msgstr "Puede ver relevancia del staff de acuerdo al servicio"
+
+msgid "Can change s o_s"
+msgstr "Puede actualizar relevancia al staff de acuerdo al servicio"
+
+msgid "Can delete s o_s"
+msgstr "Puede eliminar relevancia al staff de acuerdo al servicio"

@@ -29,7 +29,7 @@ class StaffsWithoutUserViewSet(viewsets.ModelViewSet):
 
 class PermissionViewSet(viewsets.ModelViewSet):
     model = Permission
-    queryset = Permission.objects.all().order_by('name')
+    queryset = Permission.objects.annotate(model_name=F('content_type__model')).order_by('model_name', 'name')
     serializer_class = PermissionSerializer
 
 
