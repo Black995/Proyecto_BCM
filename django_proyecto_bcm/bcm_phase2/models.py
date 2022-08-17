@@ -9,6 +9,12 @@ class Staff(models.Model):
     names = models.CharField(max_length=100)
     surnames = models.CharField(max_length=100)
     earnings = models.FloatField(default=0)
+    phone_number_1 = models.CharField(max_length=20)
+    phone_number_code_1 = models.CharField(max_length=5)
+    phone_number_1_format_international = models.CharField(max_length=20)
+    phone_number_2 = models.CharField(max_length=20, null=True, blank=True)
+    phone_number_code_2 = models.CharField(max_length=5, null=True, blank=True)
+    phone_number_2_format_international = models.CharField(max_length=20, null=True, blank=True)
 
     headquarter = models.ForeignKey(Headquarter, related_name='headquarter_staff', null=True,
                                     on_delete=models.SET_NULL)
@@ -33,9 +39,9 @@ class ServiceOffered(models.Model):
     type = models.SmallIntegerField(choices=TYPE)
     profit = models.FloatField()
     recovery_time = models.DurationField()
-    criticality = models.SmallIntegerField(null=True)
-    recovery_point = models.DurationField(null=True)
-    maximum_recovery_time = models.DurationField(null=True)
+    criticality = models.SmallIntegerField(null=True, blank=True)
+    recovery_point = models.DurationField(null=True, blank=True)
+    maximum_recovery_time = models.DurationField(null=True, blank=True)
 
     area = models.ForeignKey(Area, related_name='area_service_offered', null=True,
                              on_delete=models.SET_NULL)
@@ -170,7 +176,7 @@ class OrganizationActivity(models.Model):
     description = models.CharField(max_length=200)
     cost = models.FloatField()
     recovery_time = models.DurationField()
-    criticality = models.SmallIntegerField(null=True)
+    criticality = models.SmallIntegerField(null=True, blank=True)
 
     _services_offered = models.ManyToManyField(
         ServiceOffered, related_name='service_offered_organizacion_activity')
@@ -220,7 +226,7 @@ class OrganizationActivity(models.Model):
 
 class Ressource(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    description = models.CharField(max_length=200, null=True)
+    description = models.CharField(max_length=200, null=True, blank=True)
     amount = models.PositiveIntegerField(default=0)
 
 

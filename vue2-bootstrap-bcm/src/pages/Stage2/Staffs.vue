@@ -175,6 +175,25 @@
                     <strong>Número de Identificación: </strong
                     >{{ staffDetail.staff_number }}
                 </li>
+                <li class="list-group-item">
+                    <strong>Teléfono 1: </strong>({{
+                        staffDetail.phone_number_code_1
+                    }}) {{ staffDetail.phone_number_1_format_international }}
+                </li>
+                <li
+                    v-if="staffDetail.phone_number_2_format_international"
+                    class="list-group-item"
+                >
+                    <strong>Teléfono 2: </strong>({{
+                        staffDetail.phone_number_code_2
+                    }}) {{ staffDetail.phone_number_2_format_international }}
+                </li>
+                <li
+                    v-if="!staffDetail.phone_number_2_format_international"
+                    class="list-group-item"
+                >
+                    <strong>Teléfono 2: </strong>-
+                </li>
                 <li v-if="staffDetail.earnings" class="list-group-item">
                     <strong>Ingreso promedio: </strong
                     >{{ staffDetail.earnings }}
@@ -281,6 +300,34 @@
                                 :state="staffState.area"
                                 required
                             ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese el teléfono 1 del personal"
+                            invalid-feedback="Es necesario cumplir con el formato del país seleccionado"
+                            :state="staffState.phone_number_1"
+                        >
+                            <VuePhoneNumberInput
+                                v-model="staff.phone_number_1"
+                                v-bind="phone_number_1_props.props"
+                                @update="onUpdateNumber1"
+                            />
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese el teléfono 2 del personal (opcional)"
+                            invalid-feedback="Es necesario cumplir con el formato del país seleccionado"
+                            :state="staffState.phone_number_2"
+                        >
+                            <VuePhoneNumberInput
+                                v-model="staff.phone_number_2"
+                                v-bind="phone_number_2_props.props"
+                                @update="onUpdateNumber2"
+                            />
                         </b-form-group>
                     </b-col>
                 </b-row>
@@ -447,6 +494,34 @@
                 <b-row>
                     <b-col>
                         <b-form-group
+                            label="Ingrese el teléfono 1 del personal"
+                            invalid-feedback="Es necesario cumplir con el formato del país seleccionado"
+                            :state="staffState.phone_number_1"
+                        >
+                            <VuePhoneNumberInput
+                                v-model="staff.phone_number_1"
+                                v-bind="phone_number_1_props.props"
+                                @update="onUpdateNumber1"
+                            />
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese el teléfono 2 del personal (opcional)"
+                            invalid-feedback="Es necesario cumplir con el formato del país seleccionado"
+                            :state="staffState.phone_number_2"
+                        >
+                            <VuePhoneNumberInput
+                                v-model="staff.phone_number_2"
+                                v-bind="phone_number_2_props.props"
+                                @update="onUpdateNumber2"
+                            />
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col>
+                        <b-form-group
                             label="Ingrese el ingreso promedio personal (en dólares)"
                             invalid-feedback="Este campo no puede ser negativo"
                             :state="staffState.earnings"
@@ -559,10 +634,13 @@ import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import { FilterMatchMode } from "primevue/api";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
+import VuePhoneNumberInput from "vue-phone-number-input";
 
 export default {
     name: "Staffs",
-
+    components: {
+        VuePhoneNumberInput,
+    },
     data: () => ({
         loading: false,
         filterGlobal: {
@@ -584,6 +662,10 @@ export default {
             position_name: "",
             headquarter_name: "",
             user_email: "",
+            phone_number_code_1: "",
+            phone_number_1_format_international: "",
+            phone_number_code_2: "",
+            phone_number_2_format_international: "",
         },
         staffId: 0,
 
@@ -591,6 +673,12 @@ export default {
             staff_number: "",
             names: "",
             surnames: "",
+            phone_number_1: "",
+            phone_number_code_1: "",
+            phone_number_1_format_international: "",
+            phone_number_2: "",
+            phone_number_code_2: "",
+            phone_number_2_format_international: "",
             earnings: 0,
             area: 0,
             position: 0,
@@ -600,6 +688,8 @@ export default {
             staff_number: null,
             names: null,
             surnames: null,
+            phone_number_1: null,
+            phone_number_2: null,
             earnings: null,
             area: null,
             position: null,
@@ -609,6 +699,24 @@ export default {
         areas: [],
         positions: [],
         headquarters: [],
+        phone_number_1_props: {
+            props: {
+                countryCode: "",
+                defaultCountryCode: "VE",
+                isValid: true,
+                error: false,
+                formatInternational: "",
+            },
+        },
+        phone_number_2_props: {
+            props: {
+                countryCode: "",
+                defaultCountryCode: "VE",
+                isValid: true,
+                error: false,
+                formatInternational: "",
+            },
+        },
     }),
     mounted() {
         this.getStaffs();
@@ -635,6 +743,20 @@ export default {
                 verticalAlign: "top",
                 type: "danger",
             });
+        },
+        onUpdateNumber1(payload) {
+            //console.log("payload");
+            //console.log(payload);
+            this.phone_number_1_props.props.countryCode = payload.countryCode;
+            this.phone_number_1_props.props.isValid = payload.isValid;
+            this.phone_number_1_props.props.formatInternational =
+                payload.formatInternational;
+        },
+        onUpdateNumber2(payload) {
+            this.phone_number_2_props.props.countryCode = payload.countryCode;
+            this.phone_number_2_props.props.isValid = payload.isValid;
+            this.phone_number_2_props.props.formatInternational =
+                payload.formatInternational;
         },
         async getAreas() {
             this.areas = [];
@@ -814,6 +936,29 @@ export default {
                 this.staffState.staff_number = false;
                 valid = false;
             }
+            if (!this.staff.phone_number_1) {
+                this.phone_number_1_props.props.error = true;
+                this.staffState.phone_number_1 = false;
+                valid = false;
+            }
+
+            /**
+             * En caso de que el teléfono no cumpla el formato adecuado
+             */
+            if (!this.phone_number_1_props.props.isValid) {
+                this.phone_number_1_props.props.error = true;
+                this.staffState.phone_number_1 = false;
+                valid = false;
+            }
+            if (
+                !this.phone_number_2_props.props.isValid &&
+                this.staff.phone_number_2
+            ) {
+                this.phone_number_2_props.props.error = true;
+                this.staffState.phone_number_2 = false;
+                valid = false;
+            }
+
             if (this.staff.earnings < 0) {
                 this.staffState.earnings = false;
                 valid = false;
@@ -847,6 +992,12 @@ export default {
             this.staffState.position = null;
             this.staff.headquarter = 0;
             this.staffState.headquarter = null;
+            this.staff.phone_number_1 = "";
+            this.phone_number_1_props.props.error = false;
+            this.staffState.phone_number_1 = null;
+            this.staff.phone_number_2 = "";
+            this.phone_number_2_props.props.error = false;
+            this.staffState.phone_number_2 = null;
         },
 
         /**
@@ -862,6 +1013,10 @@ export default {
                 position_name: "",
                 headquarter_name: "",
                 user_email: "",
+                phone_number_code_1: "",
+                phone_number_1_format_international: "",
+                phone_number_code_2: "",
+                phone_number_2_format_international: "",
             };
 
             axios
@@ -914,6 +1069,14 @@ export default {
             this.staffState.area = null;
             this.staffState.position = null;
             this.staffState.headquarter = null;
+            this.phone_number_1_props.props.error = false;
+            this.staffState.phone_number_1 = null;
+            this.phone_number_2_props.props.error = false;
+            this.staffState.phone_number_2 = null;
+
+            console.log("Staff");
+            console.log(this.staff);
+            console.log(this.phone_number_1_props);
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -926,6 +1089,15 @@ export default {
             });
         },
         async createStaff() {
+            // Se le agregar los códigos de teléfono
+            this.staff.phone_number_code_1 =
+                this.phone_number_1_props.props.countryCode;
+            this.staff.phone_number_1_format_international =
+                this.phone_number_1_props.props.formatInternational;
+            this.staff.phone_number_code_2 =
+                this.phone_number_2_props.props.countryCode;
+            this.staff.phone_number_2_format_international =
+                this.phone_number_2_props.props.formatInternational;
             // Validar de que si se dejó vacío el campo de ganancia entonces se coloca cero
             if (!this.staff.earnings) {
                 this.staff.earnings = 0;
@@ -988,6 +1160,10 @@ export default {
             this.staffState.area = null;
             this.staffState.position = null;
             this.staffState.headquarter = null;
+            this.phone_number_1_props.props.error = false;
+            this.staffState.phone_number_1 = null;
+            this.phone_number_2_props.props.error = false;
+            this.staffState.phone_number_2 = null;
 
             // Exit when the form isn't valid
             if (!this.checkFormValidity()) {
@@ -1011,6 +1187,20 @@ export default {
                 })
                 .then((res) => {
                     this.staff = res.data;
+
+                    if (res.data.phone_number_code_1) {
+                        this.phone_number_1_props.props.countryCode =
+                            res.data.phone_number_code_1;
+                        this.phone_number_1_props.props.defaultCountryCode =
+                            res.data.phone_number_code_1;
+                    }
+                    if (res.data.phone_number_code_2) {
+                        this.phone_number_2_props.props.countryCode =
+                            res.data.phone_number_code_2;
+                        this.phone_number_2_props.props.defaultCountryCode =
+                            res.data.phone_number_code_2;
+                    }
+
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-update");
                     });
@@ -1039,6 +1229,14 @@ export default {
                 });
         },
         async updateStaff() {
+            this.staff.phone_number_code_1 =
+                this.phone_number_1_props.props.countryCode;
+            this.staff.phone_number_1_format_international =
+                this.phone_number_1_props.props.formatInternational;
+            this.staff.phone_number_code_2 =
+                this.phone_number_2_props.props.countryCode;
+            this.staff.phone_number_2_format_international =
+                this.phone_number_2_props.props.formatInternational;
             // Validar de que si se dejó vacío el campo de ganancia entonces se coloca cero
             if (!this.staff.earnings) {
                 this.staff.earnings = 0;

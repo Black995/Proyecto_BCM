@@ -293,6 +293,19 @@
                     <div>Cargo: {{ item.staff_position_name }}</div>
                     <div>Sede: {{ item.staff_headquarter_name }}</div>
                 </div>
+                <div class="mb-1 d-flex w-100 justify-content-between">
+                    <div>
+                        Teléfono 1: ({{ item.staff_phone_number_code_1 }})
+                        {{ item.staff_phone_number_1_format_international }}
+                    </div>
+                    <div v-if="item.staff_phone_number_2_format_international">
+                        Teléfono 2: ({{ item.staff_phone_number_code_2 }})
+                        {{ item.staff_phone_number_2_format_international }}
+                    </div>
+                    <div v-if="!item.staff_phone_number_2_format_international">
+                        Teléfono 2: -
+                    </div>
+                </div>
             </b-list-group-item>
             <h3 class="mt-3 text-center" v-if="!staffs_detail.length">
                 No existe personal de la organización encargado en este servicio
@@ -890,34 +903,6 @@
                 :multiple="true"
             ></multiselect>
 
-            <!--div class="card">
-                <div class="card-body table-responsive">
-                    <DataTable
-                        class="header-table"
-                        :value="selectedStaffs"
-                        responsiveLayout="scroll"
-                        :resizableColumns="true"
-                        :autoLayout="true"
-                        :responsive="true"
-                        :reorderableColumns="true"
-                    >
-                        <Column field="names" header="Nombres"></Column>
-                        <Column
-                            field="staff_number"
-                            header="Número de Staff"
-                        ></Column>
-                        <Column field="area_name" header="Area"></Column>
-                        <Column field="position_name" header="Cargo"></Column>
-                        <Column field="headquarter_name" header="Sede"></Column>
-
-                        <template #empty>
-                            No existe personal de la organización encargado e
-                            este servicio de la organización
-                        </template>
-                    </DataTable>
-                </div>
-            </div-->
-
             <b-list-group v-if="selectedStaffs.length" class="mt-3">
                 <b-list-group-item
                     class="flex-column align-items-start"
@@ -941,6 +926,19 @@
                         <div>Area: {{ item.area_name }}</div>
                         <div>Cargo: {{ item.position_name }}</div>
                         <div>Sede: {{ item.headquarter_name }}</div>
+                    </div>
+                    <div class="mb-1 d-flex w-100 justify-content-between">
+                        <div>
+                            Teléfono 1: ({{ item.phone_number_code_1 }})
+                            {{ item.phone_number_1_format_international }}
+                        </div>
+                        <div v-if="item.phone_number_2_format_international">
+                            Teléfono 2: ({{ item.phone_number_code_2 }})
+                            {{ item.phone_number_2_format_international }}
+                        </div>
+                        <div v-if="!item.phone_number_2_format_international">
+                            Teléfono 2: -
+                        </div>
                     </div>
                 </b-list-group-item>
             </b-list-group>
@@ -1520,6 +1518,8 @@ export default {
                     },
                 })
                 .then((res) => {
+                    console.log("DETALLE DEL STAFF");
+                    console.log(res.data);
                     this.staffs_detail = res.data;
 
                     this.$nextTick(() => {
@@ -1911,6 +1911,14 @@ export default {
                             headquarter_name: res.data[i].headquarter_name,
                             position_name: res.data[i].position_name,
                             staff_number: res.data[i].staff_number,
+                            phone_number_code_1:
+                                res.data[i].phone_number_code_1,
+                            phone_number_1_format_international:
+                                res.data[i].phone_number_1_format_international,
+                            phone_number_code_2:
+                                res.data[i].phone_number_code_2,
+                            phone_number_2_format_international:
+                                res.data[i].phone_number_2_format_international,
                             relevant: false,
                         };
                         this.staffs.push(staff);
@@ -1966,6 +1974,16 @@ export default {
                                 res.data[i].staff_headquarter_name,
                             position_name: res.data[i].staff_position_name,
                             staff_number: res.data[i].staff_number,
+                            phone_number_code_1:
+                                res.data[i].staff_phone_number_code_1,
+                            phone_number_1_format_international:
+                                res.data[i]
+                                    .staff_phone_number_1_format_international,
+                            phone_number_code_2:
+                                res.data[i].staff_phone_number_code_2,
+                            phone_number_2_format_international:
+                                res.data[i]
+                                    .staff_phone_number_2_format_international,
                             relevant: res.data[i].relevant,
                         };
 
@@ -2156,7 +2174,6 @@ export default {
                 });
         },
         show_modal_confirm_association_risks() {
-            console.log(this.selectedRisks);
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-risks");
             });
@@ -2166,13 +2183,10 @@ export default {
             for (let i = 0; i < this.selectedRisks.length; i++) {
                 risksIds.push(this.selectedRisks[i].id);
             }
-            console.log(risksIds);
             //Es necesario que el array de IDs tenga este nombre
             let ids = {
                 risks: risksIds,
             };
-
-            console.log(ids);
 
             axios
                 .patch(

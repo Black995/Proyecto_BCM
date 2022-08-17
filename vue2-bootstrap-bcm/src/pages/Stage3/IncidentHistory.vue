@@ -2,7 +2,40 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <b-row align-v="center">
+                    <b-col>
+                        <b-form-group
+                            label="Fecha inicio del filtro"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="incidentDateFilterState.start_date"
+                        >
+                            <b-form-datepicker
+                                v-model="incidentDateFilter.start_date"
+                                :state="incidentDateFilterState.start_date"
+                                locale="es"
+                            ></b-form-datepicker>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-form-group
+                            label="Fecha fin del filtro"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="incidentDateFilterState.end_date"
+                        >
+                            <b-form-datepicker
+                                v-model="incidentDateFilter.end_date"
+                                :state="incidentDateFilterState.end_date"
+                                locale="es"
+                            ></b-form-datepicker>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-button variant="info" block @click="getIncidents">
+                            Filtrar
+                        </b-button>
+                    </b-col>
+                </b-row>
+                <div class="card mt-5">
                     <div class="card-body table-responsive">
                         <DataTable
                             class="header-table"
@@ -471,6 +504,14 @@ export default {
             date: "",
             time: "",
         },
+        incidentDateFilter: {
+            start_date: "",
+            end_date: "",
+        },
+        incidentDateFilterState: {
+            start_date: null,
+            end_date: null,
+        },
         crisisScenarios: [],
     }),
     mounted() {
@@ -499,63 +540,107 @@ export default {
                 type: "danger",
             });
         },
+        checkFormValidityFilters() {
+            let valid = true;
+            if (
+                !this.incidentDateFilter.start_date &&
+                this.incidentDateFilter.end_date
+            ) {
+                this.incidentDateFilterState.start_date = false;
+                valid = false;
+            }
+            if (
+                this.incidentDateFilter.start_date &&
+                !this.incidentDateFilter.end_date
+            ) {
+                this.incidentDateFilterState.end_date = false;
+                valid = false;
+            }
+            if (
+                this.incidentDateFilter.start_date &&
+                this.incidentDateFilter.end_date &&
+                this.incidentDateFilter.start_date >
+                    this.incidentDateFilter.end_date
+            ) {
+                this.errorMessage(
+                    "La fecha inicio no puede ser superior a la fecha fin"
+                );
+                valid = false;
+            }
+            return valid;
+        },
         async getIncidents() {
-            this.loading = true;
-            this.incidents = [];
+            this.incidentDateFilterState.start_date = null;
+            this.incidentDateFilterState.end_date = null;
 
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase3/incident-histories/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
-                .then((res) => {
-                    for (var i = 0; i < res.data.length; i++) {
-                        let end_date = "";
-                        let end_hour = "";
-                        if (res.data[i].end_date) {
-                            end_date = res.data[i].end_date.slice(0, 10);
-                            end_hour = res.data[i].end_date.slice(11, 16);
+            // Exit when the filter isn't valid
+            if (!this.checkFormValidityFilters()) {
+                return;
+            } else {
+                this.loading = true;
+                this.incidents = [];
+
+                axios
+                    .get(`${SERVER_ADDRESS}/api/phase3/incident-histories/`, {
+                        params: {
+                            start_date: this.incidentDateFilter.start_date,
+                            end_date: this.incidentDateFilter.end_date,
+                        },
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    })
+                    .then((res) => {
+                        for (var i = 0; i < res.data.length; i++) {
+                            let end_date = "";
+                            let end_hour = "";
+                            if (res.data[i].end_date) {
+                                end_date = res.data[i].end_date.slice(0, 10);
+                                end_hour = res.data[i].end_date.slice(11, 16);
+                            }
+                            let inc = {
+                                id: res.data[i].id,
+                                start_date: res.data[i].start_date.slice(0, 10),
+                                start_hour: res.data[i].start_date.slice(
+                                    11,
+                                    16
+                                ),
+                                end_date: end_date,
+                                end_hour: end_hour,
+                                description: res.data[i].description,
+                                crisis_scenario_name:
+                                    res.data[i].crisis_scenario_name,
+                            };
+                            this.incidents.push(inc);
                         }
-                        let inc = {
-                            id: res.data[i].id,
-                            start_date: res.data[i].start_date.slice(0, 10),
-                            start_hour: res.data[i].start_date.slice(11, 16),
-                            end_date: end_date,
-                            end_hour: end_hour,
-                            description: res.data[i].description,
-                            crisis_scenario_name:
-                                res.data[i].crisis_scenario_name,
-                        };
-                        this.incidents.push(inc);
-                    }
-                    this.loading = false;
+                        this.loading = false;
 
-                    this.getCrisisScenarios();
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
+                        this.getCrisisScenarios();
+                    })
+                    .catch((err) => {
+                        try {
+                            // Error 400 por unicidad o 500 generico
+                            if (err.response.status == 400) {
+                                for (let e in err.response.data) {
+                                    this.errorMessage(
+                                        e + ": " + err.response.data[e]
+                                    );
+                                }
+                            } else {
+                                // Servidor no disponible
                                 this.errorMessage(
-                                    e + ": " + err.response.data[e]
+                                    "Ups! Ha ocurrido un error en el servidor"
                                 );
                             }
-                        } else {
+                        } catch {
                             // Servidor no disponible
                             this.errorMessage(
                                 "Ups! Ha ocurrido un error en el servidor"
                             );
                         }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
+                    });
+            }
         },
         /**
          * Filtros que se manejan en Prime Vue

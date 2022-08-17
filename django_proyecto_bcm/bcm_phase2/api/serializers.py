@@ -22,6 +22,12 @@ class StaffListSerializer(serializers.ModelSerializer):
             'staff_number',
             'names',
             'surnames',
+            'phone_number_1',
+            'phone_number_code_1',
+            'phone_number_1_format_international',
+            'phone_number_2',
+            'phone_number_code_2',
+            'phone_number_2_format_international',
             'earnings',
             'area',
             'area_name',
@@ -45,6 +51,12 @@ class StaffSerializer(serializers.ModelSerializer):
             'staff_number',
             'names',
             'surnames',
+            'phone_number_1',
+            'phone_number_code_1',
+            'phone_number_1_format_international',
+            'phone_number_2',
+            'phone_number_code_2',
+            'phone_number_2_format_international',
             'earnings',
             'area',
             'area_name',
@@ -52,7 +64,7 @@ class StaffSerializer(serializers.ModelSerializer):
             'position_name',
             'headquarter',
             'headquarter_name',
-            'user_staff',
+            #'user_staff',
             'user_email'
         ]
 
@@ -64,6 +76,10 @@ class SO_SSerializer(serializers.ModelSerializer):
     staff_area_name = serializers.CharField(read_only=True, source="staff.area.name")
     staff_position_name = serializers.CharField(read_only=True, source="staff.position.name")
     staff_headquarter_name = serializers.CharField(read_only=True, source="staff.headquarter.name")
+    staff_phone_number_code_1 = serializers.CharField(read_only=True, source="staff.phone_number_code_1")
+    staff_phone_number_1_format_international = serializers.CharField(read_only=True, source="staff.phone_number_1_format_international")
+    staff_phone_number_code_2 = serializers.CharField(read_only=True, source="staff.phone_number_code_2")
+    staff_phone_number_2_format_international = serializers.CharField(read_only=True, source="staff.phone_number_2_format_international")
 
     class Meta:
         model = SO_S
@@ -78,6 +94,10 @@ class SO_SSerializer(serializers.ModelSerializer):
             'staff_area_name',
             'staff_position_name',
             'staff_headquarter_name',
+            'staff_phone_number_code_1',
+            'staff_phone_number_1_format_international',
+            'staff_phone_number_code_2',
+            'staff_phone_number_2_format_international',
         ] 
 
 
@@ -281,49 +301,6 @@ class ServiceUsedSerializer(serializers.ModelSerializer):
 
     def get_type_name(self, obj):
         return dict(ServiceUsed.TYPE).get(obj.type)
-
-class StaffListSerializer(serializers.ModelSerializer):
-    area_name = serializers.CharField(read_only=True, source="area.name")
-    position_name = serializers.CharField(read_only=True, source="position.name")
-
-    class Meta:
-        model = Staff
-        fields = [
-            'id',
-            'staff_number',
-            'names',
-            'surnames',
-            'earnings',
-            'area',
-            'area_name',
-            'position',
-            'position_name',
-            'headquarter'
-        ]
-
-
-class StaffSerializer(serializers.ModelSerializer):
-    area_name = serializers.CharField(read_only=True, source="area.name")
-    position_name = serializers.CharField(read_only=True, source="position.name")
-    headquarter_name = serializers.CharField(read_only=True, source="headquarter.name")
-    user_email = serializers.CharField(read_only=True, source="user_staff.email")
-
-    class Meta:
-        model = Staff
-        fields = [
-            'id',
-            'staff_number',
-            'names',
-            'surnames',
-            'earnings',
-            'area',
-            'area_name',
-            'position',
-            'position_name',
-            'headquarter',
-            'headquarter_name',
-            'user_email'
-        ]
 
 class OrganizationActivityListSerializer(serializers.ModelSerializer):
     scale_max_value = serializers.CharField(read_only=True, source="scale.max_value")
