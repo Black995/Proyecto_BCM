@@ -19,10 +19,39 @@
         </b-row>
         <b-row class="mt-3" align-v="center">
             <b-col>
-                <h5 v-if="loadingServicesOffered" class="text-center">
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    class="text-center"
+                >
                     Criticidad de los servicios de la organización afectados
                 </h5>
-                <div v-if="loadingServicesOffered" id="services-offered">
+                <!--
+                    En caso de colocar la clase que facilite el scroll
+                -->
+                <!--div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    id="services-offered"
+                    class="chart"
+                -->
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    id="services-offered"
+                >
                     <apexchart
                         type="bar"
                         height="500"
@@ -31,11 +60,29 @@
                     ></apexchart>
                 </div>
             </b-col>
+        </b-row>
+        <b-row class="mt-3" align-v="center">
             <b-col>
-                <h5 v-if="loadingServicesUsed" class="text-center">
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    class="text-center"
+                >
                     Criticidad de los servicios de soporte afectados
                 </h5>
-                <div v-if="loadingServicesUsed" id="services-used">
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    id="services-used"
+                >
                     <apexchart
                         type="bar"
                         height="500"
@@ -47,10 +94,26 @@
         </b-row>
         <b-row class="mt-3" align-v="center">
             <b-col>
-                <h5 v-if="loadingOrgActivities" class="text-center">
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    class="text-center"
+                >
                     Criticidad de las actividades del negocio afectadas
                 </h5>
-                <div v-if="loadingOrgActivities" id="organization-activities">
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    id="organization-activities"
+                >
                     <apexchart
                         type="bar"
                         height="500"
@@ -60,10 +123,26 @@
                 </div>
             </b-col>
             <b-col>
-                <h5 v-if="loadingStaffsArea" class="text-center">
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    class="text-center"
+                >
                     Cantidad del personal afectado por área
                 </h5>
-                <div v-if="loadingStaffsArea" id="staffs-area">
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    id="staffs-area"
+                >
                     <apexchart
                         type="polarArea"
                         height="500"
@@ -75,11 +154,31 @@
         </b-row>
         <b-row class="mt-3" align-v="center">
             <b-col>
-                <h5 v-if="loadingServicesMinimunRTO" class="text-center">
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea &&
+                        loadingServicesOnlyMinimumRTO &&
+                        loadingServicesMinimunRTO
+                    "
+                    class="text-center"
+                >
                     Servicios que excedieron el RTO debido a la duración de la
                     incidencias
                 </h5>
-                <div v-if="loadingServicesMinimunRTO" id="services-minimum-rto">
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea &&
+                        loadingServicesOnlyMinimumRTO &&
+                        loadingServicesMinimunRTO
+                    "
+                    id="services-minimum-rto"
+                >
                     <apexchart
                         type="pie"
                         height="500"
@@ -89,12 +188,29 @@
                 </div>
             </b-col>
             <b-col>
-                <h5 v-if="loadingServicesOnlyMinimumRTO" class="text-center">
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea &&
+                        loadingServicesOnlyMinimumRTO &&
+                        loadingServicesMinimunRTO
+                    "
+                    class="text-center"
+                >
                     Servicios que excedieron el RTO debido a la duración de la
                     incidencias
                 </h5>
                 <div
-                    v-if="loadingServicesOnlyMinimumRTO"
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea &&
+                        loadingServicesOnlyMinimumRTO &&
+                        loadingServicesMinimunRTO
+                    "
                     id="services-only-minimum-rto"
                 >
                     <apexchart
@@ -150,91 +266,8 @@ export default {
                 data: [],
             },
         ],
-        chartOptionsServicesOffered: {
-            chart: {
-                id: "services-offered",
-                type: "bar",
-                height: 100,
-                width: 200,
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 10,
-                    dataLabels: {
-                        position: "top", // top, center, bottom
-                    },
-                },
-            },
-            xaxis: {
-                categories: [],
-                position: "top",
-                axisBorder: {
-                    show: false,
-                },
-                axisTicks: {
-                    show: false,
-                },
-                crosshairs: {
-                    fill: {
-                        type: "gradient",
-                        gradient: {
-                            colorFrom: "#D8E3F0",
-                            colorTo: "#BED1E6",
-                            stops: [0, 100],
-                            opacityFrom: 0.4,
-                            opacityTo: 0.5,
-                        },
-                    },
-                },
-                tooltip: {
-                    enabled: true,
-                },
-            },
-            yaxis: {
-                min: 0,
-                max: 0,
-                labels: {
-                    rotate: 0,
-                    rotateAlways: false,
-                    formatter: function (val) {
-                        return val.toFixed(0);
-                    },
-                },
-                decimalsInFloat: 0,
-            },
-            responsive: [
-                {
-                    breakpoint: 480,
-                    options: {
-                        chart: {
-                            width: 350,
-                        },
-                        legend: {
-                            position: "bottom",
-                        },
-                    },
-                },
-            ],
-            noData: {
-                text: "No se encontraron servicios de la organización",
-                align: "center",
-                verticalAlign: "middle",
-                style: {
-                    fontSize: "14px",
-                },
-            },
-            /*
-            title: {
-                text: "Criticidad de los servicios de la organización",
-                floating: true,
-                //offsetY: 330,
-                align: "center",
-                style: {
-                    color: "#718AFF",
-                },
-            },
-            */
-        },
+        test: 0,
+
         loadingServicesUsed: false,
         seriesServicesUsed: [
             {
@@ -592,7 +625,101 @@ export default {
         this.getServiceUsedScale();
         this.getOrgActivitiesScale();
     },
+    computed: {
+        chartOptionsServicesOffered: function () {
+            return {
+                chart: {
+                    id: "services-offered",
+                    type: "bar",
+                    height: 100,
+                    width: 0,
+                    events: {
+                        dataPointSelection: (event, chartContext, config) => {
+                            console.log(config.dataPointIndex);
+                            //this.test = config.dataPointIndex;
+                            this.testFunction(config.dataPointIndex);
+                        },
+                    },
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 10,
+                        dataLabels: {
+                            position: "top", // top, center, bottom
+                        },
+                    },
+                },
+                xaxis: {
+                    categories: [],
+                    position: "top",
+                    axisBorder: {
+                        show: false,
+                    },
+                    axisTicks: {
+                        show: false,
+                    },
+                    crosshairs: {
+                        fill: {
+                            type: "gradient",
+                            gradient: {
+                                colorFrom: "#D8E3F0",
+                                colorTo: "#BED1E6",
+                                stops: [0, 100],
+                                opacityFrom: 0.4,
+                                opacityTo: 0.5,
+                            },
+                        },
+                    },
+                    tooltip: {
+                        enabled: true,
+                    },
+                },
+                yaxis: {
+                    min: 0,
+                    max: 0,
+                    labels: {
+                        rotate: 0,
+                        rotateAlways: false,
+                        formatter: function (val) {
+                            return val.toFixed(0);
+                        },
+                    },
+                    decimalsInFloat: 0,
+                },
+                responsive: [
+                    {
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                width: 350,
+                            },
+                            legend: {
+                                position: "bottom",
+                            },
+                        },
+                    },
+                ],
+                noData: {
+                    text: "No se encontraron servicios de la organización",
+                    align: "center",
+                    verticalAlign: "middle",
+                    style: {
+                        fontSize: "14px",
+                    },
+                },
+            };
+        },
+    },
     methods: {
+        testFunction(index) {
+            console.log("LLEGÓ A LA FUNCIÓN");
+            console.log("Nombre servicio");
+            console.log(
+                this.chartOptionsServicesOffered.xaxis.categories[index]
+            );
+            console.log("Criticidad");
+            console.log(this.seriesServicesOffered[0].data[index]);
+        },
         successMessage(successText) {
             this.$notify({
                 component: NotificationTemplate,
@@ -934,8 +1061,8 @@ export default {
             this.servicesOffered = [];
             this.staffs = [];
             this.servicesByRTO = [];
-            this.chartOptionsServicesOffered.xaxis.categories = [];
-            this.seriesServicesOffered[0].data = [];
+            //this.chartOptionsServicesOffered.xaxis.categories = [];
+            //this.seriesServicesOffered[0].data = [];
             this.chartOptionsStaffsArea.labels = [];
             this.seriesStaffsArea = [];
             this.seriesServicesMinimunRTO = [];
@@ -1043,6 +1170,9 @@ export default {
                                     res.data.risks_incident[i]
                                         .services_offered_risk[j].name
                                 );
+                                this.chartOptionsServicesOffered.chart.width =
+                                    this.chartOptionsServicesOffered.chart
+                                        .width + 100;
                                 this.seriesServicesOffered[0].data.push(
                                     res.data.risks_incident[i]
                                         .services_offered_risk[j].criticality
@@ -1326,4 +1456,8 @@ export default {
 };
 </script>
 <style lang="scss">
+.chart {
+    overflow: auto;
+    width: "100%";
+}
 </style>

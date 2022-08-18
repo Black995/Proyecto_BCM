@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 class PermissionSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     model_name = serializers.CharField(read_only=True, source="content_type.model")
+    model_name_es = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Permission
@@ -22,10 +23,14 @@ class PermissionSerializer(serializers.ModelSerializer):
             'name',
             'codename',
             'model_name',
+            'model_name_es',
         ]
 
     def get_name(self, obj):
         return _(obj.name)
+        
+    def get_model_name_es(self, obj):
+        return _(obj.content_type.model)
 
 
 class GroupListSerializer(serializers.ModelSerializer):

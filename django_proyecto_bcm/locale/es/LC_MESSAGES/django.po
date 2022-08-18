@@ -155,16 +155,16 @@ msgid "Can delete scale"
 msgstr "Puede eliminar escala"
 
 msgid "Can add scale view"
-msgstr "Puede agregar vista de la escala"
+msgstr "Puede agregar escala de la vista"
 
 msgid "Can view scale view"
-msgstr "Puede ver vista de la escala"
+msgstr "Puede ver escala de la vista"
 
 msgid "Can change scale view"
-msgstr "Puede actualizar vista de la escala"
+msgstr "Puede actualizar escala de la vista"
 
 msgid "Can delete scale view"
-msgstr "Puede eliminar vista de la escala"
+msgstr "Puede eliminar escala de la vista"
 
 msgid "Can add group"
 msgstr "Puede agregar rol"
@@ -328,14 +328,121 @@ msgstr "Puede actualizar sesión"
 msgid "Can delete session"
 msgstr "Puede eliminar sesión"
 
+msgid "Can add ressource"
+msgstr "Puede agregar recursos"
+
+msgid "Can view ressource"
+msgstr "Puede ver recursos"
+
+msgid "Can change ressource"
+msgstr "Puede actualizar recursos"
+
+msgid "Can delete ressource"
+msgstr "Puede eliminar recursos"
+
 msgid "Can add s o_s"
-msgstr "Puede agregar relevancia al staff de acuerdo al servicio"
+msgstr "Puede agregar personal al servicio de la org."
 
 msgid "Can view s o_s"
-msgstr "Puede ver relevancia del staff de acuerdo al servicio"
+msgstr "Puede ver personal del servicio de la org."
 
 msgid "Can change s o_s"
-msgstr "Puede actualizar relevancia al staff de acuerdo al servicio"
+msgstr "Puede actualizar personal del servicio de la org."
 
 msgid "Can delete s o_s"
-msgstr "Puede eliminar relevancia al staff de acuerdo al servicio"
+msgstr "Puede eliminar personal del servicio de la org."
+
+msgid "Can add r_so"
+msgstr "Puede asignar recursos al servicio de la org."
+
+msgid "Can view r_so"
+msgstr "Puede ver recursos asignados al servicio de la org."
+
+msgid "Can change r_so"
+msgstr "Puede actualizar recursos asignados al servicio de la org."
+
+msgid "Can delete r_so"
+msgstr "Puede eliminar recursos al servicio de la org."
+
+# Models name
+
+msgid "area"
+msgstr "Areas"
+
+msgid "city"
+msgstr "Ciudades"
+
+msgid "contenttype"
+msgstr "Content Type (tabla de uso interno de la base de datos)"
+
+msgid "crisisscenario"
+msgstr "Escenarios Críticos"
+
+msgid "group"
+msgstr "Roles"
+
+msgid "headquarter"
+msgstr "Sedes"
+
+msgid "incidenthistory"
+msgstr "Histórico de Incidentes"
+
+msgid "interestedparty"
+msgstr "Partes Interesadas"
+
+msgid "logentry"
+msgstr "Logger (tabla de uso interno de la base de datos)"
+
+msgid "organization"
+msgstr "Organización"
+
+msgid "organizationactivity"
+msgstr "Actividades de la Organización"
+
+msgid "parish"
+msgstr "Parroquias"
+
+msgid "permission"
+msgstr "Permisos"
+
+msgid "position"
+msgstr "Cargos"
+
+msgid "r_so"
+msgstr "Recursos de los Servicios de la Org."
+
+msgid "ressource"
+msgstr "Recursos"
+
+msgid "risk"
+msgstr "Riesgos"
+
+msgid "scale"
+msgstr "Escalas"
+
+msgid "scaleview"
+msgstr "Escala de las vistas"
+
+msgid "serviceoffered"
+msgstr "Servicios de la Organización"
+
+msgid "serviceused"
+msgstr "Servicios de Soporte"
+
+msgid "session"
+msgstr "Sesión (tabla de uso interno de la base de datos)"
+
+msgid "so_s"
+msgstr "Personal del servicio de la org."
+
+msgid "staff"
+msgstr "Personal de la Organización"
+
+msgid "state"
+msgstr "Estados"
+
+msgid "township"
+msgstr "Municipios"
+
+msgid "user"
+msgstr "Usuarios"

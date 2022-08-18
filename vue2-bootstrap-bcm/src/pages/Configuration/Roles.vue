@@ -216,7 +216,7 @@
                                 :key="item.key"
                             >
                                 <b-list-group-item
-                                    v-if="title == item.model_name"
+                                    v-if="title == item.model_name_es"
                                     href="#"
                                     class="flex-column align-items-start"
                                 >
@@ -320,7 +320,7 @@
                                 :key="item.key"
                             >
                                 <b-list-group-item
-                                    v-if="title == item.model_name"
+                                    v-if="title == item.model_name_es"
                                     href="#"
                                     class="flex-column align-items-start"
                                 >
@@ -518,8 +518,8 @@ export default {
 
                     // Guardar solamente los nombres de los modelos
                     this.permissionsList.forEach((x) => {
-                        if (!this.modelsList.includes(x.model_name)) {
-                            this.modelsList.push(x.model_name);
+                        if (!this.modelsList.includes(x.model_name_es)) {
+                            this.modelsList.push(x.model_name_es);
                         }
                     });
                 })
