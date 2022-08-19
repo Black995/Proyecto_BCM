@@ -28,6 +28,66 @@
                     "
                     class="text-center"
                 >
+                    Criticidad de los servicios de soporte afectados
+                </h5>
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    id="services-used"
+                >
+                    <apexchart
+                        type="bar"
+                        height="500"
+                        :options="chartOptionsServicesUsed"
+                        :series="seriesServicesUsed"
+                    ></apexchart>
+                </div>
+            </b-col>
+            <b-col>
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    class="text-center"
+                >
+                    Criticidad de las actividades del negocio afectadas
+                </h5>
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    id="organization-activities"
+                >
+                    <apexchart
+                        type="bar"
+                        height="500"
+                        :options="chartOptionsOrgActivities"
+                        :series="seriesOrgActivities"
+                    ></apexchart>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row class="mt-3" align-v="center">
+            <b-col>
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea
+                    "
+                    class="text-center"
+                >
                     Criticidad de los servicios de la organización afectados
                 </h5>
                 <!--
@@ -72,66 +132,6 @@
                     "
                     class="text-center"
                 >
-                    Criticidad de los servicios de soporte afectados
-                </h5>
-                <div
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea
-                    "
-                    id="services-used"
-                >
-                    <apexchart
-                        type="bar"
-                        height="500"
-                        :options="chartOptionsServicesUsed"
-                        :series="seriesServicesUsed"
-                    ></apexchart>
-                </div>
-            </b-col>
-        </b-row>
-        <b-row class="mt-3" align-v="center">
-            <b-col>
-                <h5
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea
-                    "
-                    class="text-center"
-                >
-                    Criticidad de las actividades del negocio afectadas
-                </h5>
-                <div
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea
-                    "
-                    id="organization-activities"
-                >
-                    <apexchart
-                        type="bar"
-                        height="500"
-                        :options="chartOptionsOrgActivities"
-                        :series="seriesOrgActivities"
-                    ></apexchart>
-                </div>
-            </b-col>
-            <b-col>
-                <h5
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea
-                    "
-                    class="text-center"
-                >
                     Cantidad del personal afectado por área
                 </h5>
                 <div
@@ -151,8 +151,6 @@
                     ></apexchart>
                 </div>
             </b-col>
-        </b-row>
-        <b-row class="mt-3" align-v="center">
             <b-col>
                 <h5
                     v-if="
@@ -187,6 +185,8 @@
                     ></apexchart>
                 </div>
             </b-col>
+        </b-row>
+        <b-row class="mt-3" align-v="center">
             <b-col>
                 <h5
                     v-if="
@@ -250,6 +250,7 @@ export default {
         servicesUsed: [],
         organizationActivities: [],
         staffs: [],
+        staffsComplete: [],
         staffsArea: [],
         // Variables para guardar la duración del incidente y para guardar el servicio
         // de la organización y si excedió dicho RTO
@@ -266,7 +267,6 @@ export default {
                 data: [],
             },
         ],
-        test: 0,
 
         loadingServicesUsed: false,
         seriesServicesUsed: [
@@ -614,17 +614,6 @@ export default {
             },
         },
     }),
-    mounted() {
-        this.getIncidents();
-        this.permissions = JSON.parse(localStorage.getItem("permissions"));
-        this.is_superuser = localStorage.getItem("is_superuser");
-        /**
-         * Llamamos a los métodos que tienen las escalas de las vistas
-         */
-        this.getServiceOfferedScale();
-        this.getServiceUsedScale();
-        this.getOrgActivitiesScale();
-    },
     computed: {
         chartOptionsServicesOffered: function () {
             return {
@@ -635,9 +624,7 @@ export default {
                     width: 0,
                     events: {
                         dataPointSelection: (event, chartContext, config) => {
-                            console.log(config.dataPointIndex);
-                            //this.test = config.dataPointIndex;
-                            this.testFunction(config.dataPointIndex);
+                            this.selectServiceOffered(config.dataPointIndex);
                         },
                     },
                 },
@@ -710,15 +697,28 @@ export default {
             };
         },
     },
+    mounted() {
+        this.getIncidents();
+        this.permissions = JSON.parse(localStorage.getItem("permissions"));
+        this.is_superuser = localStorage.getItem("is_superuser");
+        /**
+         * Llamamos a los métodos que tienen las escalas de las vistas
+         */
+        this.getServiceOfferedScale();
+        this.getServiceUsedScale();
+        this.getOrgActivitiesScale();
+    },
     methods: {
-        testFunction(index) {
-            console.log("LLEGÓ A LA FUNCIÓN");
-            console.log("Nombre servicio");
-            console.log(
-                this.chartOptionsServicesOffered.xaxis.categories[index]
+        selectServiceOffered(index) {
+            let service = this.servicesOffered.find(
+                (x) =>
+                    x.criticality ===
+                        this.seriesServicesOffered[0].data[index] &&
+                    x.name ===
+                        this.chartOptionsServicesOffered.xaxis.categories[index]
             );
-            console.log("Criticidad");
-            console.log(this.seriesServicesOffered[0].data[index]);
+
+            this.countStaffsAreaByService(service.id);
         },
         successMessage(successText) {
             this.$notify({
@@ -967,8 +967,81 @@ export default {
                 }
             });
 
-            //console.log("Cantidad de staffs por área");
-            //console.log(this.staffsArea);
+            for (var i = 0; i < this.staffsArea.length; i++) {
+                this.chartOptionsStaffsArea.labels.push(
+                    this.staffsArea[i].staff_area_name
+                );
+                this.seriesStaffsArea.push(this.staffsArea[i].occurrence);
+            }
+            this.loadingStaffsArea = true;
+        },
+        countStaffsAreaByService(serviceId) {
+            this.loadingStaffsArea = false;
+            this.staffsArea = [];
+
+            if (serviceId) {
+                this.staffsComplete.forEach((x) => {
+                    // Checking if there is any object in arr2
+                    // which contains the key value
+                    if (
+                        this.staffsArea.some((val) => {
+                            return (
+                                val.staff_area_name == x.staff_area_name &&
+                                serviceId == x.service_offered
+                            );
+                        })
+                    ) {
+                        // If yes! then increase the occurrence by 1
+                        this.staffsArea.forEach((k) => {
+                            if (k.staff_area_name === x.staff_area_name) {
+                                k["occurrence"]++;
+                            }
+                        });
+                    } else {
+                        // If not! Then create a new object initialize
+                        // it with the present iteration key's value and
+                        // set the occurrence to 1
+                        if (serviceId == x.service_offered) {
+                            let a = {};
+                            a = {
+                                staff_area_name: x.staff_area_name,
+                                occurrence: 1,
+                            };
+                            this.staffsArea.push(a);
+                        }
+                    }
+                });
+            } else {
+                this.staffsComplete.forEach((x) => {
+                    // Checking if there is any object in arr2
+                    // which contains the key value
+                    if (
+                        this.staffsArea.some((val) => {
+                            return val.staff_area_name == x.staff_area_name;
+                        })
+                    ) {
+                        // If yes! then increase the occurrence by 1
+                        this.staffsArea.forEach((k) => {
+                            if (k.staff_area_name === x.staff_area_name) {
+                                k["occurrence"]++;
+                            }
+                        });
+                    } else {
+                        // If not! Then create a new object initialize
+                        // it with the present iteration key's value and
+                        // set the occurrence to 1
+                        let a = {};
+                        a = {
+                            staff_area_name: x.staff_area_name,
+                            occurrence: 1,
+                        };
+                        this.staffsArea.push(a);
+                    }
+                });
+            }
+
+            this.chartOptionsStaffsArea.labels = [];
+            this.seriesStaffsArea = [];
 
             for (var i = 0; i < this.staffsArea.length; i++) {
                 this.chartOptionsStaffsArea.labels.push(
@@ -976,11 +1049,6 @@ export default {
                 );
                 this.seriesStaffsArea.push(this.staffsArea[i].occurrence);
             }
-            /*
-            console.log("Elementos para la gráfica del personal");
-            console.log(this.seriesStaffsArea);
-            console.log(this.chartOptionsStaffsArea.labels);
-            */
             this.loadingStaffsArea = true;
         },
         countServicesMinimumRTO() {
@@ -1003,14 +1071,6 @@ export default {
             this.chartOptionsServicesMinimunRTO.labels.push(
                 "Servicios que NO exceden el RTO"
             );
-
-            /*
-            console.log(
-                "Elementos para la gráfica de servicios que exceden el RTO"
-            );
-            console.log(this.seriesServicesMinimunRTO);
-            console.log(this.chartOptionsServicesMinimunRTO.labels);
-            */
 
             this.loadingServicesMinimunRTO = true;
         },
@@ -1061,8 +1121,8 @@ export default {
             this.servicesOffered = [];
             this.staffs = [];
             this.servicesByRTO = [];
-            //this.chartOptionsServicesOffered.xaxis.categories = [];
-            //this.seriesServicesOffered[0].data = [];
+            this.chartOptionsServicesOffered.xaxis.categories = [];
+            this.seriesServicesOffered[0].data = [];
             this.chartOptionsStaffsArea.labels = [];
             this.seriesStaffsArea = [];
             this.seriesServicesMinimunRTO = [];
@@ -1201,6 +1261,13 @@ export default {
                                     .length;
                                 k++
                             ) {
+                                // Array de staffs para tenerlos todos por servicio
+                                this.staffsComplete.push(
+                                    res.data.risks_incident[i]
+                                        .services_offered_risk[j]
+                                        .staffs_service[k]
+                                );
+
                                 // En caso de que no esté el objeto en el array
                                 if (
                                     !this.staffs.find(
@@ -1258,6 +1325,25 @@ export default {
                             }
                         }
                     }
+
+                    //Eliminar repetidos de la lista completa de staff
+                    const uniqueIds = [];
+
+                    const staffsNoRepeated = this.staffsComplete.filter(
+                        (element) => {
+                            const isDuplicate = uniqueIds.includes(element.id);
+
+                            if (!isDuplicate) {
+                                uniqueIds.push(element.id);
+
+                                return true;
+                            }
+
+                            return false;
+                        }
+                    );
+                    this.staffsComplete = staffsNoRepeated;
+
                     //console.log("Servicios de la organización:");
                     //console.log(this.servicesOffered);
                     //console.log("Staffs:");

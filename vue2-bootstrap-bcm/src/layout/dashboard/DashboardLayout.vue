@@ -126,9 +126,27 @@
                         is_superuser == true ||
                         permissions.includes('bcm_phase3.view_incidenthistory')
                     "
+                    to="/layout/impacto-incidentes"
+                    name="Impacto Incidentes (all)"
+                    icon="ti-blackboard"
+                />
+                <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase3.view_incidenthistory')
+                    "
                     to="/layout/impacto-incidente"
                     name="Impacto del Incidente"
                     icon="ti-blackboard"
+                />
+                <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase3.view_incidenthistory')
+                    "
+                    to="/layout/mapa-calor"
+                    name="Mapa de Calor Riesgos"
+                    icon="ti-map"
                 />
                 <!--
                     Encabezado Configuración

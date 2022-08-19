@@ -18,6 +18,10 @@ def organization_activity_list_serializer():
     from bcm_phase2.api.serializers import OrganizationActivityListSerializer
     return OrganizationActivityListSerializer
 
+def service_offered_serializer():
+    from bcm_phase2.api.serializers import ServiceOfferedListSerializer
+    return ServiceOfferedListSerializer
+
     
 
 
@@ -79,6 +83,7 @@ class ServicesOfferedRiskSerializer(serializers.ModelSerializer):
             'services_offered_risk'
         ]
 
+
 class ServicesUsedRiskSerializer(serializers.ModelSerializer):
     # Serializer aninado
     services_used_risk = service_used_list_serializer()(many=True, read_only=True, source='risk_service_used')
@@ -90,6 +95,7 @@ class ServicesUsedRiskSerializer(serializers.ModelSerializer):
             'name',
             'services_used_risk'
         ]
+
 
 class OrganizationActivitiesRiskSerializer(serializers.ModelSerializer):
     # Serializer aninado
@@ -104,3 +110,14 @@ class OrganizationActivitiesRiskSerializer(serializers.ModelSerializer):
         ]
 
 
+class ServicesOfferedRiskListSerializer(serializers.ModelSerializer):
+    # Serializer aninado
+    services_offered_risk = service_offered_serializer()(many=True, read_only=True, source='risk_service_offered')
+
+    class Meta:
+        model = Risk
+        fields = [
+            'id',
+            'name',
+            'services_offered_risk'
+        ]

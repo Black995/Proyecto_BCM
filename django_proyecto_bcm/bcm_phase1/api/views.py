@@ -1,6 +1,7 @@
 from bcm_phase1.models import Risk, CrisisScenario
 from django.shortcuts import get_object_or_404
-from .serializers import RiskSerializer, CrisisScenarioSerializer, CrisisScenarioListSerializer
+from .serializers import (RiskSerializer, CrisisScenarioSerializer, CrisisScenarioListSerializer,
+                            ServicesOfferedRiskListSerializer)
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q, F
@@ -27,4 +28,10 @@ class CrisisScenarioListRisksViewSet(viewsets.ModelViewSet):
     model = CrisisScenario
     queryset = CrisisScenario.objects.all()
     serializer_class = CrisisScenarioSerializer
+
+
+class ServicesOfferedRiskListViewSet(viewsets.ModelViewSet):
+    model = Risk
+    queryset = Risk.objects.all().order_by('name')
+    serializer_class = ServicesOfferedRiskListSerializer
 

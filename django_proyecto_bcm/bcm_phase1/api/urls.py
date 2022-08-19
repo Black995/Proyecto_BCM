@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .views import (RiskViewSet, CrisisScenarioViewSet, CrisisScenarioListViewSet, CrisisScenarioListRisksViewSet)
+from .views import (RiskViewSet, CrisisScenarioViewSet, CrisisScenarioListViewSet, 
+                    CrisisScenarioListRisksViewSet, ServicesOfferedRiskListViewSet)
 
 
 urlpatterns = [
@@ -23,4 +24,6 @@ urlpatterns = [
         'delete': 'destroy'}), name='crisis_scenario_detail'),
     path('crisis_scenarios_list_risks/', CrisisScenarioListRisksViewSet.as_view({
         'get': 'list'}), name='crisis_scenarios_list_risks'),
+    path('service_offered_risks_list/', ServicesOfferedRiskListViewSet.as_view({
+        'get': 'list'}), name='service_offered_risks_list'),
 ]
