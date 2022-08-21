@@ -9,7 +9,7 @@
                 <div v-if="loadingServicesOffered" id="services-offered">
                     <apexchart
                         type="heatmap"
-                        height="350"
+                        :height="heightServicesOfferedHeatmap"
                         :options="chartOptionsServicesOffered"
                         :series="seriesServicesOffered"
                     ></apexchart>
@@ -56,6 +56,7 @@ export default {
         ],
         */
         maxValueServiceOfferedScale: 0,
+        heightServicesOfferedHeatmap: 50,
         seriesServicesOffered: [],
         chartOptionsServicesOffered: {
             chart: {
@@ -75,42 +76,35 @@ export default {
                                 from: 0,
                                 to: 0,
                                 name: "bajo",
-                                color: "#00A100",
+                                color: "#18a350",
                             },
                             {
                                 from: 1,
                                 to: 2,
                                 name: "medio",
-                                color: "#128FD9",
+                                color: "#F4D03F",
                             },
                             {
                                 from: 3,
                                 to: 4,
                                 name: "alto",
-                                color: "#FFB200",
+                                color: "#f38d30",
                             },
                             {
                                 from: 5,
                                 to: 6,
                                 name: "extremo",
-                                color: "#FF0000",
+                                color: "#df3447",
                             },
                         ],
                     },
                 },
             },
-            /*
-            yaxis: {
+            xaxis: {
                 labels: {
                     formatter: function (value) {
                         return "Criticidad " + value;
                     },
-                },
-            },
-            */
-            xaxis: {
-                labels: {
-                    rotateAlways: true,
                 },
             },
             dataLabels: {
@@ -175,11 +169,12 @@ export default {
                 })
                 .then((res) => {
                     this.risks = res.data;
-                    for (var i = 0; i < res.data.length; i++) {
-                        this.chartOptionsServicesOffered.labels.push(
-                            res.data[i].name
-                        );
-                    }
+
+                    // A la altura del mapa de calor le sumamos 50 por cada riesgo
+                    this.heightServicesOfferedHeatmap =
+                        this.heightServicesOfferedHeatmap +
+                        this.risks.length * 50;
+
                     // Ahora llamamos al servicio que se seleccionó
                     this.getServiceOfferedScale();
                 })
@@ -221,14 +216,18 @@ export default {
                     this.maxValueServiceOfferedScale = max_value;
 
                     for (var i = min_value; i <= max_value; i++) {
+                        this.chartOptionsServicesOffered.labels.push(i);
+                    }
+
+                    for (var i = 0; i < this.risks.length; i++) {
                         let obj = {
-                            name: i,
+                            name: this.risks[i].name,
                             data: [],
                         };
 
                         // Le vamos agregando ceros al array de obj.data para que
                         // luego se le vaya sumando a los valores que sean necesarios
-                        for (var j = 0; j < this.risks.length; j++) {
+                        for (var j = min_value; j <= max_value; j++) {
                             obj.data.push(0);
                         }
 
@@ -278,33 +277,55 @@ export default {
                     }
                 )
                 .then((res) => {
-                    // Doble ciclo para la información del request
                     for (var i = 0; i < res.data.length; i++) {
+                        // Doble ciclo para el array de las series
                         for (
-                            var j = 0;
-                            j < res.data[i].services_offered_risk.length;
-                            j++
+                            var x = 0;
+                            x < this.seriesServicesOffered.length;
+                            x++
                         ) {
-                            // Doble ciclo para el array de las series
-                            for (
-                                var x = 0;
-                                x < this.seriesServicesOffered.length;
-                                x++
+                            if (
+                                this.seriesServicesOffered[x].name ==
+                                res.data[i].name
                             ) {
-                                if (
-                                    this.seriesServicesOffered[x].name ==
-                                    res.data[i].services_offered_risk[j]
-                                        .criticality
+                                for (
+                                    var j = 0;
+                                    j <
+                                    res.data[i].services_offered_risk.length;
+                                    j++
                                 ) {
-                                    this.seriesServicesOffered[x].data[i]++;
+                                    for (
+                                        var y = 0;
+                                        y <
+                                        this.chartOptionsServicesOffered.labels
+                                            .length;
+                                        y++
+                                    ) {
+                                        if (
+                                            this.chartOptionsServicesOffered
+                                                .labels[y] ==
+                                            res.data[i].services_offered_risk[j]
+                                                .criticality
+                                        ) {
+                                            this.seriesServicesOffered[x].data[
+                                                y
+                                            ]++;
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                     console.log("SERIES SUMADAS");
                     console.log(this.seriesServicesOffered);
+
+                    this.getHeatmapColorSeparation(
+                        this.seriesServicesOffered,
+                        1
+                    );
+
                     this.servicesOfferedRisks = res.data;
-                    this.loadingServicesOffered = true;
                 })
                 .catch((err) => {
                     console.log("err");
@@ -330,6 +351,62 @@ export default {
                         );
                     }
                 });
+        },
+        getHeatmapColorSeparation(series, type) {
+            /**
+             * Types:
+             * 1 -> Services Offered
+             * 2 -> Services Used
+             * 3 -> Organizacion Activities
+             */
+
+            // Variable a utilizar para definir la máxima cantidad de elementos que puede
+            // existir en un cuadro
+            let max_quantity = 0;
+            for (var i = 0; i < series.length; i++) {
+                for (var j = 0; j < series[i].data.length; j++) {
+                    if (series[i].data[j] > max_quantity) {
+                        max_quantity = series[i].data[j];
+                    }
+                }
+            }
+            console.log("Máxima cantidad de elementos para un cuadro");
+            console.log(max_quantity);
+
+            /**
+             * Separamos en 4 partes las cantidad de elementos para los colores de las filas
+             */
+            let base_1_4 = Math.round(max_quantity / 4);
+            let base_1_2 = Math.round(max_quantity / 2);
+            let base_3_4 = Math.round((max_quantity * 3) / 4);
+            console.log("bases");
+            console.log(base_1_4);
+            console.log(base_1_2);
+            console.log(base_3_4);
+
+            if (type == 1) {
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[0].from = 0;
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[0].to =
+                    base_1_4 - 1;
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[1].from =
+                    base_1_4;
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[1].to =
+                    base_1_2 - 1;
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[2].from =
+                    base_1_2;
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[2].to =
+                    base_3_4 - 1;
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[3].from =
+                    base_3_4;
+                this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[3].to =
+                    max_quantity;
+                console.log("Rango de colores:");
+                console.log(
+                    this.chartOptionsServicesOffered.plotOptions.heatmap
+                        .colorScale.ranges
+                );
+                this.loadingServicesOffered = true;
+            }
         },
     },
 };
