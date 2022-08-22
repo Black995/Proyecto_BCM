@@ -10,9 +10,6 @@ class IncidentDatesFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
-        print('Fechas')
-        print(start_date)
-        print(end_date)
         if not start_date or not end_date:
             return queryset
         start_date = datetime.strptime(start_date, '%Y-%m-%d')

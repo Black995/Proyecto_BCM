@@ -1211,9 +1211,6 @@ export default {
              * escala para el rto (minimum_scale_value) no sea menor o igual que el mínimo
              * valor de la escala (scale.min_value)
              */
-            console.log("Escala de las vistas");
-            console.log(this.scaleView);
-            console.log(this.scaleView.name);
             if (
                 this.scaleView.name == "Actividades de la Organización" ||
                 this.scaleView.name == "Servicios de la Organización"
@@ -1257,8 +1254,6 @@ export default {
                 );
                 valid = false;
             }
-            console.log("VALIDO");
-            console.log(valid);
             return valid;
         },
         resetModalScaleView() {

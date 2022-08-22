@@ -865,7 +865,7 @@ export default {
                         date: res.data.start_date.slice(0, 10),
                         time: res.data.start_date.slice(11, 16),
                     };
-                    if (res.date.end_date) {
+                    if (res.data.end_date) {
                         this.endDateTime = {
                             date: res.data.end_date.slice(0, 10),
                             time: res.data.end_date.slice(11, 16),

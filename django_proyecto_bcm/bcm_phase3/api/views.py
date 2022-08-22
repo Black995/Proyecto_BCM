@@ -25,23 +25,27 @@ class IncidentHistoryViewSet(viewsets.ModelViewSet):
 class RisksAffectedByIncidentViewSet(viewsets.ModelViewSet):
     model = IncidentHistory
     queryset = IncidentHistory.objects.all()
-    serializer_class = RisksAffectedByIncidentSerializer 
+    serializer_class = RisksAffectedByIncidentSerializer
+    filter_backends = [IncidentDatesFilterBackend, ]
 
 
 class ServicesOfferedAffectedByIncidentViewSet(viewsets.ModelViewSet):
     model = IncidentHistory
     queryset = IncidentHistory.objects.all()
-    serializer_class = ServicesOfferedAffectedByIncidentSerializer 
+    serializer_class = ServicesOfferedAffectedByIncidentSerializer
+    filter_backends = [IncidentDatesFilterBackend, ]
 
 
 class ServicesUsedAffectedByIncidentViewSet(viewsets.ModelViewSet):
     model = IncidentHistory
     queryset = IncidentHistory.objects.all()
-    serializer_class = ServicesUsedAffectedByIncidentSerializer 
+    serializer_class = ServicesUsedAffectedByIncidentSerializer
+    filter_backends = [IncidentDatesFilterBackend, ]
 
 
 class OrganizationActivitiesAffectedByIncidentViewSet(viewsets.ModelViewSet):
     model = IncidentHistory
     queryset = IncidentHistory.objects.all()
     serializer_class = OrganizationActivitiesAffectedByIncidentSerializer 
+    filter_backends = [IncidentDatesFilterBackend, ]
 

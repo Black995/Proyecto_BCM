@@ -234,9 +234,6 @@ export default {
                         this.seriesServicesOffered.push(obj);
                     }
 
-                    //console.log("Lista de series");
-                    //console.log(this.seriesServicesOffered);
-
                     this.getServicesOfferedRisks();
                 })
                 .catch((err) => {
@@ -317,8 +314,8 @@ export default {
                             }
                         }
                     }
-                    console.log("SERIES SUMADAS");
-                    console.log(this.seriesServicesOffered);
+                    //console.log("SERIES SUMADAS");
+                    //console.log(this.seriesServicesOffered);
 
                     this.getHeatmapColorSeparation(
                         this.seriesServicesOffered,
@@ -328,8 +325,6 @@ export default {
                     this.servicesOfferedRisks = res.data;
                 })
                 .catch((err) => {
-                    console.log("err");
-                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
@@ -370,8 +365,6 @@ export default {
                     }
                 }
             }
-            console.log("Máxima cantidad de elementos para un cuadro");
-            console.log(max_quantity);
 
             /**
              * Separamos en 4 partes las cantidad de elementos para los colores de las filas
@@ -379,10 +372,6 @@ export default {
             let base_1_4 = Math.round(max_quantity / 4);
             let base_1_2 = Math.round(max_quantity / 2);
             let base_3_4 = Math.round((max_quantity * 3) / 4);
-            console.log("bases");
-            console.log(base_1_4);
-            console.log(base_1_2);
-            console.log(base_3_4);
 
             if (type == 1) {
                 this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[0].from = 0;
@@ -400,11 +389,6 @@ export default {
                     base_3_4;
                 this.chartOptionsServicesOffered.plotOptions.heatmap.colorScale.ranges[3].to =
                     max_quantity;
-                console.log("Rango de colores:");
-                console.log(
-                    this.chartOptionsServicesOffered.plotOptions.heatmap
-                        .colorScale.ranges
-                );
                 this.loadingServicesOffered = true;
             }
         },

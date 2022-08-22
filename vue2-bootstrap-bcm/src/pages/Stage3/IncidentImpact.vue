@@ -1,8 +1,13 @@
 <template>
     <div class="container-fluid">
+        <b-row align-v="center">
+            <b-col>
+                <h4 class="text-center">Gráficas del impacto del incidente</h4>
+            </b-col>
+        </b-row>
         <b-row class="mt-3" align-v="center">
             <b-col>
-                <h4>Seleccione una de las incidencias</h4>
+                <h5>Seleccione una de las incidencias</h5>
                 <div class="text-center">
                     <b-spinner v-if="loadingIncidents" type="grow"></b-spinner>
                     <b-form-select
@@ -709,17 +714,6 @@ export default {
         this.getOrgActivitiesScale();
     },
     methods: {
-        selectServiceOffered(index) {
-            let service = this.servicesOffered.find(
-                (x) =>
-                    x.criticality ===
-                        this.seriesServicesOffered[0].data[index] &&
-                    x.name ===
-                        this.chartOptionsServicesOffered.xaxis.categories[index]
-            );
-
-            this.countStaffsAreaByService(service.id);
-        },
         successMessage(successText) {
             this.$notify({
                 component: NotificationTemplate,
@@ -739,6 +733,18 @@ export default {
                 verticalAlign: "top",
                 type: "danger",
             });
+        },
+
+        selectServiceOffered(index) {
+            let service = this.servicesOffered.find(
+                (x) =>
+                    x.criticality ===
+                        this.seriesServicesOffered[0].data[index] &&
+                    x.name ===
+                        this.chartOptionsServicesOffered.xaxis.categories[index]
+            );
+
+            this.countStaffsAreaByService(service.id);
         },
         async getIncidents() {
             this.incidents = [];
