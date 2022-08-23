@@ -196,7 +196,7 @@ class ServiceOfferedSerializer(serializers.ModelSerializer):
         if(scale_view and recovery_time and criticality):
             if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
                 raise serializers.ValidationError( 
-                    'La criticidad ingresada es superior al mínimo tolerable para el RTO ingresado')
+                    'El RTO ingresado supera el máximo tolerable para la criticidad ingresada')
             else:
                 return super().validate(attrs)
         else:

@@ -108,7 +108,7 @@ class OrganizationActivitiesAffectedByIncidentSerializer(serializers.ModelSerial
 
 class ContingencyPlanSerializer(serializers.ModelSerializer):
     #contingency_father = serializers.SerializerMethodField()
-    contingency_father = RecursiveField(allow_null=True)
+    contingency_children = serializers.ListField(child=RecursiveField())
 
     class Meta:
         model = ContingencyPlan
@@ -116,7 +116,7 @@ class ContingencyPlanSerializer(serializers.ModelSerializer):
             'id',
             'number_order',
             'description',
-            'contingency_father'
+            'contingency_children'
         ]
 
 

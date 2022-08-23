@@ -184,11 +184,11 @@
                             ></Column>
                             <Column
                                 field="minimum_recovery_time"
-                                header="Máximo RTO para criticidad"
+                                header="Máximo RTO tolerable"
                             ></Column>
                             <Column
                                 field="minimum_scale_value"
-                                header="Máxima criticidad para el RTO"
+                                header="Criticidad de referencia para el RTO"
                             ></Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
@@ -573,7 +573,7 @@
                 >
                     <b-col>
                         <b-form-group
-                            label="Mínimo tiempo de recuperación (RTO) para considerarse crítico"
+                            label="Máximo tiempo de recuperación (RTO) tolerable"
                             invalid-feedback="Este campo es obligatorio"
                             :state="scaleViewState.minimum_recovery_time"
                         >
@@ -624,7 +624,7 @@
                     </b-col>
                     <b-col>
                         <b-form-group
-                            label="Ingrese el valor mínimo de la escala para considerar crítico el RTO"
+                            label="Ingrese la criticidad de referencia para el RTO (es decir, la criticidad ingresada de referencia que no pueda superar el máximo RTO tolerable)"
                             invalid-feedback="La escala mínima para el RTO tiene que estar en el rango de la escala seleccionada"
                             :state="scaleViewState.minimum_scale_value"
                         >

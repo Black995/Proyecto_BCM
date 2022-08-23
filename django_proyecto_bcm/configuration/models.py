@@ -63,7 +63,7 @@ class Headquarter(models.Model):
 
 class Position(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    #relevant = models.BooleanField(default=False)
+    relevant = models.BooleanField(default=False)
 
 
 class Area(models.Model):

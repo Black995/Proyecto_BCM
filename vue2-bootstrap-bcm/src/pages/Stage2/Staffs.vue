@@ -1178,6 +1178,18 @@ export default {
         async show_modal_update(id) {
             this.staffId = id;
 
+            this.staffState.names = null;
+            this.staffState.surnames = null;
+            this.staffState.staff_number = null;
+            this.staffState.earnings = null;
+            this.staffState.area = null;
+            this.staffState.position = null;
+            this.staffState.headquarter = null;
+            this.phone_number_1_props.props.error = false;
+            this.staffState.phone_number_1 = null;
+            this.phone_number_2_props.props.error = false;
+            this.staffState.phone_number_2 = null;
+
             axios
                 .get(`${SERVER_ADDRESS}/api/phase2/staff/${id}/`, {
                     withCredentials: true,

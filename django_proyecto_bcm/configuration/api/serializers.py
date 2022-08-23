@@ -63,7 +63,7 @@ class PositionSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-            #'relevant'
+            'relevant'
         ]
         
 
