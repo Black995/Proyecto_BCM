@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (IncidentHistoryListViewSet, IncidentHistoryViewSet, 
                     RisksAffectedByIncidentViewSet, ServicesOfferedAffectedByIncidentViewSet,
                     ServicesUsedAffectedByIncidentViewSet, OrganizationActivitiesAffectedByIncidentViewSet,
-                    )
+                    ContingencyPlanCreateViewSet, ContingencyPlanViewSet)
 
  
 
@@ -31,4 +31,9 @@ urlpatterns = [
         'get': 'retrieve'}), name='incident_history_services_used'),
     path('incident-history/organization-activities/<int:pk>/', OrganizationActivitiesAffectedByIncidentViewSet.as_view({
         'get': 'retrieve'}), name='incident_history_organization_activities'),
+    path('contingency-plan-create/', ContingencyPlanCreateViewSet.as_view({
+        'put': 'update',
+        'patch': 'partial_update'}), name='contingency_plan_create'),
+    path('contingency-plan-detail/', ContingencyPlanViewSet.as_view({
+        'get': 'list'}), name='contingency_plan_list'),
 ]
