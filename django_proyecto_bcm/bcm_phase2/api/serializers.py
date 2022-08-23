@@ -402,10 +402,19 @@ class InterestedPartyListSerializer(serializers.ModelSerializer):
             'type_name',
             'description'
         ]
-
+    def get_type_name(self, obj):
+        return dict(InterestedParty.TYPE).get(obj.type)
 
 class interestedPartySerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only = True)
+
+    services_offered = serializers.ListField(
+        child=serializers.IntegerField(),required=False,write_only=True)
+    _services_offered = ServiceOfferedSerializer(many=True,read_only=True)
+
+    services_used = serializers.ListField(
+        child=serializers.IntegerField(),required=False,write_only=True)
+    _services_used = ServiceUsedSerializer(many=True,read_only=True)
 
     class Meta:
         model = InterestedParty
@@ -415,8 +424,14 @@ class interestedPartySerializer(serializers.ModelSerializer):
             'type',
             'type_name',
             'description',
+            "services_offered",
+            "_services_offered",
+            "services_used",
+            "_services_used",
         ] 
 
+    def get_type_name(self, obj):
+        return dict(ServiceUsed.TYPE).get(obj.type)
 
 class ServiceOfferedStaffSerializer(serializers.ModelSerializer):
     type_name = serializers.SerializerMethodField(read_only=True)

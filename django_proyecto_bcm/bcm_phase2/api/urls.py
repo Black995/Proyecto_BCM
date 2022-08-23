@@ -46,7 +46,7 @@ urlpatterns = [
     path('interestedParties/', InterestedPartyListViewSet.as_view({
         'get':'list',
         'post':'create'}), name='party_list'),
-    path('interestedParty/<int:id>/', InterestedPartyViewSet.as_view({
+    path('interestedParty/<int:pk>/', InterestedPartyViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',
