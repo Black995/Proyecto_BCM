@@ -30,6 +30,7 @@ import IncidentHistory from "@/pages/Stage3/IncidentHistory.vue";
 import IncidentImpact from "@/pages/Stage3/IncidentImpact.vue";
 import IncidentImpactAll from "@/pages/Stage3/IncidentImpactAll.vue";
 import RiskHeatmap from "@/pages/Stage3/RiskHeatmap.vue";
+import ContingencyPlans from "@/pages/Stage3/ContingencyPlans.vue";
 // Configuration
 import Areas from "@/pages/Configuration/Areas.vue";
 import Positions from "@/pages/Configuration/Positions.vue";
@@ -122,6 +123,11 @@ const routes = [
         path: "mapa-calor",
         name: "Mapa de Calor Riesgos",
         component: RiskHeatmap
+      },
+      {
+        path: "planes-contingencia",
+        name: "Planes de Contingencia",
+        component: ContingencyPlans
       },
       /**
        * Configuration

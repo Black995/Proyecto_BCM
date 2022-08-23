@@ -148,6 +148,15 @@
                     name="Mapa de Calor Riesgos"
                     icon="ti-map"
                 />
+                <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase3.view_incidenthistory')
+                    "
+                    to="/layout/planes-contingencia"
+                    name="Planes de Contingencia"
+                    icon="ti-layers"
+                />
                 <!--
                     Encabezado Configuración
                 -->

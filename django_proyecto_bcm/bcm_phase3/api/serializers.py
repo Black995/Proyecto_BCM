@@ -1,10 +1,11 @@
-from bcm_phase3.models import IncidentHistory
+from bcm_phase3.models import IncidentHistory, ContingencyPlan
 from rest_framework import serializers
 from django.db.models import F, Q
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from bcm_phase1.api.serializers import (RiskSerializer, ServicesOfferedRiskSerializer, 
                                         ServicesUsedRiskSerializer, OrganizationActivitiesRiskSerializer)
+from rest_framework_recursive.fields import RecursiveField
 
 
 
@@ -104,4 +105,62 @@ class OrganizationActivitiesAffectedByIncidentSerializer(serializers.ModelSerial
             'risks_incident'
         ]
 
+
+class ContingencyPlanSerializer(serializers.ModelSerializer):
+    #contingency_father = serializers.SerializerMethodField()
+    contingency_father = RecursiveField(allow_null=True)
+
+    class Meta:
+        model = ContingencyPlan
+        fields = [
+            'id',
+            'number_order',
+            'description',
+            'contingency_father'
+        ]
+
+
+class ContingencyPlanCreateSerializer(serializers.ModelSerializer):
+    contingency_plan_list = serializers.ListField(
+        child=serializers.JSONField(), required=False)
+
+    class Meta:
+        model = ContingencyPlan
+        fields = [
+            'id',
+            'number_order',
+            'description',
+            'crisis_scenario',
+            'contingency_plan_list'
+        ]
+
+
+    def update(self, instance, validated_data):
+        crisis_scenario = validated_data.get('crisis_scenario', instance.crisis_scenario)
+        contingency_plan_list = validated_data.get('contingency_plan_list')
+        
+        """
+            Si se envía el campo contingency_plan entonces se procede a crear los registros en 
+            el modelo ContingencyPlan
+        """
+        print('Escenario crítico')
+        print(crisis_scenario)
+        print('Plan de contingencia')
+        print(contingency_plan_list)
+        """
+        if staffs_json is not None:
+            SO_S.objects.filter(service_offered=service).delete()
+
+            for s in staffs_json:
+                staff = Staff.objects.get(id=s['staff'])
+
+                SO_S.objects.create(
+                    relevant=s['relevant'],
+                    service_offered=service,
+                    staff=staff
+                )
+        """
+                
+        instance.save()
+        return instance
 

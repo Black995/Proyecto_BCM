@@ -728,7 +728,7 @@ export default {
             this.$notify({
                 component: NotificationTemplate,
                 title: errorText,
-                icon: "ti-check",
+                icon: "ti-close",
                 horizontalAlign: "right",
                 verticalAlign: "top",
                 type: "danger",
