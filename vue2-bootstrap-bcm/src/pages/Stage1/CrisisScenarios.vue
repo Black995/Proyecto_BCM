@@ -56,6 +56,10 @@
                                 field="description"
                                 header="Descripción"
                             ></Column>
+                            <Column
+                                field="frequency_name"
+                                header="Frecuencia"
+                            ></Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
@@ -164,6 +168,10 @@
             </h3>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
+                    <strong>Frecuencia: </strong
+                    >{{ crisisScenarioDetail.frequency_name }}
+                </li>
+                <li class="list-group-item">
                     <strong>Descripción: </strong
                     >{{ crisisScenarioDetail.description }}
                 </li>
@@ -172,7 +180,6 @@
             <h4 class="mt-3 text-center font-weight-bold">
                 Riesgos del escenario crítico
             </h4>
-
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
                 v-for="item in crisisScenarioDetail._risks"
@@ -184,6 +191,12 @@
                     {{ item.description }}
                 </p>
             </b-list-group-item>
+            <h3
+                class="mt-3 text-center"
+                v-if="!crisisScenarioDetail._risks.length"
+            >
+                No existen riesgos asociados a este escenario crítico
+            </h3>
 
             <template #modal-footer>
                 <div class="w-100">
@@ -223,6 +236,18 @@
                         :state="crisisState.name"
                         required
                     ></b-form-input>
+                </b-form-group>
+                <b-form-group
+                    label="Seleccione la frecuencia"
+                    invalid-feedback="Este campo es obligatorio"
+                >
+                    <b-form-select
+                        v-model="crisisScenario.frequency"
+                        :options="frequencies"
+                        value-field="value"
+                        text-field="name"
+                        required
+                    ></b-form-select>
                 </b-form-group>
                 <b-form-group
                     label="Ingrese la descripción del escenario crítico"
@@ -298,6 +323,18 @@
                         :state="crisisState.name"
                         required
                     ></b-form-input>
+                </b-form-group>
+                <b-form-group
+                    label="Seleccione la frecuencia"
+                    invalid-feedback="Este campo es obligatorio"
+                >
+                    <b-form-select
+                        v-model="crisisScenario.frequency"
+                        :options="frequencies"
+                        value-field="value"
+                        text-field="name"
+                        required
+                    ></b-form-select>
                 </b-form-group>
                 <b-form-group
                     label="Ingrese la descripción del escenario crítico"
@@ -480,6 +517,7 @@ export default {
         crisisScenarioDetail: {
             name: "",
             description: "",
+            frequency_name: "",
             _risks: [],
         },
         crisisId: 0,
@@ -488,11 +526,34 @@ export default {
         crisisScenario: {
             name: "",
             description: "",
+            frequency: 1,
         },
         crisisState: {
             name: null,
             description: null,
         },
+        frequencies: [
+            {
+                value: 1,
+                name: "Muy improbable",
+            },
+            {
+                value: 2,
+                name: "Improbable",
+            },
+            {
+                value: 3,
+                name: "Posible",
+            },
+            {
+                value: 4,
+                name: "Probable",
+            },
+            {
+                value: 5,
+                name: "Seguro",
+            },
+        ],
 
         // Listas de riesgos para realizar la asociación
         risks: [],
@@ -597,6 +658,7 @@ export default {
             this.crisisState.name = null;
             this.crisisScenario.description = "";
             this.crisisState.description = null;
+            this.crisisScenario.frequency_name = 1;
         },
         /**
          * Detail
@@ -605,6 +667,7 @@ export default {
             this.crisisScenarioDetail = {
                 name: "",
                 description: "",
+                frequency_name: "",
                 _risks: [],
             };
 

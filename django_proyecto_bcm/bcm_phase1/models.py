@@ -13,8 +13,23 @@ class Risk(models.Model):
 
 
 class CrisisScenario(models.Model):
+
+    VERY_UNLIKELY = 1
+    UNLIKELY = 2
+    POSSIBLE = 3
+    LIKELY = 4
+    SURE = 5
+    FREQUENCY = (
+        (VERY_UNLIKELY, 'Muy improbable'),
+        (UNLIKELY, 'Improbable'),
+        (POSSIBLE, 'Posible'),
+        (LIKELY, 'Probable'),
+        (SURE, 'Seguro'),
+    )
+
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=200)
+    frequency = models.SmallIntegerField(choices=FREQUENCY)
 
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_crisis_scenario')

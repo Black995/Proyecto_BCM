@@ -144,65 +144,6 @@ class ServiceOfferedListSerializer(serializers.ModelSerializer):
             return super().validate(attrs)
 
 
-class ServiceOfferedSerializer(serializers.ModelSerializer):
-    type_name = serializers.SerializerMethodField(read_only=True)
-    area_name = serializers.CharField(read_only=True, source="area.name")
-    scale_name = serializers.CharField(read_only=True, source="scale.name")
-    scale_min_value = serializers.CharField(
-        read_only=True, source="scale.min_value")
-    scale_max_value = serializers.CharField(
-        read_only=True, source="scale.max_value")
-    # El risks funciona para llenar los elementos del many to many
-    risks = serializers.ListField(
-        child=serializers.IntegerField(), required=False, write_only=True)
-    # Serializer aninado
-    _risks = RiskSerializer(many=True, read_only=True)
-    staffs_json = serializers.ListField(
-        child=serializers.JSONField(), required=False)
-
-    class Meta:
-        model = ServiceOffered
-        fields = [
-            'id',
-            'name',
-            'type',
-            'type_name',
-            'profit',
-            'recovery_time',
-            'recovery_point',
-            'maximum_recovery_time',
-            'criticality',
-            'area',
-            'area_name',
-            'scale',
-            'scale_name',
-            'scale_min_value',
-            'scale_max_value',
-            'risks',
-            '_risks',
-            'staffs_json'
-        ]
-
-    def get_type_name(self, obj):
-        return dict(ServiceOffered.TYPE).get(obj.type)
-    
-    def validate(self, attrs):
-        # Se trae la escala de la vista para validar el mínimo RTO para la criticidad
-        scale_view = ScaleView.objects.filter(name="Servicios de la Organización").first() if ScaleView.objects.filter(name="Servicios de la Organización") else None
-
-        recovery_time = attrs.get('recovery_time')
-        criticality = attrs.get('criticality')
-
-        if(scale_view and recovery_time and criticality):
-            if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
-                raise serializers.ValidationError( 
-                    'El RTO ingresado supera el máximo tolerable para la criticidad ingresada')
-            else:
-                return super().validate(attrs)
-        else:
-            return super().validate(attrs)
-
-
 class ServiceOfferedWithStaffsSerializer(serializers.ModelSerializer):
     
     staffs_json = serializers.ListField(
@@ -261,6 +202,68 @@ class ServiceUsedListSerializer(serializers.ModelSerializer):
 
     def get_type_name(self, obj):
         return dict(ServiceUsed.TYPE).get(obj.type)
+
+
+class ServiceOfferedSerializer(serializers.ModelSerializer):
+    type_name = serializers.SerializerMethodField(read_only=True)
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    scale_name = serializers.CharField(read_only=True, source="scale.name")
+    scale_min_value = serializers.CharField(
+        read_only=True, source="scale.min_value")
+    scale_max_value = serializers.CharField(
+        read_only=True, source="scale.max_value")
+    # El risks funciona para llenar los elementos del many to many
+    risks = serializers.ListField(
+        child=serializers.IntegerField(), required=False, write_only=True)
+    # Serializer aninado
+    _risks = RiskSerializer(many=True, read_only=True)
+    staffs_json = serializers.ListField(
+        child=serializers.JSONField(), required=False)
+    # Serializer aninado
+    service_offered_service_used = ServiceUsedListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ServiceOffered
+        fields = [
+            'id',
+            'name',
+            'type',
+            'type_name',
+            'profit',
+            'recovery_time',
+            'recovery_point',
+            'maximum_recovery_time',
+            'criticality',
+            'area',
+            'area_name',
+            'scale',
+            'scale_name',
+            'scale_min_value',
+            'scale_max_value',
+            'risks',
+            '_risks',
+            'staffs_json',
+            'service_offered_service_used'
+        ]
+
+    def get_type_name(self, obj):
+        return dict(ServiceOffered.TYPE).get(obj.type)
+    
+    def validate(self, attrs):
+        # Se trae la escala de la vista para validar el mínimo RTO para la criticidad
+        scale_view = ScaleView.objects.filter(name="Servicios de la Organización").first() if ScaleView.objects.filter(name="Servicios de la Organización") else None
+
+        recovery_time = attrs.get('recovery_time')
+        criticality = attrs.get('criticality')
+
+        if(scale_view and recovery_time and criticality):
+            if(criticality >= scale_view.minimum_scale_value and recovery_time >= scale_view.minimum_recovery_time):
+                raise serializers.ValidationError( 
+                    'El RTO ingresado supera el máximo tolerable para la criticidad ingresada')
+            else:
+                return super().validate(attrs)
+        else:
+            return super().validate(attrs)
 
 
 class ServiceUsedSerializer(serializers.ModelSerializer):

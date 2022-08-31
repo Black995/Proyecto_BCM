@@ -68,6 +68,12 @@
                                             Escenario crítico:
                                             {{ item.crisis_scenario_name }}
                                         </h5>
+                                        <small class="text-muted"
+                                            >Frecuencia:
+                                            {{
+                                                item.crisis_scenario_frequency_name
+                                            }}</small
+                                        >
                                     </div>
                                     <div
                                         class="
@@ -88,7 +94,7 @@
                                         </div>
                                     </div>
                                     <div class="mb-1 d-flex w-100">
-                                        Descripción de la incidencia:
+                                        Observaciones del incidente:
                                         {{ item.description }}
                                     </div>
                                 </b-list-group-item>
@@ -244,7 +250,7 @@
                             class="text-center"
                         >
                             Servicios que excedieron el RTO debido a la duración
-                            de la incidencias
+                            del incidente
                         </h5>
                         <div
                             v-if="
@@ -280,7 +286,7 @@
                             class="text-center"
                         >
                             Servicios que excedieron el RTO debido a la duración
-                            de la incidencias
+                            del incidente
                         </h5>
                         <div
                             v-if="
@@ -899,12 +905,12 @@ export default {
                                 description: res.data[i].description,
                                 crisis_scenario_name:
                                     res.data[i].crisis_scenario_name,
+                                crisis_scenario_frequency_name:
+                                    res.data[i].crisis_scenario_frequency_name,
                             };
                             this.incidents.push(inc);
                         }
                         this.loadingIncidents = false;
-                        console.log("incidentes");
-                        console.log(this.incidents);
 
                         // Se procede a llamar a los demás requests para las gráficas
                         this.getServicesOfferedStaff();
@@ -1310,10 +1316,10 @@ export default {
                                             .services_offered_risk[j]
                                     );
                                     /**
-                                     * Cálculo del RTO del servicio con la duración de
-                                     * la incidencia
+                                     * Cálculo del RTO del servicio con la duración del
+                                     * incidente
                                      *
-                                     * SÓLO SE APLICA SI EXISTE LA FECHA FINAL DE LA INCIDENCIA
+                                     * SÓLO SE APLICA SI EXISTE LA FECHA FINAL DE LA INCIDENTE
                                      */
                                     let exceed_recovery_time = false;
                                     if (res.data[t].end_date) {
@@ -1488,13 +1494,14 @@ export default {
                         }
                     );
                     this.staffsComplete = staffsNoRepeated;
-
+                    /*
                     console.log("Servicios de la organización:");
                     console.log(this.servicesOffered);
                     console.log("Staffs:");
                     console.log(this.staffs);
                     console.log("RTO de los servicios");
                     console.log(this.servicesByRTO);
+                    */
                     this.countStaffsArea();
                     this.loadingServicesOffered = true;
 

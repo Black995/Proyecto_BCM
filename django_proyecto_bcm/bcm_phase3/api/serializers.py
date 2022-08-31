@@ -1,4 +1,5 @@
 from bcm_phase3.models import IncidentHistory, ContingencyPlan
+from bcm_phase1.models import CrisisScenario
 from rest_framework import serializers
 from django.db.models import F, Q
 from django.core.exceptions import ValidationError
@@ -11,6 +12,8 @@ from rest_framework_recursive.fields import RecursiveField
 
 class IncidentHistoryListSerializer(serializers.ModelSerializer):
     crisis_scenario_name = serializers.CharField(read_only=True, source="crisis_scenario.name")
+    crisis_scenario_frequency = serializers.CharField(read_only=True, source="crisis_scenario.frequency")
+    crisis_scenario_frequency_name = serializers.CharField(read_only=True, source="crisis_scenario.frequency")
     
     class Meta:
         model = IncidentHistory
@@ -21,13 +24,19 @@ class IncidentHistoryListSerializer(serializers.ModelSerializer):
             'description',
             'crisis_scenario',
             'crisis_scenario_name',
+            'crisis_scenario_frequency',
+            'crisis_scenario_frequency_name'
         ]
 
+    def get_crisis_scenario_frequency_name(self, obj):
+        return dict(CrisisScenario.FREQUENCY).get(obj.crisis_scenario_frequency)
 
 
 class IncidentHistorySerializer(serializers.ModelSerializer):
     crisis_scenario_name = serializers.CharField(read_only=True, source="crisis_scenario.name")
     crisis_scenario_description = serializers.CharField(read_only=True, source="crisis_scenario.description")
+    crisis_scenario_frequency = serializers.CharField(read_only=True, source="crisis_scenario.frequency")
+    crisis_scenario_frequency_name = serializers.CharField(read_only=True, source="crisis_scenario.frequency")
     
     class Meta:
         model = IncidentHistory
@@ -38,8 +47,13 @@ class IncidentHistorySerializer(serializers.ModelSerializer):
             'description',
             'crisis_scenario',
             'crisis_scenario_name',
-            'crisis_scenario_description'
+            'crisis_scenario_description',
+            'crisis_scenario_frequency',
+            'crisis_scenario_frequency_name'
         ]
+
+    def get_crisis_scenario_frequency_name(self, obj):
+        return dict(CrisisScenario.FREQUENCY).get(obj.crisis_scenario_frequency)
 
 
 class RisksAffectedByIncidentSerializer(serializers.ModelSerializer):

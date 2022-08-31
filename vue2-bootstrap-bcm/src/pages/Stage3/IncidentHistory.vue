@@ -51,8 +51,10 @@
                             :loading="loading"
                             :globalFilterFields="[
                                 'start_date',
+                                'start_hour',
                                 'end_date',
-                                'description',
+                                'end_hour',
+                                'crisis_scenario_frequency_name',
                                 'crisis_scenario_name',
                             ]"
                             :filters="filterGlobal"
@@ -107,11 +109,23 @@
                                 header="Nombre del escenario crítico"
                             ></Column>
                             <Column
-                                field="description"
-                                header="Descripción del incidente"
+                                field="crisis_scenario_frequency_name"
+                                header="Frecuencia del escenario crítico"
                             ></Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
+                                    <b-button
+                                        title="Detalle del incidente"
+                                        pill
+                                        variant="info"
+                                        @click="
+                                            show_modal_detail(slotProps.data.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            icon="fa-solid fa-search"
+                                        />
+                                    </b-button>
                                     <b-button
                                         v-if="
                                             is_superuser == true ||
@@ -119,7 +133,7 @@
                                                 'bcm_phase3.change_incidenthistory'
                                             )
                                         "
-                                        title="Editar incidencia"
+                                        title="Editar incidente"
                                         pill
                                         variant="warning"
                                         @click="
@@ -137,7 +151,7 @@
                                                 'bcm_phase3.delete_incidenthistory'
                                             )
                                         "
-                                        title="Eliminar incidencia"
+                                        title="Eliminar incidente"
                                         pill
                                         variant="danger"
                                         @click="
@@ -163,6 +177,56 @@
             <!-- /.col -->
         </div>
         <div class="row"></div>
+
+        <!--
+            Modal del detalle
+        -->
+        <b-modal
+            id="modal-detail"
+            title="Detalle del incidente"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <h3 class="text-center font-weight-bold">
+                {{ incidentDetail.crisis_scenario_name }}
+            </h3>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Fecha de inicio: </strong
+                    >{{ incidentDetail.start_date }} -
+                    {{ incidentDetail.start_time }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Fecha fin: </strong>{{ incidentDetail.end_date }} -
+                    {{ incidentDetail.end_time }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Frecuencia: </strong
+                    >{{ incidentDetail.crisis_scenario_frequency_name }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Descripción del escenario crítico: </strong
+                    >{{ incidentDetail.crisis_scenario_description }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Observaciones del incidente: </strong
+                    >{{ incidentDetail.description }}
+                </li>
+            </ul>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="info"
+                        class="float-right"
+                        @click="$bvModal.hide('modal-detail')"
+                    >
+                        Cerrar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
 
         <!--
             Modal de crear  
@@ -238,7 +302,7 @@
                     </b-col>
                 </b-row>
                 <b-form-group
-                    label="Seleccione el escenario crítico que ocasionará la incidencia"
+                    label="Seleccione el escenario crítico que ocasionará el incidente"
                     invalid-feedback="Este campo es obligatorio"
                     :state="incidentState.crisis_scenario"
                 >
@@ -252,7 +316,7 @@
                     ></b-form-select>
                 </b-form-group>
                 <b-form-group
-                    label="Ingrese la descripción del incidente"
+                    label="Ingrese las observaciones del incidente"
                     :state="incidentState.description"
                 >
                     <b-form-textarea
@@ -282,10 +346,10 @@
         -->
         <b-modal
             id="modal-confirm-create"
-            title="Confirmar crear incidencia"
+            title="Confirmar crear incidente"
             centered
         >
-            <h4>¿Está seguro de crear esta incidencia?</h4>
+            <h4>¿Está seguro de crear este incidente?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -371,7 +435,7 @@
                     </b-col>
                 </b-row>
                 <b-form-group
-                    label="Seleccione el escenario crítico que ocasionará la incidencia"
+                    label="Seleccione el escenario crítico que ocasionará el incidente"
                     invalid-feedback="Este campo es obligatorio"
                     :state="incidentState.crisis_scenario"
                 >
@@ -385,7 +449,7 @@
                     ></b-form-select>
                 </b-form-group>
                 <b-form-group
-                    label="Ingrese la descripción del incidente"
+                    label="Ingrese las observaciones del incidente"
                     :state="incidentState.description"
                 >
                     <b-form-textarea
@@ -481,6 +545,16 @@ export default {
 
         incidents: [],
         incidentId: 0,
+        incidentDetail: {
+            start_date: "",
+            start_time: "",
+            end_date: "",
+            end_time: "",
+            description: "",
+            crisis_scenario_name: "",
+            crisis_scenario_description: "",
+            crisis_scenario_frequency_name: "",
+        },
 
         incident: {
             start_date: "",
@@ -611,6 +685,8 @@ export default {
                                 description: res.data[i].description,
                                 crisis_scenario_name:
                                     res.data[i].crisis_scenario_name,
+                                crisis_scenario_frequency_name:
+                                    res.data[i].crisis_scenario_frequency_name,
                             };
                             this.incidents.push(inc);
                         }
@@ -739,6 +815,80 @@ export default {
             this.incident.crisis_scenario = 0;
             this.incidentState.crisis_scenario = null;
         },
+
+        /**
+         * Detail
+         */
+        async show_modal_detail(id) {
+            this.incidentDetail = {
+                start_date: "",
+                start_time: "",
+                end_date: "",
+                end_time: "",
+                description: "",
+                crisis_scenario_name: "",
+                crisis_scenario_description: "",
+                crisis_scenario_frequency_name: "",
+            };
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase3/incident-history/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.incidentDetail = {
+                        start_date: res.data.start_date.slice(0, 10),
+                        start_time: res.data.start_date.slice(11, 16),
+                        description: res.data.description,
+                        crisis_scenario_name: res.data.crisis_scenario_name,
+                        crisis_scenario_description:
+                            res.data.crisis_scenario_description,
+                        crisis_scenario_frequency_name:
+                            res.data.crisis_scenario_frequency_name,
+                    };
+
+                    if (res.data.end_date) {
+                        this.incidentDetail.end_date = res.data.end_date.slice(
+                            0,
+                            10
+                        );
+                        this.incidentDetail.end_time = res.data.end_date.slice(
+                            11,
+                            16
+                        );
+                    }
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-detail");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
         /**
          * Create
          */

@@ -312,7 +312,52 @@
             </h3>
 
             <h4 class="mt-5 text-center font-weight-bold">
-                Riesgos del servicios de la organización
+                Servicios de soporte asociados al servicio de la organización
+            </h4>
+            <b-list-group-item
+                class="mt-2 flex-column align-items-start"
+                v-for="item in serviceDetail.service_offered_service_used"
+                :key="item.key"
+            >
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        {{ item.name }}
+                    </h5>
+                    <small class="text-muted"
+                        >Tipo de servicio: {{ item.type_name }}
+                    </small>
+                </div>
+                <div class="mb-1 d-flex w-100 justify-content-between">
+                    <div>
+                        Criticidad: {{ item.criticality }}/{{
+                            item.scale_max_value
+                        }}
+                    </div>
+                    <div v-if="item.spending">
+                        Costo promedio: {{ item.spending }}$
+                    </div>
+                    <div v-if="!item.spending">Costo promedio: no aplica</div>
+                </div>
+                <div class="mb-1 d-flex w-100 justify-content-between">
+                    <div v-if="item.type == 1">
+                        <strong>Acuerdo de nivel de servicio (SLA): </strong
+                        >{{ item.agreement_comment }}
+                    </div>
+                    <div v-if="item.type == 2">
+                        <strong>Acuerdo de nivel operativo (OLA): </strong
+                        >{{ item.agreement_comment }}
+                    </div>
+                </div>
+            </b-list-group-item>
+            <h3
+                class="mt-3 text-center"
+                v-if="!serviceDetail.service_offered_service_used.length"
+            >
+                No existen servicios de soporte asociados a este servicio
+            </h3>
+
+            <h4 class="mt-5 text-center font-weight-bold">
+                Riesgos del servicio de la organización
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -846,9 +891,62 @@
         <b-modal
             id="modal-confirm-update"
             title="Confirmar editar servicio de la organización"
+            size="lg"
             centered
         >
-            <h4>¿Está seguro de editar este {{ type }} ofrecido?</h4>
+            <h4 v-if="services_used_by_service.length">
+                ¿Está seguro de editar este {{ type }} ofrecido? Tenga en
+                consideración que este servicio está asociado a los siguientes
+                servicios de soporte:
+            </h4>
+
+            <h4
+                v-if="services_used_by_service.length"
+                class="mt-5 text-center font-weight-bold"
+            >
+                Servicios de soporte asociados al servicio de la organización
+            </h4>
+            <b-list-group-item
+                class="mt-2 flex-column align-items-start"
+                v-for="item in services_used_by_service"
+                :key="item.key"
+            >
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        {{ item.name }}
+                    </h5>
+                    <small class="text-muted"
+                        >Tipo de servicio: {{ item.type_name }}
+                    </small>
+                </div>
+                <div class="mb-1 d-flex w-100 justify-content-between">
+                    <div>
+                        Criticidad: {{ item.criticality }}/{{
+                            item.scale_max_value
+                        }}
+                    </div>
+                    <div v-if="item.spending">
+                        Costo promedio: {{ item.spending }}$
+                    </div>
+                    <div v-if="!item.spending">Costo promedio: no aplica</div>
+                </div>
+                <div class="mb-1 d-flex w-100 justify-content-between">
+                    <div v-if="item.type == 1">
+                        <strong>Acuerdo de nivel de servicio (SLA): </strong
+                        >{{ item.agreement_comment }}
+                    </div>
+                    <div v-if="item.type == 2">
+                        <strong>Acuerdo de nivel operativo (OLA): </strong
+                        >{{ item.agreement_comment }}
+                    </div>
+                </div>
+            </b-list-group-item>
+            <h4 v-if="!services_used_by_service.length">
+                ¿Está seguro de editar este {{ type }} ofrecido? Tenga en
+                consideración que este servicio no posee servicios de soporte
+                asociados
+            </h4>
+
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -1110,8 +1208,10 @@ export default {
             scale_max_value: 0,
             _staffs_json: [],
             _risks: [],
+            service_offered_service_used: [],
         },
         staffs_detail: [],
+        services_used_by_service: [],
         serviceId: 0,
         serviceName: "",
         type: "",
@@ -1444,6 +1544,7 @@ export default {
                 scale_max_value: 0,
                 _staffs_json: [],
                 _risks: [],
+                service_offered_service_used: [],
             };
 
             axios
@@ -1518,8 +1619,6 @@ export default {
                     },
                 })
                 .then((res) => {
-                    console.log("DETALLE DEL STAFF");
-                    console.log(res.data);
                     this.staffs_detail = res.data;
 
                     this.$nextTick(() => {
@@ -1705,6 +1804,9 @@ export default {
                 )
                 .then((res) => {
                     this.service = res.data;
+                    this.services_used_by_service =
+                        res.data.service_offered_service_used;
+
                     this.recoveryTimeDuration = getRecoveryTime(
                         res.data.recovery_time
                     );

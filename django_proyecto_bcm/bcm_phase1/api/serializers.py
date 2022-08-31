@@ -43,6 +43,7 @@ class CrisisScenarioSerializer(serializers.ModelSerializer):
         child=serializers.IntegerField(), required=False, write_only=True)
     # Serializer aninado
     _risks = RiskSerializer(many=True, read_only=True)
+    frequency_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CrisisScenario
@@ -52,11 +53,16 @@ class CrisisScenarioSerializer(serializers.ModelSerializer):
             'description',
             'risks',
             '_risks',
+            'frequency',
+            'frequency_name'
         ]
 
+    def get_frequency_name(self, obj):
+        return dict(CrisisScenario.FREQUENCY).get(obj.frequency)
 
 
 class CrisisScenarioListSerializer(serializers.ModelSerializer):
+    frequency_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CrisisScenario
@@ -64,7 +70,12 @@ class CrisisScenarioListSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'description',
+            'frequency',
+            'frequency_name'
         ]
+
+    def get_frequency_name(self, obj):
+        return dict(CrisisScenario.FREQUENCY).get(obj.frequency)
 
 
 """
