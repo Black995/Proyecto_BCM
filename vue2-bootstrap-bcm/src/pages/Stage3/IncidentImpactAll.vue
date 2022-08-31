@@ -10,6 +10,15 @@
                         </h4>
                     </b-col>
                 </b-row>
+                <b-row class="text-right">
+                    <b-col>
+                        <b-button
+                            variant="outline-primary"
+                            @click="countStaffsArea"
+                            >Limpiar filtro de las gráficas
+                            <b-icon icon="filter"></b-icon></b-button
+                    ></b-col>
+                </b-row>
                 <b-row class="mt-3" align-v="center">
                     <b-col>
                         <b-form-group
@@ -176,19 +185,6 @@
                             Criticidad de los servicios de la organización
                             afectados
                         </h5>
-                        <!--
-                    En caso de colocar la clase que facilite el scroll
-                -->
-                        <!--div
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea
-                    "
-                    id="services-offered"
-                    class="chart"
-                -->
                         <div
                             v-if="
                                 loadingServicesOffered &&
@@ -286,7 +282,7 @@
                             class="text-center"
                         >
                             Servicios que excedieron el RTO debido a la duración
-                            del incidente
+                            de la incidencias
                         </h5>
                         <div
                             v-if="
@@ -307,9 +303,102 @@
                             ></apexchart>
                         </div>
                     </b-col>
+                    <b-col>
+                        <h5
+                            v-if="
+                                loadingServicesOffered &&
+                                loadingServicesUsed &&
+                                loadingOrgActivities &&
+                                loadingStaffsArea &&
+                                loadingServicesOnlyMinimumRTO &&
+                                loadingServicesMinimunRTO
+                            "
+                            class="text-center"
+                        >
+                            Servicios que NO excedieron el RTO debido a la
+                            duración de la incidencias
+                        </h5>
+                        <div
+                            v-if="
+                                loadingServicesOffered &&
+                                loadingServicesUsed &&
+                                loadingOrgActivities &&
+                                loadingStaffsArea &&
+                                loadingServicesOnlyMinimumRTO &&
+                                loadingServicesMinimunRTO
+                            "
+                            id="services-only-minimum-rto"
+                        >
+                            <apexchart
+                                type="bar"
+                                height="500"
+                                :options="
+                                    chartOptionsServicesNotExceedMinimumRTO
+                                "
+                                :series="seriesServicesNotExceedMinimumRTO"
+                            ></apexchart>
+                        </div>
+                    </b-col>
                 </b-row>
             </div>
         </div>
+
+        <b-row class="mt-3" align-v="center">
+            <b-col>
+                <h5
+                    v-if="servicesUsedAffectedByServicesOnlyMinimumRTO.length"
+                    class="text-center"
+                >
+                    Servicios de soporte afectados por los servicios de la
+                    organización que excedieron el RTO debido a la duración de
+                    la incidencias
+                </h5>
+                <b-list-group
+                    v-if="servicesUsedAffectedByServicesOnlyMinimumRTO.length"
+                    class="mt-3"
+                >
+                    <b-list-group-item
+                        class="flex-column align-items-start"
+                        v-for="item in servicesUsedAffectedByServicesOnlyMinimumRTO"
+                        :key="item.key"
+                    >
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                {{ item.name }}
+                            </h5>
+                            <small class="text-muted"
+                                >Tipo de servicio: {{ item.type_name }}
+                            </small>
+                        </div>
+                        <div class="mb-1 d-flex w-100 justify-content-between">
+                            <div>
+                                Criticidad: {{ item.criticality }}/{{
+                                    item.scale_max_value
+                                }}
+                            </div>
+                            <div v-if="item.spending">
+                                Costo promedio: {{ item.spending }}$
+                            </div>
+                            <div v-if="!item.spending">
+                                Costo promedio: no aplica
+                            </div>
+                        </div>
+                        <div class="mb-1 d-flex w-100 justify-content-between">
+                            <div v-if="item.type == 1">
+                                <strong
+                                    >Acuerdo de nivel de servicio (SLA): </strong
+                                >{{ item.agreement_comment }}
+                            </div>
+                            <div v-if="item.type == 2">
+                                <strong
+                                    >Acuerdo de nivel operativo (OLA): </strong
+                                >{{ item.agreement_comment }}
+                            </div>
+                        </div>
+                    </b-list-group-item>
+                </b-list-group>
+            </b-col>
+        </b-row>
     </div>
 </template>
 
@@ -347,6 +436,9 @@ export default {
         // Variables para guardar la duración del incidente y para guardar el servicio
         // de la organización y si excedió dicho RTO
         incidentDurationTime: 0,
+        hoursNow: 0,
+        minutesNow: 0,
+        timeNow: "",
         servicesByRTO: [],
 
         /**
@@ -643,6 +735,34 @@ export default {
                     },
                 },
             },
+            /**
+             * Tooltip -> y
+             * permite cambiar el texto en negritas del cuadrito flotante de la gráfica
+             */
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        let hours = 0;
+                        let minutes = 0;
+                        while (val >= 3600000) {
+                            val = val - 3600000;
+                            hours++;
+                        }
+                        while (val >= 60000) {
+                            val = val - 60000;
+                            minutes++;
+                        }
+
+                        let text = "";
+                        if (hours != 0) {
+                            text = hours + " horas, " + minutes + " minutos";
+                        } else {
+                            text = minutes + " minutos";
+                        }
+                        return text;
+                    },
+                },
+            },
             dataLabels: {
                 enabled: false,
             },
@@ -671,7 +791,24 @@ export default {
                     rotate: 0,
                     rotateAlways: false,
                     formatter: function (val) {
-                        return val.toFixed(0);
+                        let hours = 0;
+                        let minutes = 0;
+                        while (val >= 3600000) {
+                            val = val - 3600000;
+                            hours++;
+                        }
+                        while (val >= 60000) {
+                            val = val - 60000;
+                            minutes++;
+                        }
+
+                        let text = "";
+                        if (hours != 0) {
+                            text = hours + " horas, " + minutes + " minutos";
+                        } else {
+                            text = minutes + " minutos";
+                        }
+                        return text;
                     },
                 },
                 tooltip: {
@@ -705,6 +842,136 @@ export default {
                 },
             },
         },
+        seriesServicesNotExceedMinimumRTO: [
+            {
+                name: "RTO",
+                data: [],
+            },
+        ],
+        chartOptionsServicesNotExceedMinimumRTO: {
+            chart: {
+                id: "services-not-exceed-minimum-rto",
+                type: "bar",
+                height: 200,
+                width: 400,
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 10,
+                    horizontal: true,
+                    dataLabels: {
+                        position: "top", // top, center, bottom
+                    },
+                },
+            },
+            /**
+             * Tooltip -> y
+             * permite cambiar el texto en negritas del cuadrito flotante de la gráfica
+             */
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        let hours = 0;
+                        let minutes = 0;
+                        while (val >= 3600000) {
+                            val = val - 3600000;
+                            hours++;
+                        }
+                        while (val >= 60000) {
+                            val = val - 60000;
+                            minutes++;
+                        }
+
+                        let text = "";
+                        if (hours != 0) {
+                            text = hours + " horas, " + minutes + " minutos";
+                        } else {
+                            text = minutes + " minutos";
+                        }
+                        return text;
+                    },
+                },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            xaxis: {
+                categories: [],
+                //position: "top",
+                axisBorder: {
+                    show: false,
+                },
+                axisTicks: {
+                    show: false,
+                },
+                crosshairs: {
+                    fill: {
+                        type: "gradient",
+                        gradient: {
+                            colorFrom: "#D8E3F0",
+                            colorTo: "#BED1E6",
+                            stops: [0, 100],
+                            opacityFrom: 0.4,
+                            opacityTo: 0.5,
+                        },
+                    },
+                },
+                labels: {
+                    rotate: 0,
+                    rotateAlways: false,
+                    formatter: function (val) {
+                        let hours = 0;
+                        let minutes = 0;
+                        while (val >= 3600000) {
+                            val = val - 3600000;
+                            hours++;
+                        }
+                        while (val >= 60000) {
+                            val = val - 60000;
+                            minutes++;
+                        }
+
+                        let text = "";
+                        if (hours != 0) {
+                            text = hours + " horas, " + minutes + " minutos";
+                        } else {
+                            text = minutes + " minutos";
+                        }
+                        return text;
+                    },
+                },
+                tooltip: {
+                    enabled: true,
+                },
+            },
+            yaxis: {
+                min: 0,
+                max: 0,
+                decimalsInFloat: 0,
+            },
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 350,
+                        },
+                        legend: {
+                            position: "bottom",
+                        },
+                    },
+                },
+            ],
+            noData: {
+                text: "No se encontraron servicios de la organización que NO excedieran el RTO",
+                align: "center",
+                verticalAlign: "middle",
+                style: {
+                    fontSize: "14px",
+                },
+            },
+        },
+        servicesUsedAffectedByServicesOnlyMinimumRTO: [],
     }),
     computed: {
         chartOptionsServicesOffered: function () {
@@ -819,6 +1086,18 @@ export default {
                 verticalAlign: "top",
                 type: "danger",
             });
+        },
+        timeNowHoursMinutes(val) {
+            this.hoursNow = 0;
+            this.minutesNow = 0;
+            while (val >= 3600000) {
+                val = val - 3600000;
+                this.hoursNow++;
+            }
+            while (val >= 60000) {
+                val = val - 60000;
+                this.minutesNow++;
+            }
         },
 
         selectServiceOffered(index) {
@@ -957,10 +1236,6 @@ export default {
                     this.chartOptionsServicesOffered.yaxis.max = parseInt(
                         res.data[0].scale_max_value
                     );
-                    this.chartOptionsServicesOnlyMinimumRTO.yaxis.min =
-                        parseInt(res.data[0].scale_min_value);
-                    this.chartOptionsServicesOnlyMinimumRTO.yaxis.max =
-                        parseInt(res.data[0].scale_max_value);
                 })
                 .catch((err) => {
                     try {
@@ -1094,6 +1369,9 @@ export default {
                     this.staffsArea.push(a);
                 }
             });
+
+            this.chartOptionsStaffsArea.labels = [];
+            this.seriesStaffsArea = [];
 
             for (var i = 0; i < this.staffsArea.length; i++) {
                 this.chartOptionsStaffsArea.labels.push(
@@ -1250,6 +1528,8 @@ export default {
             this.loadingStaffsArea = false;
             this.loadingServicesMinimunRTO = false;
             this.loadingServicesOnlyMinimumRTO = false;
+            this.incidentDurationTime = 0;
+            this.timeNow = "";
             this.servicesOffered = [];
             this.staffs = [];
             this.servicesByRTO = [];
@@ -1261,6 +1541,14 @@ export default {
             this.chartOptionsServicesMinimunRTO.labels = [];
             this.chartOptionsServicesOnlyMinimumRTO.xaxis.categories = [];
             this.seriesServicesOnlyMinimumRTO[0].data = [];
+            this.chartOptionsServicesNotExceedMinimumRTO.xaxis.categories = [];
+            this.seriesServicesNotExceedMinimumRTO[0].data = [];
+            this.servicesUsedAffectedByServicesOnlyMinimumRTO = [];
+            // Reiniciamos mínimo y máximo de las gráficas que manejan RTO
+            this.chartOptionsServicesOnlyMinimumRTO.yaxis.min = 0;
+            this.chartOptionsServicesOnlyMinimumRTO.yaxis.max = 0;
+            this.chartOptionsServicesNotExceedMinimumRTO.yaxis.min = 0;
+            this.chartOptionsServicesNotExceedMinimumRTO.yaxis.max = 0;
 
             axios
                 .get(
@@ -1278,16 +1566,35 @@ export default {
                 )
                 .then((res) => {
                     for (var t = 0; t < res.data.length; t++) {
+                        let start_date_incident = new Date(
+                            res.data[t].start_date
+                        ).getTime();
+                        let end_date_incident;
+
                         if (res.data[t].end_date) {
-                            let start_date_incident = new Date(
-                                res.data[t].start_date
-                            ).getTime();
-                            let end_date_incident = new Date(
+                            end_date_incident = new Date(
                                 res.data[t].end_date
                             ).getTime();
-                            // Duración del incidente en milisegundos
-                            this.incidentDurationTime =
-                                end_date_incident - start_date_incident;
+                        } else {
+                            end_date_incident = Date.now();
+                            this.timeNow = Date.now();
+                        }
+
+                        // Duración del incidente en milisegundos
+                        this.incidentDurationTime =
+                            end_date_incident - start_date_incident;
+
+                        console.log("INCIDENT DURATION");
+                        console.log(this.incidentDurationTime);
+
+                        this.timeNowHoursMinutes(this.incidentDurationTime);
+                        // Mínimo tiempo de duración para los servicios que exceden el RTO
+                        if (
+                            this.chartOptionsServicesOnlyMinimumRTO.yaxis.min <
+                            this.incidentDurationTime
+                        ) {
+                            this.chartOptionsServicesOnlyMinimumRTO.yaxis.min =
+                                this.incidentDurationTime;
                         }
 
                         for (
@@ -1322,7 +1629,8 @@ export default {
                                      * SÓLO SE APLICA SI EXISTE LA FECHA FINAL DE LA INCIDENTE
                                      */
                                     let exceed_recovery_time = false;
-                                    if (res.data[t].end_date) {
+                                    let recovery_time_service = 0;
+                                    if (this.incidentDurationTime) {
                                         let hours = parseInt(
                                             res.data[t].risks_incident[
                                                 i
@@ -1337,14 +1645,22 @@ export default {
                                                 j
                                             ].recovery_time.slice(3, 5)
                                         );
-                                        let recovery_time_service =
+                                        recovery_time_service =
                                             hours * 3600000 + minutes * 60000;
+
+                                        console.log("Recovery time service");
+                                        console.log(recovery_time_service);
+
                                         if (
                                             this.incidentDurationTime <=
                                             recovery_time_service
                                         ) {
                                             exceed_recovery_time = true;
                                         }
+
+                                        console.log("Exceed RTO");
+                                        console.log(exceed_recovery_time);
+
                                         let serviceByRTO = {
                                             id: res.data[t].risks_incident[i]
                                                 .services_offered_risk[j].id,
@@ -1372,14 +1688,16 @@ export default {
                                         res.data[t].risks_incident[i]
                                             .services_offered_risk[j].name
                                     );
-                                    this.chartOptionsServicesOffered.chart.width =
-                                        this.chartOptionsServicesOffered.chart
-                                            .width + 100;
                                     this.seriesServicesOffered[0].data.push(
                                         res.data[t].risks_incident[i]
                                             .services_offered_risk[j]
                                             .criticality
                                     );
+                                    /*
+                                    this.chartOptionsServicesOffered.chart.width =
+                                        this.chartOptionsServicesOffered.chart
+                                            .width + 100;
+                                    */
                                     /**
                                      * Variables para la gráfica de servicios que exceden el RTO
                                      */
@@ -1389,10 +1707,94 @@ export default {
                                                 .services_offered_risk[j].name
                                         );
                                         this.seriesServicesOnlyMinimumRTO[0].data.push(
+                                            recovery_time_service
+                                        );
+                                        /**
+                                         * Mientras más valores vamos insertando en el tiempo,
+                                         * Vamos actualizando el RTO más alto
+                                         */
+                                        if (
+                                            this
+                                                .chartOptionsServicesOnlyMinimumRTO
+                                                .yaxis.max <
+                                            recovery_time_service
+                                        ) {
+                                            this.chartOptionsServicesOnlyMinimumRTO.yaxis.max =
+                                                recovery_time_service;
+                                        }
+
+                                        /**
+                                         * Se agregan los servicios de soporte afectados por servicios de la org.
+                                         */
+                                        console.log(
+                                            "Servicios de soporte del servicio afectado"
+                                        );
+                                        console.log(
                                             res.data[t].risks_incident[i]
                                                 .services_offered_risk[j]
-                                                .criticality
                                         );
+                                        console.log(
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j]
+                                                .service_offered_service_used
+                                        );
+                                        for (
+                                            var a = 0;
+                                            a <
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j]
+                                                .service_offered_service_used
+                                                .length;
+                                            a++
+                                        ) {
+                                            // En caso de que no esté el objeto en el array
+                                            if (
+                                                !this.servicesUsedAffectedByServicesOnlyMinimumRTO.find(
+                                                    (x) =>
+                                                        x.id ===
+                                                        res.data[t]
+                                                            .risks_incident[i]
+                                                            .services_offered_risk[
+                                                            j
+                                                        ]
+                                                            .service_offered_service_used[
+                                                            a
+                                                        ].id
+                                                )
+                                            ) {
+                                                this.servicesUsedAffectedByServicesOnlyMinimumRTO.push(
+                                                    res.data[t].risks_incident[
+                                                        i
+                                                    ].services_offered_risk[j]
+                                                        .service_offered_service_used[
+                                                        a
+                                                    ]
+                                                );
+                                            }
+                                        }
+                                    } else {
+                                        /**
+                                         * Para el caso de los servicios que no excedieron RTO
+                                         */
+                                        this.chartOptionsServicesNotExceedMinimumRTO.xaxis.categories.push(
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j].name
+                                        );
+                                        this.seriesServicesNotExceedMinimumRTO[0].data.push(
+                                            recovery_time_service
+                                        );
+                                        /**
+                                         * Máximo valor es el tiempo del RTO excedido
+                                         */
+                                        if (
+                                            this
+                                                .chartOptionsServicesNotExceedMinimumRTO
+                                                .yaxis.max <
+                                            this.incidentDurationTime
+                                        ) {
+                                            this.chartOptionsServicesNotExceedMinimumRTO.yaxis.max =
+                                                this.incidentDurationTime;
+                                        }
                                     }
                                 }
                                 // Staffs
@@ -1502,6 +1904,11 @@ export default {
                     console.log("RTO de los servicios");
                     console.log(this.servicesByRTO);
                     */
+                    console.log("Servicios de soporte afectados");
+                    console.log(
+                        this.servicesUsedAffectedByServicesOnlyMinimumRTO
+                    );
+
                     this.countStaffsArea();
                     this.loadingServicesOffered = true;
 
@@ -1509,6 +1916,8 @@ export default {
                     this.loadingServicesOnlyMinimumRTO = true;
                 })
                 .catch((err) => {
+                    console.log("ERROR:");
+                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {

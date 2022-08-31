@@ -441,6 +441,8 @@ class ServiceOfferedStaffSerializer(serializers.ModelSerializer):
     area_name = serializers.CharField(read_only=True, source="area.name")
     # Serializer aninado
     staffs_service = SO_SSerializer(many=True, read_only=True, source="service_offered_so_s")
+    # Serializer aninado
+    service_offered_service_used = ServiceUsedListSerializer(many=True, read_only=True)
 
     class Meta:
         model = ServiceOffered
@@ -454,7 +456,8 @@ class ServiceOfferedStaffSerializer(serializers.ModelSerializer):
             'maximum_recovery_time',
             'criticality',
             'area_name',
-            'staffs_service'
+            'staffs_service',
+            'service_offered_service_used'
         ]
 
     def get_type_name(self, obj):

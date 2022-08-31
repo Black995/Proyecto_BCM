@@ -13,7 +13,7 @@ from rest_framework_recursive.fields import RecursiveField
 class IncidentHistoryListSerializer(serializers.ModelSerializer):
     crisis_scenario_name = serializers.CharField(read_only=True, source="crisis_scenario.name")
     crisis_scenario_frequency = serializers.CharField(read_only=True, source="crisis_scenario.frequency")
-    crisis_scenario_frequency_name = serializers.CharField(read_only=True, source="crisis_scenario.frequency")
+    crisis_scenario_frequency_name = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = IncidentHistory
@@ -29,7 +29,7 @@ class IncidentHistoryListSerializer(serializers.ModelSerializer):
         ]
 
     def get_crisis_scenario_frequency_name(self, obj):
-        return dict(CrisisScenario.FREQUENCY).get(obj.crisis_scenario_frequency)
+        return dict(CrisisScenario.FREQUENCY).get(obj.crisis_scenario.frequency)
 
 
 class IncidentHistorySerializer(serializers.ModelSerializer):
