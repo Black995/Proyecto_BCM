@@ -1,3 +1,6 @@
+import csv
+import os
+from django.conf import settings
 from bcm_phase2.models import (InterestedParty, ServiceOffered, ServiceUsed, Staff, 
                                 OrganizationActivity, SO_S)
 from django.shortcuts import get_object_or_404
@@ -9,6 +12,9 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q, F
 from bcm_phase2.api.filters import (SO_SFilterBackend)
+from rest_framework.generics import (ListAPIView)
+from django.http.response import Http404
+from django.shortcuts import HttpResponse
 
 
 class ServiceOfferedListViewSet(viewsets.ModelViewSet):
@@ -84,3 +90,18 @@ class SO_SViewSet(viewsets.ModelViewSet):
     filter_backends = [SO_SFilterBackend, ]
 
     
+
+class download_excel_massive_load_staff(ListAPIView):
+    queryset = Staff.objects.all()
+
+    def get(self, request):
+        file_path = os.path.join(
+            settings.STATICFILES_DIRS[2], 'massive_load_staff.xlsx')
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-Excel")
+                response['Content-Disposition'] = 'inline; filename=' + \
+                    os.path.basename(file_path)
+                return response
+        raise Http404

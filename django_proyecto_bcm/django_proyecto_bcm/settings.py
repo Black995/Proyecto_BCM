@@ -190,6 +190,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(MEDIA_ROOT, 'organization'),
     os.path.join(MEDIA_ROOT, 'users'),
+    os.path.join(BASE_DIR, 'Ressources'),
 ]
 
 # Default primary key field type

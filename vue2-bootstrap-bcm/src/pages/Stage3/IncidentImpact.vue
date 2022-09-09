@@ -916,8 +916,6 @@ export default {
                     type: "bar",
                     height: 200,
                     width: 400,
-                    //height: 100,
-                    //width: 0,
                     events: {
                         dataPointSelection: (event, chartContext, config) => {
                             this.selectServiceOffered(config.dataPointIndex);
@@ -1757,8 +1755,6 @@ export default {
                     }
                 })
                 .catch((err) => {
-                    console.log("Err");
-                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {

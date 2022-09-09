@@ -979,8 +979,8 @@ export default {
                 chart: {
                     id: "services-offered",
                     type: "bar",
-                    height: 100,
-                    width: 0,
+                    height: 200,
+                    width: 400,
                     events: {
                         dataPointSelection: (event, chartContext, config) => {
                             this.selectServiceOffered(config.dataPointIndex);
@@ -990,10 +990,14 @@ export default {
                 plotOptions: {
                     bar: {
                         borderRadius: 10,
+                        horizontal: true,
                         dataLabels: {
                             position: "top", // top, center, bottom
                         },
                     },
+                },
+                dataLabels: {
+                    enabled: false,
                 },
                 xaxis: {
                     categories: [],
@@ -1016,13 +1020,6 @@ export default {
                             },
                         },
                     },
-                    tooltip: {
-                        enabled: true,
-                    },
-                },
-                yaxis: {
-                    min: 0,
-                    max: 0,
                     labels: {
                         rotate: 0,
                         rotateAlways: false,
@@ -1030,6 +1027,13 @@ export default {
                             return val.toFixed(0);
                         },
                     },
+                    tooltip: {
+                        enabled: true,
+                    },
+                },
+                yaxis: {
+                    min: 0,
+                    max: 0,
                     decimalsInFloat: 0,
                 },
                 responsive: [
@@ -1581,10 +1585,11 @@ export default {
                         }
 
                         // Duración del incidente en milisegundos
+                        this.incidentDurationTime = 0;
                         this.incidentDurationTime =
                             end_date_incident - start_date_incident;
 
-                        console.log("INCIDENT DURATION");
+                        console.log("INCIDENT DURATION TIME");
                         console.log(this.incidentDurationTime);
 
                         this.timeNowHoursMinutes(this.incidentDurationTime);
@@ -1610,6 +1615,12 @@ export default {
                                 j++
                             ) {
                                 // Servicios de la org.
+                                /**
+                                 * El problema aquí es que en la primera iteracción inserta
+                                 * los servicios que encuentra y no toma en cuenta los servicios
+                                 * de las demás iteracciones y, por lo tanto, no se pueden
+                                 * hacer cálculos con el tiempo de duración del incidente
+                                 */
                                 if (
                                     !this.servicesOffered.find(
                                         (x) =>
@@ -1648,17 +1659,13 @@ export default {
                                         recovery_time_service =
                                             hours * 3600000 + minutes * 60000;
 
-                                        console.log("Recovery time service");
-                                        console.log(recovery_time_service);
-
                                         if (
                                             this.incidentDurationTime <=
                                             recovery_time_service
                                         ) {
                                             exceed_recovery_time = true;
                                         }
-
-                                        console.log("Exceed RTO");
+                                        console.log("Exceed recovery time");
                                         console.log(exceed_recovery_time);
 
                                         let serviceByRTO = {
@@ -1726,13 +1733,7 @@ export default {
                                         /**
                                          * Se agregan los servicios de soporte afectados por servicios de la org.
                                          */
-                                        console.log(
-                                            "Servicios de soporte del servicio afectado"
-                                        );
-                                        console.log(
-                                            res.data[t].risks_incident[i]
-                                                .services_offered_risk[j]
-                                        );
+                                        console.log("services used");
                                         console.log(
                                             res.data[t].risks_incident[i]
                                                 .services_offered_risk[j]
@@ -1797,6 +1798,245 @@ export default {
                                         }
                                     }
                                 }
+                                /**
+                                 * Alternativa para manejar servicios con los RTO excedidos
+                                 */
+                                /*
+                                if (
+                                    !this.servicesOffered.find(
+                                        (x) =>
+                                            x.id ===
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j].id
+                                    )
+                                ) {
+                                    this.servicesOffered.push(
+                                        res.data[t].risks_incident[i]
+                                            .services_offered_risk[j]
+                                    );
+                                    
+                                    this.chartOptionsServicesOffered.xaxis.categories.push(
+                                        res.data[t].risks_incident[i]
+                                            .services_offered_risk[j].name
+                                    );
+                                    this.seriesServicesOffered[0].data.push(
+                                        res.data[t].risks_incident[i]
+                                            .services_offered_risk[j]
+                                            .criticality
+                                    );
+                                }
+
+                                let exceed_recovery_time = false;
+                                let recovery_time_service = 0;
+                                if (this.incidentDurationTime) {
+                                    let hours = parseInt(
+                                        res.data[t].risks_incident[
+                                            i
+                                        ].services_offered_risk[
+                                            j
+                                        ].recovery_time.slice(0, 2)
+                                    );
+                                    let minutes = parseInt(
+                                        res.data[t].risks_incident[
+                                            i
+                                        ].services_offered_risk[
+                                            j
+                                        ].recovery_time.slice(3, 5)
+                                    );
+                                    recovery_time_service =
+                                        hours * 3600000 + minutes * 60000;
+
+                                    if (
+                                        this.incidentDurationTime <=
+                                        recovery_time_service
+                                    ) {
+                                        exceed_recovery_time = true;
+                                    }
+                                    console.log("Exceed recovery time");
+                                    console.log(exceed_recovery_time);
+                                    if (
+                                        !this.servicesByRTO.find(
+                                            (x) =>
+                                                x.id ===
+                                                res.data[t].risks_incident[i]
+                                                    .services_offered_risk[j].id
+                                        )
+                                    ) {
+                                        let serviceByRTO = {
+                                            id: res.data[t].risks_incident[i]
+                                                .services_offered_risk[j].id,
+                                            area_name:
+                                                res.data[t].risks_incident[i]
+                                                    .services_offered_risk[j]
+                                                    .area_name,
+                                            name: res.data[t].risks_incident[i]
+                                                .services_offered_risk[j].name,
+                                            type_name:
+                                                res.data[t].risks_incident[i]
+                                                    .services_offered_risk[j]
+                                                    .type_name,
+                                            recovery_time:
+                                                recovery_time_service,
+                                            exceed_recovery_time:
+                                                exceed_recovery_time,
+                                        };
+                                        this.servicesByRTO.push(serviceByRTO);
+                                    }
+                                }
+                                */
+                                /**
+                                 * Variables para la gráfica de servicios que exceden el RTO
+                                 */
+                                /*
+                                if (exceed_recovery_time) {
+                                    if (
+                                        !this.chartOptionsServicesOnlyMinimumRTO.xaxis.categories.find(
+                                            (x) =>
+                                                x ===
+                                                res.data[t].risks_incident[i]
+                                                    .services_offered_risk[j]
+                                                    .name
+                                        )
+                                    ) {
+                                        this.chartOptionsServicesOnlyMinimumRTO.xaxis.categories.push(
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j].name
+                                        );
+                                        this.seriesServicesOnlyMinimumRTO[0].data.push(
+                                            recovery_time_service
+                                        );
+                                        */
+                                /**
+                                 * Mientras más valores vamos insertando en el tiempo,
+                                 * Vamos actualizando el RTO más alto
+                                 */
+                                /*
+                                        if (
+                                            this
+                                                .chartOptionsServicesOnlyMinimumRTO
+                                                .yaxis.max <
+                                            recovery_time_service
+                                        ) {
+                                            this.chartOptionsServicesOnlyMinimumRTO.yaxis.max =
+                                                recovery_time_service;
+                                        }
+                                        
+                                        // Se agregan los servicios de soporte afectados por servicios de la org.
+                                        
+                                        console.log("services used");
+                                        console.log(
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j]
+                                                .service_offered_service_used
+                                        );
+                                        for (
+                                            var a = 0;
+                                            a <
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j]
+                                                .service_offered_service_used
+                                                .length;
+                                            a++
+                                        ) {
+                                            // En caso de que no esté el objeto en el array
+                                            if (
+                                                !this.servicesUsedAffectedByServicesOnlyMinimumRTO.find(
+                                                    (x) =>
+                                                        x.id ===
+                                                        res.data[t]
+                                                            .risks_incident[i]
+                                                            .services_offered_risk[
+                                                            j
+                                                        ]
+                                                            .service_offered_service_used[
+                                                            a
+                                                        ].id
+                                                )
+                                            ) {
+                                                this.servicesUsedAffectedByServicesOnlyMinimumRTO.push(
+                                                    res.data[t].risks_incident[
+                                                        i
+                                                    ].services_offered_risk[j]
+                                                        .service_offered_service_used[
+                                                        a
+                                                    ]
+                                                );
+                                            }
+                                        }
+                                    } else {
+                                    */
+                                /**
+                                 * Si no está en el array de servicios que excedieron el RTO,
+                                 * entonces está en el array de los que no excedieron, por lo
+                                 * que se tiene que eliminar del mismo
+                                 */
+                                /*
+                                        for (
+                                            var k = 0;
+                                            k <
+                                            this
+                                                .chartOptionsServicesNotExceedMinimumRTO
+                                                .xaxis.categories.length;
+                                            k++
+                                        ) {
+                                            if (
+                                                this
+                                                    .chartOptionsServicesNotExceedMinimumRTO
+                                                    .xaxis.categories[k] ==
+                                                res.data[t].risks_incident[i]
+                                                    .services_offered_risk[j]
+                                                    .name
+                                            ) {
+                                                this.chartOptionsServicesNotExceedMinimumRTO.xaxis.categories.slice(
+                                                    1,
+                                                    k
+                                                );
+                                                this.seriesServicesNotExceedMinimumRTO[0].data.slice(
+                                                    1,
+                                                    k
+                                                );
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    */
+                                /**
+                                 * Para el caso de los servicios que no excedieron RTO.
+                                 * Primero se verifica si no está en la lista de los que excedieron RTO
+                                 * En el caso de que sí haya excedido, entonces no se agrega
+                                 */
+                                /*
+                                    if (
+                                        !this.chartOptionsServicesOnlyMinimumRTO.xaxis.categories.find(
+                                            (x) =>
+                                                x ===
+                                                res.data[t].risks_incident[i]
+                                                    .services_offered_risk[j]
+                                                    .name
+                                        )
+                                    ) {
+                                        this.chartOptionsServicesNotExceedMinimumRTO.xaxis.categories.push(
+                                            res.data[t].risks_incident[i]
+                                                .services_offered_risk[j].name
+                                        );
+                                        this.seriesServicesNotExceedMinimumRTO[0].data.push(
+                                            recovery_time_service
+                                        );*/
+                                /**
+                                 * Máximo valor es el tiempo del RTO excedido
+                                 */
+                                /*        if (
+                                            this
+                                                .chartOptionsServicesNotExceedMinimumRTO
+                                                .yaxis.max <
+                                            this.incidentDurationTime
+                                        ) {
+                                            this.chartOptionsServicesNotExceedMinimumRTO.yaxis.max =
+                                                this.incidentDurationTime;
+                                        }
+                                    }
+                                }
+                                */
                                 // Staffs
                                 for (
                                     var k = 0;
@@ -1904,10 +2144,6 @@ export default {
                     console.log("RTO de los servicios");
                     console.log(this.servicesByRTO);
                     */
-                    console.log("Servicios de soporte afectados");
-                    console.log(
-                        this.servicesUsedAffectedByServicesOnlyMinimumRTO
-                    );
 
                     this.countStaffsArea();
                     this.loadingServicesOffered = true;
@@ -1916,8 +2152,6 @@ export default {
                     this.loadingServicesOnlyMinimumRTO = true;
                 })
                 .catch((err) => {
-                    console.log("ERROR:");
-                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
