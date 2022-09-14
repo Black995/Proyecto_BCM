@@ -112,6 +112,27 @@
                                     </div>
                                 </template>
                             </Column>
+                            <Column field="id_2" header="Asociar servicios">
+                                <template #body="slotProps">
+                                    <div class="text-center">
+                                        <b-button
+                                            pill
+                                            title="Asociar servicios de soporte"
+                                            variant="primary"
+                                            @click="
+                                                show_modal_association_support_services(
+                                                    slotProps.data.id,
+                                                    slotProps.data.name
+                                                )
+                                            "
+                                        >
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-computer"
+                                            />
+                                        </b-button>
+                                    </div>
+                                </template>
+                            </Column>
                             <template #empty>
                                 No hay servicios encontradas.
                             </template>
@@ -428,8 +449,7 @@
             </b-list-group>
 
             <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
-                No existen servicios de la organización asociados a este
-                servicio contratado
+                No existen servicios de la organización asociados a esta parte interesada
             </h3>
 
             <template #modal-footer>
@@ -466,6 +486,65 @@
                         @click="associateServices"
                     >
                         Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+
+        <b-modal
+            id="modal-associate-support-services"
+            title="Asociar servicios de la organización con la parte interesada"
+            size="lg"
+            centered
+        >
+            <multiselect
+                v-model="selectedServicesUsed"
+                placeholder="Buscar servicios de la organización"
+                label="name"
+                track-by="id"
+                :options="servicesUsed"
+                :multiple="true"
+            ></multiselect>
+
+            <b-list-group v-if="selectedServicesUsed.length" class="mt-3">
+                <b-list-group-item
+                    href="#"
+                    class="flex-column align-items-start"
+                    v-for="item in selectedServicesUsed"
+                    :key="item.key"
+                >
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ item.name }}</h5>
+                        <!--small class="text-muted">3 days ago</small-->
+                    </div>
+                    <div class="mb-1 d-flex w-100 justify-content-between">
+                        <div>Area: {{ item.area_name }}</div>
+                        <div>Tipo: {{ item.type_name }}</div>
+                        <div v-if="!item.scale_max_value">
+                            Criticidad: {{ item.criticality }}
+                        </div>
+                        <div v-if="item.scale_max_value">
+                            Criticidad: {{ item.criticality }}/{{
+                                item.scale_max_value
+                            }}
+                        </div>
+                    </div>
+                </b-list-group-item>
+            </b-list-group>
+
+            <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
+                No existen servicios de soporte asociados a esta parte interesada
+            </h3>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        class="float-right"
+                        @click="show_modal_confirm_association_services"
+                    >
+                        Asociar servicios de soporte
                     </b-button>
                 </div>
             </template>
@@ -552,6 +631,7 @@ export default {
     mounted() {
         this.getParties()
         this.getServicesOffered()
+        this.getServicesUsed()
         this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
     },
@@ -953,6 +1033,7 @@ export default {
                     }
                 });
         },
+    
         async associateServices() {
             let servicesIds = [];
             for (let i = 0; i < this.selectedServicesOffered.length; i++) {
@@ -981,6 +1062,72 @@ export default {
                         this.$bvModal.hide("modal-confirm-associate-services");
                         this.$bvModal.hide("modal-associate-services");
                     });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async show_modal_association_support_services(id) {
+            this.partyId = id;
+            this.selectedServicesOffered = [];
+
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    for (
+                        let i = 0;
+                        i < res.data._services_used.length;
+                        i++
+                    ) {
+                        this.selectedServicesUsed.push(
+                            res.data._services_used[i]
+                        );
+                    }
+
+                    this.$nextTick(() => {
+                        this.$bvModal.show("modal-associate-support-services");
+                    });
+                });
+        },
+        async getServicesUsed() {
+            this.servicesUsed = [];
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/services/used/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.servicesUsed = res.data;
                 })
                 .catch((err) => {
                     try {
