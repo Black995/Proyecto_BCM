@@ -91,6 +91,11 @@ import 'vue-phone-number-input/dist/vue-phone-number-input.css';
 
 Vue.component('vue-phone-number-input', VuePhoneNumberInput);
 
+/**
+ * Flowchart Vue
+ */
+import FlowChart from 'flowchart-vue';
+Vue.use(FlowChart);
 
 /* eslint-disable no-new */
 new Vue({

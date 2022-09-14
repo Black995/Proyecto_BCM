@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, ServiceOfferedListViewSet, ServiceOfferedViewSet,
                     ServiceUsedListViewSet, ServiceUsedViewSet, StaffListViewSet,
                     StaffViewSet,OrganizationActivityListViewSet,OrganizationActivityViewSet, 
-                    SO_SViewSet, ServiceOfferedWithStaffsViewSet)
+                    SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_excel_massive_load_staff)
 
 
 urlpatterns = [
@@ -35,6 +35,8 @@ urlpatterns = [
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='staff_detail'),
+    path('staffs/download_excel_massive_load_staff/', download_excel_massive_load_staff.as_view(),
+         name='download_excel_massive_load_staff'),
     path('organizationActivities/', OrganizationActivityListViewSet.as_view({
         'get':'list',
         'post':'create'}), name='activity_list'),
