@@ -1,9 +1,11 @@
 from django.urls import path
 
-from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, ServiceOfferedListViewSet, ServiceOfferedViewSet,
+from bcm_phase2.api.filters import R_SOFilterBackend
+
+from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, R_SOViewSet, ServiceOfferedListViewSet, ServiceOfferedViewSet,
                     ServiceUsedListViewSet, ServiceUsedViewSet, StaffListViewSet,
                     StaffViewSet,OrganizationActivityListViewSet,OrganizationActivityViewSet, 
-                    SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_excel_massive_load_staff)
+                    SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_excel_massive_load_staff, RessourceWithServiceOfferedViewSet, RessourceViewSet, RessourceListViewSet)
 
 
 urlpatterns = [
@@ -60,6 +62,27 @@ urlpatterns = [
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',
-        'delete': 'destroy'}), name='so_s_detail')
+        'delete': 'destroy'}), name='so_s_detail'),
+    path('ressources/', RessourceListViewSet.as_view({
+        'get':'list',
+        'post':'create'}), name='resource_list'),
+    path('resources/<int:pk>/', RessourceViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'}), name='ressource_detail'),
+    path('ressource/service_offered/<int:pk>/', RessourceWithServiceOfferedViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update'}), name='ressource_with_service_offered'),
+    path('ressource_service_offered/', R_SOViewSet.as_view({
+        'get':'list',
+        'post':'create'}), name='r_so_list'),
+    path('ressource_service_offered/<int:id>/', R_SOViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'}), name='r_so_detail')
+
     
 ]

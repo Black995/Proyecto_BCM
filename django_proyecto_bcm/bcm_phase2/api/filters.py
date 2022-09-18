@@ -10,3 +10,11 @@ class SO_SFilterBackend(filters.BaseFilterBackend):
         if service_id:
             queryset = queryset.filter(service_offered=service_id)
         return queryset
+
+class R_SOFilterBackend(filters.BaseFilterBackend):
+
+    def filter_queryset(self,request,queryset,view):
+        ressource_id = request.GET.get('ressource_id')
+        if ressource_id:
+            queryset = queryset.filter(ressource=ressource_id)
+        return queryset

@@ -91,7 +91,7 @@
                                     </b-button>
                                 </template>
                             </Column>
-                            <Column field="id_2" header="Asociar servicios">
+                            <Column field="id_2" header="Asociar servicios de Org.">
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
@@ -112,7 +112,7 @@
                                     </div>
                                 </template>
                             </Column>
-                            <Column field="id_2" header="Asociar servicios">
+                            <Column field="id_3" header="Asociar servicios de soporte">
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
@@ -166,7 +166,7 @@
                 </li>
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
-                Servicios ofrecidos asociados a esta parte interesada
+                Servicios de la organización asociados a esta parte interesada
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -178,10 +178,10 @@
             
             </b-list-group-item>
             <h3 class="mt-3 text-center" v-if="!partyDetail._services_offered.length">
-                No existen servicios ofrecidos asociados a esta parte interesada
+                No existen servicios de la organización asociados a esta parte interesada
             </h3>
             <h4 class="mt-5 text-center font-weight-bold">
-                Servicios de la organización asociados a esta parte interesada
+                Servicios de soporte asociados a esta parte interesada
             </h4>
             <b-list-group-item
                 class="mt-2 flex-column align-items-start"
@@ -192,7 +192,7 @@
                 <p class="mb-1">Tipo:</p> {{item.type_name}}
             </b-list-group-item>
             <h3 class="mt-3 text-center" v-if="!partyDetail._services_used.length">
-                No existen servicios de la organización asociados a esta parte interesada
+                No existen servicios de soporte asociados a esta parte interesada
             </h3>
 
             <template #modal-footer>
@@ -235,18 +235,6 @@
                     </b-form-input>
                 </b-form-group>
                 <b-form-group
-                    label="Ingrese la descripción de la parte interesada"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.description"
-                >
-                    <b-form-textarea
-                        v-model="party.description"
-                        :state="partyState.description"
-                        required
-                        rows="3"
-                    ></b-form-textarea>
-                </b-form-group>
-                <b-form-group
                     label="Seleccione el tipo"
                     invalid-feedback="Este campo es obligatorio"
                     :state="partyState.type"
@@ -260,6 +248,19 @@
                         required
                     ></b-form-select>
                 </b-form-group>
+                <b-form-group
+                    label="Ingrese la descripción de la parte interesada"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="partyState.description"
+                >
+                    <b-form-textarea
+                        v-model="party.description"
+                        :state="partyState.description"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
+                
             </form>   
             <template #modal-footer>
                 <div class="w-100">
@@ -533,7 +534,7 @@
                 </b-list-group-item>
             </b-list-group>
 
-            <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
+            <h3 class="mt-3 text-center" v-if="!selectedServicesUsed.length">
                 No existen servicios de soporte asociados a esta parte interesada
             </h3>
 
@@ -542,9 +543,35 @@
                     <b-button
                         variant="primary"
                         class="float-right"
-                        @click="show_modal_confirm_association_services"
+                        @click="show_modal_confirm_association_support_services"
                     >
                         Asociar servicios de soporte
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar asociar servicios  
+        -->
+        <b-modal
+            id="modal-confirm-associate-support-services"
+            title="Confirmar asociar servicios de la organización"
+            centered
+        >
+            <h4>
+                ¿Está seguro de asociar estos servicios de la soporte a la
+                parte interesada?                
+                
+            </h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        class="float-right"
+                        @click="associateSupportServices"
+                    >
+                        Confirmar
                     </b-button>
                 </div>
             </template>
@@ -1055,7 +1082,7 @@ export default {
                 )
                 .then((res) => {
                     this.successMessage(
-                        "¡Los servicios fuero asociados a la parte interesada exitosamente!"
+                        "¡Los servicios fueron asociados a la parte interesada exitosamente!"
                     );
 
                     this.$nextTick(() => {
@@ -1088,7 +1115,7 @@ export default {
         },
         async show_modal_association_support_services(id) {
             this.partyId = id;
-            this.selectedServicesOffered = [];
+            this.selectedServicesUsed = [];
 
             axios
                 .get(
@@ -1128,6 +1155,63 @@ export default {
                 })
                 .then((res) => {
                     this.servicesUsed = res.data;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        show_modal_confirm_association_support_services() {
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-associate-support-services");
+            });
+        },
+        async associateSupportServices() {
+            let servicesIds = [];
+            for (let i = 0; i < this.selectedServicesUsed.length; i++) {
+                servicesIds.push(this.selectedServicesUsed[i].id);
+            }
+            let ids = {
+                services_used: servicesIds,
+            };
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
+                    ids,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    this.successMessage(
+                        "¡Los servicios fueron asociados a la parte interesada exitosamente!"
+                    );
+
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-associate-services");
+                        this.$bvModal.hide("modal-associate-services");
+                    });
                 })
                 .catch((err) => {
                     try {

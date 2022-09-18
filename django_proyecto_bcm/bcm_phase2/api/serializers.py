@@ -1,7 +1,7 @@
 from curses.ascii import SO
 from wsgiref.simple_server import server_version
 from numpy import delete
-from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity, SO_S
+from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity, SO_S, Ressource, R_SO
 from configuration.models import ScaleView
 from rest_framework import serializers
 from django.db.models import F, Q
@@ -463,3 +463,64 @@ class ServiceOfferedStaffSerializer(serializers.ModelSerializer):
     def get_type_name(self, obj):
         return dict(ServiceOffered.TYPE).get(obj.type)
 
+class RessourceListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ressource
+        fields = [
+            'id',
+            'name',
+            'amount',
+        ]
+
+class RessourceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ressource
+        fields =[
+            'id',
+            'name',
+            'amount',
+        ]
+class RessourceWithServiceOfferedSerializer(serializers.ModelSerializer):
+
+    services_json = serializers.ListField(
+        child = serializers.JSONField(), requiered=False)
+
+    class Meta:
+        model: ServiceOffered
+        fields = [
+            'id',
+            'services_json'
+        ]
+    
+    def update(self, instance, validated_data):
+        id_ressource = validated_data.get('id',instance.id)
+        services_json = validated_data.get('services_json')
+        ressource = Ressource.objects.get(id=id_ressource)
+
+
+        if services_json is not None:
+            R_SO.objects.filter(ressource=id_ressource).delete()
+
+            for s in services_json:
+                service = ServiceOffered.objects.get(id=s['id'])
+                R_SO.objects.create(
+                    amount=s['amount'],
+                    ressource = ressource,
+                    service_offered = service
+                )
+
+        instance.save()
+        return instance
+
+class R_SOSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(read_only=True, source="service_offered.name")
+    service_type_name =serializers.CharFiled(read_only=True, source="service_ofered.type")
+    serivce_profit = serializers.CharField(read_only=True, source="service_offered.profit")
+    fields = [
+        'id',
+        'service_name',
+        'service_type_name',
+        'service_profit',
+    ]
