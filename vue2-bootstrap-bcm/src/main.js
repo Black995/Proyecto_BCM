@@ -41,7 +41,7 @@ Vue.use(PaperDashboard);
  * Bootstrap Vue
  */
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import { BButton } from 'bootstrap-vue'
+import { BButton, BIconJustify } from 'bootstrap-vue'
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
 Vue.use(BootstrapVue)
@@ -92,10 +92,13 @@ import 'vue-phone-number-input/dist/vue-phone-number-input.css';
 Vue.component('vue-phone-number-input', VuePhoneNumberInput);
 
 /**
- * Flowchart Vue
+ * Flowy
  */
-import FlowChart from 'flowchart-vue';
-Vue.use(FlowChart);
+import FlowyPlugin from "@hipsjs/flowy-vue";
+import "@hipsjs/flowy-vue/dist/lib/flowy-vue.css";
+
+Vue.use(FlowyPlugin);
+
 
 /* eslint-disable no-new */
 new Vue({
