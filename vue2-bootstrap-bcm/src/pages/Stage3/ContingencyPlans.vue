@@ -21,8 +21,8 @@
                 <b-row>
                     <b-col cols="9">
                         <h5 class="text-center">
-                            Arrastre bloques al árbol de nodos debajo usando el
-                            botón de hamburguesa
+                            Arrastre bloques al árbol de nodos usando el botón
+                            de hamburguesa
                         </h5>
                     </b-col>
                     <b-col cols="3">
@@ -64,8 +64,53 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
+                <b-row v-if="editNodeForm" class="mt-5">
+                    <b-col>
+                        <h5 class="text-center">Editar nodo</h5>
+                    </b-col>
+                </b-row>
+                <b-row v-if="editNodeForm" align-v="center">
+                    <b-col>
+                        <b-form-group
+                            label="Ingrese el título del nodo"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="EditNodeState.title"
+                        >
+                            <b-form-input
+                                v-model="node.title"
+                                :state="EditNodeState.title"
+                                required
+                            ></b-form-input>
+                        </b-form-group>
+                        <b-form-group
+                            label="Ingrese la descripción del nodo"
+                            invalid-feedback="Este campo es obligatorio"
+                            :state="EditNodeState.description"
+                        >
+                            <b-form-textarea
+                                v-model="node.description"
+                                :state="EditNodeState.description"
+                                required
+                                rows="3"
+                            ></b-form-textarea>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row v-if="editNodeForm">
+                    <b-col>
+                        <div class="w-100">
+                            <b-button
+                                variant="warning"
+                                class="float-right"
+                                @click="saveNode"
+                            >
+                                Editar nodo
+                            </b-button>
+                        </div>
+                    </b-col>
+                </b-row>
 
-                <b-row align-v="center">
+                <b-row v-if="!editNodeForm" align-v="center">
                     <b-col>
                         <div class="d-flex justify-content-center">
                             <!--flowy-new-block
@@ -131,6 +176,16 @@ const DemoNode = {
         };
     },
     props: ["remove", "node", "title", "description"],
+    methods: {
+        editNode() {
+            this.$props.node.action = "edit";
+            this.remove();
+        },
+        deleteNode() {
+            this.$props.node.action = "delete";
+            this.remove();
+        },
+    },
     template: `
     <b-card flat bordered class="my-card bg-white q-pa-md">
         <div class="row items-center no-wrap">
@@ -147,8 +202,11 @@ const DemoNode = {
             </div>
         </div>
 
-        <div class="q-py-md" v-html="description" />
-        <b-button variant="primary" @click="remove()">Remove</b-button>
+        <div v-html="description" />
+        <div class="d-flex justify-content-around">
+            <b-col><b-button variant="warning" @click="editNode()">Editar</b-button></b-col>
+            <b-col><b-button variant="danger" @click="deleteNode()">Eliminar</b-button></b-col>
+        </div>
     </b-card>
   `,
 };
@@ -176,14 +234,25 @@ export default {
             description: null,
         },
 
+        node: {
+            title: "",
+            description: "",
+        },
+        nodeIndex: 0,
+        editNodeForm: false,
+        editNodeState: {
+            title: null,
+            description: null,
+        },
+
         dragging: false,
         block: {
             preview: {
                 title: "Nuevo paso a ingresar",
             },
             node: {
-                title: "asd",
-                description: "asdaswqbv3b34ojin",
+                title: "",
+                description: ".",
             },
         },
         /*
@@ -201,7 +270,7 @@ export default {
         */
         nodes: [
             {
-                id: "1",
+                id: 1,
                 parentId: -1,
                 nodeComponent: "demo-node",
                 data: {
@@ -211,8 +280,8 @@ export default {
                 },
             },
             {
-                id: "2",
-                parentId: "1",
+                id: 2,
+                parentId: 1,
                 nodeComponent: "demo-node",
                 data: {
                     text: "Parent block",
@@ -265,13 +334,13 @@ export default {
         },
 
         onDragStartNewBlock(event) {
-            console.log("onDragStartNewBlock", event);
+            // console.log("onDragStartNewBlock", event);
             // contains all the props and attributes passed to demo-node
             const { props } = event;
             this.newDraggingBlock = props;
         },
         onDragStopNewBlock(event) {
-            console.log("onDragStopNewBlock", event);
+            // console.log("onDragStopNewBlock", event);
             this.newDraggingBlock = null;
         },
         // REQUIRED
@@ -279,7 +348,7 @@ export default {
             // called before moving node (during drag and after drag)
             // indicator will turn red when we return false
             // from is null when we're not dragging from the current node tree
-            console.log("beforeMove", to, from);
+            // console.log("beforeMove", to, from);
 
             // we cannot drag upper parent nodes in this demo
             if (from && from.parentId === -1) {
@@ -300,9 +369,8 @@ export default {
             // called before moving node (during drag and after drag)
             // indicator will turn red when we return false
             // from is null when we're not dragging from the current node tree
-            console.log("beforeAdd", to, from);
+            // console.log("beforeAdd", to, from);
 
-            /*
             // Inicializamos variables de estados
             this.blockState.title = null;
             this.blockState.description = null;
@@ -311,15 +379,11 @@ export default {
             if (!this.checkBlockValidity()) {
                 return false;
             }
-            */
 
             // we've passed this attribute to the demo-node
             if (this.newDraggingBlock["custom-attribute"] === false) {
                 return false;
             }
-
-            console.log("Bloque a ingresar");
-            console.log(this.block);
 
             return true;
         },
@@ -341,18 +405,8 @@ export default {
                 id,
             });
         },
-        remove(event) {
-            console.log("remove", event);
-
-            // node we're dragging to
-            const { node } = event;
-
-            // we use lodash in this demo to remove node from the array
-            const nodeIndex = _.findIndex(this.nodes, { id: node.id });
-            this.nodes.splice(nodeIndex, 1);
-        },
         move(event) {
-            console.log("move", event);
+            // console.log("move", event);
 
             // node we're dragging to and node we've just dragged
             const { dragged, to } = event;
@@ -363,10 +417,6 @@ export default {
         add(event) {
             // every node needs an ID
             const id = this.generateId();
-
-            console.log("ADD NODE");
-            console.log(event);
-            console.log(event.node);
 
             // Le asignamos la pre visualización al título
             this.block.node.title = this.block.preview.title;
@@ -382,8 +432,70 @@ export default {
             });
         },
         onDragStart(event) {
-            console.log("onDragStart", event);
+            // console.log("onDragStart", event);
             this.dragging = true;
+        },
+        remove(event) {
+            // console.log("remove", event);
+
+            // node we're dragging to
+            const { node } = event;
+
+            // we use lodash in this demo to remove node from the array
+            const nodeIndex = _.findIndex(this.nodes, { id: node.id });
+
+            if (event.node.action == "edit") {
+                console.log("Nodo editado");
+                this.nodeIndex = nodeIndex;
+                this.editNode();
+            }
+            if (event.node.action == "delete") {
+                this.nodes.splice(nodeIndex, 1);
+            }
+        },
+        editNode() {
+            this.editMainBlock = false;
+
+            let nodeFound;
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (i == this.nodeIndex) {
+                    nodeFound = this.nodes[i];
+                    break;
+                }
+            }
+
+            console.log("node found");
+            console.log(nodeFound);
+            this.node.title = nodeFound.data.title;
+            this.node.description = nodeFound.data.description;
+            this.EditNodeState = {
+                title: null,
+                description: null,
+            };
+
+            this.editNodeForm = true;
+        },
+        saveNode() {
+            console.log("Check node");
+            this.EditNodeState.title = null;
+            this.EditNodeState.description = null;
+
+            // Exit when the form isn't valid
+            if (!this.checkNodeValidity()) {
+                return;
+            }
+            console.log("Checked");
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (i == this.nodeIndex) {
+                    this.nodes[i].data.title = this.node.title;
+                    this.nodes[i].data.description = this.node.description;
+                    break;
+                }
+            }
+
+            this.editNodeForm = false;
+            this.editMainBlock = true;
         },
 
         /**
@@ -397,6 +509,19 @@ export default {
             }
             if (!this.block.node.description) {
                 this.blockState.description = false;
+                valid = false;
+            }
+
+            return valid;
+        },
+        checkNodeValidity() {
+            let valid = true;
+            if (!this.node.title) {
+                this.editNodeState.title = false;
+                valid = false;
+            }
+            if (!this.node.description) {
+                this.editNodeState.description = false;
                 valid = false;
             }
 
