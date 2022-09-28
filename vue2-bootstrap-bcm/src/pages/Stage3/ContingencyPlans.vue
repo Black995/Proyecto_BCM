@@ -2,27 +2,42 @@
     <div>
         <b-row class="mt-3" align-v="center">
             <b-col>
-                <h5>Seleccione una de las incidencias</h5>
+                <h5>Seleccione uno de los escenarios críticos</h5>
                 <div class="text-center">
-                    <b-spinner v-if="loadingIncidents" type="grow"></b-spinner>
+                    <b-spinner
+                        v-if="loadingCrisisScenarios"
+                        type="grow"
+                    ></b-spinner>
                     <b-form-select
-                        v-if="!loadingIncidents"
-                        v-model="incidentId"
-                        :options="incidents"
+                        v-if="!loadingCrisisScenarios"
+                        v-model="crisisScenarioId"
+                        :options="crisisScenarios"
                         value-field="id"
                         text-field="name"
-                        label="Incidencias"
+                        label="Escenarios críticos"
+                        @change="getContingencyPlanBlockNodes"
                     ></b-form-select>
                 </div>
             </b-col>
         </b-row>
-        <b-row align-v="center" class="mt-5">
+        <b-row align-v="center" class="mt-3">
+            <b-col>
+                <div class="text-center">
+                    <b-spinner v-if="loadingNodes" type="grow"></b-spinner>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row
+            v-if="!loadingNodes && loadingFirstNodes"
+            align-v="center"
+            class="mt-5"
+        >
             <b-col>
                 <b-row>
                     <b-col cols="9">
                         <h5 class="text-center">
                             Arrastre bloques al árbol de nodos usando el botón
-                            de hamburguesa
+                            de menú
                         </h5>
                     </b-col>
                     <b-col cols="3">
@@ -156,6 +171,19 @@
                 </b-row>
             </b-col>
         </b-row>
+        <b-row
+            v-if="!loadingNodes && loadingFirstNodes"
+            align-v="center"
+            class="mt-3"
+        >
+            <b-col>
+                <div class="text-right">
+                    <b-button variant="success" @click="saveContingencyPlan">
+                        Guardar plan de contingencia
+                    </b-button>
+                </div>
+            </b-col>
+        </b-row>
     </div>
 </template>
 
@@ -223,10 +251,10 @@ export default {
         permissions: [],
         is_superuser: false,
 
-        loadingIncidents: false,
+        loadingCrisisScenarios: false,
 
-        incidents: [],
-        incidentId: 0,
+        crisisScenarios: [],
+        crisisScenarioId: 0,
 
         editMainBlock: false,
         blockState: {
@@ -268,48 +296,27 @@ export default {
             },
         },
         */
-        nodes: [
-            {
-                id: 1,
-                parentId: -1,
-                nodeComponent: "demo-node",
-                data: {
-                    text: "Parent block",
-                    title: "Paso 1",
-                    description: "Primer paso del plan de contingencia",
-                },
+        loadingNodes: false,
+        loadingFirstNodes: false,
+        nodes: [],
+        /*
+        {
+            id: "3",
+            parentId: "1",
+            nodeComponent: "demo-node",
+            data: {
+                text: "Parent block",
+                title: "New Visitor",
+                description:
+                    "<span>When a <b>new visitor</b> goes to <i>Site 1</i></span>",
             },
-            {
-                id: 2,
-                parentId: 1,
-                nodeComponent: "demo-node",
-                data: {
-                    text: "Parent block",
-                    title: "Paso 1.1",
-                    description: "Paso 1.1 del plan de contingencia",
-                },
-            },
-            /*
-            {
-                id: "3",
-                parentId: "1",
-                nodeComponent: "demo-node",
-                data: {
-                    text: "Parent block",
-                    title: "New Visitor",
-                    description:
-                        "<span>When a <b>new visitor</b> goes to <i>Site 1</i></span>",
-                },
-            },
-            */
-        ],
+        },
+        */
     }),
     mounted() {
+        this.getCrisisScenarios();
         this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
-
-        // Inicializamos diagrama
-        //this.initDiagram();
     },
     methods: {
         successMessage(successText) {
@@ -333,6 +340,172 @@ export default {
             });
         },
 
+        async getCrisisScenarios() {
+            this.crisisScenarios = [];
+            this.loadingCrisisScenarios = true;
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenarios_list/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.crisisScenarios = res.data;
+                    this.loadingCrisisScenarios = false;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getContingencyPlanBlockNodes() {
+            this.nodes = [];
+            this.loadingNodes = true;
+            this.loadingFirstNodes = true;
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase3/contingency-plan-detail/`, {
+                    params: { crisis_scenario: this.crisisScenarioId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    if (res.data.length) {
+                        for (var i = 0; i < res.data.length; i++) {
+                            let nodeObj = {
+                                id: res.data[i].block_id,
+                                parentId: res.data[i].parent_block_id,
+                                nodeComponent: "demo-node",
+                                data: {
+                                    text: res.data[i].title,
+                                    title: res.data[i].title,
+                                    description: res.data[i].description,
+                                },
+                            };
+                            this.nodes.push(nodeObj);
+                        }
+                    } else {
+                        let nodeObj = {
+                            id: 1,
+                            parentId: -1,
+                            nodeComponent: "demo-node",
+                            data: {
+                                text: "Ejemplo de plan de contingencia",
+                                title: "Ejemplo de plan de contingencia",
+                                description:
+                                    "Este escenario crítico todavía no posee un plan de contingencia",
+                            },
+                        };
+                        this.nodes.push(nodeObj);
+                    }
+                    this.loadingNodes = false;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        saveContingencyPlan() {
+            let contingencyObj = {
+                contingency_plan_list: [],
+            };
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                let nodeObj = {
+                    block_id: this.nodes[i].id,
+                    parent_block_id: this.nodes[i].parentId,
+                    title: this.nodes[i].data.title,
+                    description: this.nodes[i].data.description,
+                };
+                contingencyObj.contingency_plan_list.push(nodeObj);
+            }
+            console.log("Plan de contingencia a enviar");
+            console.log(contingencyObj.contingency_plan_list);
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase3/contingency-plans-create/${this.crisisScenarioId}/`,
+                    contingencyObj,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡El plan de contingencia ha sido guardado exitosamente!"
+                    );
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Métodos para manejar el diagrama
+         */
         onDragStartNewBlock(event) {
             // console.log("onDragStartNewBlock", event);
             // contains all the props and attributes passed to demo-node

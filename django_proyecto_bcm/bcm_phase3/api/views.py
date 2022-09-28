@@ -1,12 +1,13 @@
-from bcm_phase3.models import IncidentHistory, ContingencyPlan
+from bcm_phase3.models import IncidentHistory, ContingencyPlanBlock
+from bcm_phase1.models import CrisisScenario
 from .serializers import (IncidentHistoryListSerializer, IncidentHistorySerializer,
                             ServicesOfferedAffectedByIncidentSerializer, RisksAffectedByIncidentSerializer,
                             ServicesUsedAffectedByIncidentSerializer, OrganizationActivitiesAffectedByIncidentSerializer,
-                            ContingencyPlanCreateSerializer, ContingencyPlanSerializer)
+                            ContingencyPlanBlockCreateSerializer, ContingencyPlanBlockSerializer)
 from django.db.models import Q, F
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework import viewsets
-from bcm_phase3.api.filters import (IncidentDatesFilterBackend, ContingencyPlanByCrisisScenarioFilterBackend)
+from bcm_phase3.api.filters import (IncidentDatesFilterBackend, ContingencyPlanBlockByCrisisScenarioFilterBackend)
 
 
 class IncidentHistoryListViewSet(viewsets.ModelViewSet):
@@ -50,15 +51,15 @@ class OrganizationActivitiesAffectedByIncidentViewSet(viewsets.ModelViewSet):
     filter_backends = [IncidentDatesFilterBackend, ]
 
 
-class ContingencyPlanCreateViewSet(viewsets.ModelViewSet):
-    model = ContingencyPlan
-    queryset = ContingencyPlan.objects.all()
-    serializer_class = ContingencyPlanCreateSerializer
+class ContingencyPlanBlockCreateViewSet(viewsets.ModelViewSet):
+    model = CrisisScenario
+    queryset = CrisisScenario.objects.all()
+    serializer_class = ContingencyPlanBlockCreateSerializer
 
     
-class ContingencyPlanViewSet(viewsets.ModelViewSet):
-    model = ContingencyPlan
-    queryset = ContingencyPlan.objects.filter(contingency_children__isnull=True).order_by('number_order')
-    serializer_class = ContingencyPlanSerializer
-    filter_backends = [ContingencyPlanByCrisisScenarioFilterBackend, ]
+class ContingencyPlanBlockViewSet(viewsets.ModelViewSet):
+    model = ContingencyPlanBlock
+    queryset = ContingencyPlanBlock.objects.all().order_by('block_id')
+    serializer_class = ContingencyPlanBlockSerializer
+    filter_backends = [ContingencyPlanBlockByCrisisScenarioFilterBackend, ]
 

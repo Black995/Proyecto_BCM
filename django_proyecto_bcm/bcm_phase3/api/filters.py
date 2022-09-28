@@ -1,6 +1,5 @@
 from rest_framework import filters
 from django.db.models import Q, F
-from bcm_phase3.models import IncidentHistory
 from django.utils.timezone import utc
 from datetime import datetime, timedelta
 
@@ -17,7 +16,7 @@ class IncidentDatesFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(start_date__gte=start_date, start_date__lte=end_date)
 
         
-class ContingencyPlanByCrisisScenarioFilterBackend(filters.BaseFilterBackend):
+class ContingencyPlanBlockByCrisisScenarioFilterBackend(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         crisis_scenario = request.GET.get('crisis_scenario')
