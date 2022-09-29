@@ -150,11 +150,6 @@ class ContingencyPlanBlockCreateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         crisis_scenario = validated_data.get('crisis_scenario', instance)
         contingency_plan_list = validated_data.get('contingency_plan_list')
-
-        print('Escenario crítico')
-        print(crisis_scenario)
-        print('Plan de contingencia')
-        print(contingency_plan_list)
         
         """
             Si se envía el campo contingency_plan_list entonces se procede a crear los registros en 
@@ -173,19 +168,7 @@ class ContingencyPlanBlockCreateSerializer(serializers.ModelSerializer):
             )
             for e in contingency_plan_list
         ]
-        created = ContingencyPlanBlock.objects.bulk_create(contingency_block_plans)
-        """
-        if staffs_json is not None:
-            SO_S.objects.filter(service_offered=service).delete()
-
-            for s in staffs_json:
-                staff = Staff.objects.get(id=s['staff'])
-
-                SO_S.objects.create(
-                    relevant=s['relevant'],
-                    service_offered=service,
-                    staff=staff
-                )
-        """
+        ContingencyPlanBlock.objects.bulk_create(contingency_block_plans)
+        
         return instance
 

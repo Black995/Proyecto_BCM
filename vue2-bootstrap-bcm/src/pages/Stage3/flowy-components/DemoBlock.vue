@@ -4,7 +4,7 @@
         bordered
         class="q-px-md q-py-sm row items-center justify-between"
     >
-        <div class="text-subtitle1">{{ title }}</div>
+        <div v-html="title" />
         <flowy-drag-handle>
             <b-button variant="light">
                 <b-icon-justify></b-icon-justify>

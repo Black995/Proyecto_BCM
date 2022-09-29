@@ -52,79 +52,113 @@
                         </div>
                     </b-col>
                 </b-row>
-                <b-row v-if="editMainBlock" align-v="center">
+                <b-row v-if="editMainBlock" class="mt-5">
                     <b-col>
-                        <b-form-group
-                            label="Ingrese el título del bloque"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="blockState.title"
-                        >
-                            <b-form-input
-                                v-model="block.preview.title"
-                                :state="blockState.title"
-                                required
-                            ></b-form-input>
-                        </b-form-group>
-                        <b-form-group
-                            label="Ingrese la descripción del bloque"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="blockState.description"
-                        >
-                            <b-form-textarea
-                                v-model="block.node.description"
-                                :state="blockState.description"
-                                required
-                                rows="3"
-                            ></b-form-textarea>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-                <b-row v-if="editNodeForm" class="mt-5">
-                    <b-col>
-                        <h5 class="text-center">Editar nodo</h5>
-                    </b-col>
-                </b-row>
-                <b-row v-if="editNodeForm" align-v="center">
-                    <b-col>
-                        <b-form-group
-                            label="Ingrese el título del nodo"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="EditNodeState.title"
-                        >
-                            <b-form-input
-                                v-model="node.title"
-                                :state="EditNodeState.title"
-                                required
-                            ></b-form-input>
-                        </b-form-group>
-                        <b-form-group
-                            label="Ingrese la descripción del nodo"
-                            invalid-feedback="Este campo es obligatorio"
-                            :state="EditNodeState.description"
-                        >
-                            <b-form-textarea
-                                v-model="node.description"
-                                :state="EditNodeState.description"
-                                required
-                                rows="3"
-                            ></b-form-textarea>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-                <b-row v-if="editNodeForm">
-                    <b-col>
-                        <div class="w-100">
-                            <b-button
-                                variant="warning"
-                                class="float-right"
-                                @click="saveNode"
-                            >
-                                Editar nodo
-                            </b-button>
+                        <div class="card">
+                            <div class="card-body">
+                                <b-row align-v="center">
+                                    <b-col>
+                                        <b-form-group
+                                            label="Ingrese el título del bloque"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="blockState.title"
+                                        >
+                                            <vue-editor
+                                                v-model="block.preview.title"
+                                                :state="blockState.title"
+                                            ></vue-editor>
+                                            <!--b-form-input
+                                                v-model="block.preview.title"
+                                                :state="blockState.title"
+                                                required
+                                            ></b-form-input-->
+                                        </b-form-group>
+                                        <b-form-group
+                                            label="Ingrese la descripción del bloque"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="blockState.description"
+                                        >
+                                            <vue-editor
+                                                v-model="block.node.description"
+                                                :state="blockState.description"
+                                            ></vue-editor>
+                                            <!--b-form-textarea
+                                                v-model="block.node.description"
+                                                :state="blockState.description"
+                                                required
+                                                rows="3"
+                                            ></b-form-textarea-->
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                            </div>
                         </div>
                     </b-col>
                 </b-row>
 
+                <b-row v-if="editNodeForm" class="mt-5">
+                    <b-col>
+                        <div class="card">
+                            <div class="card-body">
+                                <b-row>
+                                    <b-col>
+                                        <h5 class="text-center">Editar nodo</h5>
+                                    </b-col>
+                                </b-row>
+                                <b-row align-v="center">
+                                    <b-col>
+                                        <b-form-group
+                                            label="Ingrese el título del nodo"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="EditNodeState.title"
+                                        >
+                                            <vue-editor
+                                                v-model="node.title"
+                                                :state="EditNodeState.title"
+                                            ></vue-editor>
+                                            <!--b-form-input
+                                            v-model="node.title"
+                                            :state="EditNodeState.title"
+                                            required
+                                        ></b-form-input-->
+                                        </b-form-group>
+                                        <b-form-group
+                                            label="Ingrese la descripción del nodo"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="EditNodeState.description"
+                                        >
+                                            <vue-editor
+                                                v-model="node.description"
+                                                :state="
+                                                    EditNodeState.description
+                                                "
+                                            ></vue-editor>
+                                            <!--b-form-textarea
+                                            v-model="node.description"
+                                            :state="EditNodeState.description"
+                                            required
+                                            rows="3"
+                                        ></b-form-textarea-->
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col>
+                                        <div class="w-100">
+                                            <b-button
+                                                variant="warning"
+                                                class="float-right"
+                                                @click="saveNode"
+                                            >
+                                                Editar nodo
+                                            </b-button>
+                                        </div>
+                                    </b-col>
+                                </b-row>
+                            </div>
+                        </div>
+                    </b-col>
+                </b-row>
                 <b-row v-if="!editNodeForm" align-v="center">
                     <b-col>
                         <div class="d-flex justify-content-center">
@@ -158,16 +192,25 @@
                     </b-col>
                 </b-row>
 
-                <b-row align-v="center">
-                    <flowy
-                        :nodes="nodes"
-                        :beforeMove="beforeMove"
-                        :beforeAdd="beforeAdd"
-                        @add="add"
-                        @move="move"
-                        @remove="remove"
-                        @drag-start="onDragStart"
-                    ></flowy>
+                <b-row align-v="center" class="mt-5">
+                    <b-col>
+                        <h5 class="text-center">
+                            Plan de contingencia para el Escenario Crítico
+                        </h5>
+                    </b-col>
+                </b-row>
+                <b-row class="justify-content-md-center mt-3" align-v="center">
+                    <b-col md="auto">
+                        <flowy
+                            :nodes="nodes"
+                            :beforeMove="beforeMove"
+                            :beforeAdd="beforeAdd"
+                            @add="add"
+                            @move="move"
+                            @remove="remove"
+                            @drag-start="onDragStart"
+                        ></flowy>
+                    </b-col>
                 </b-row>
             </b-col>
         </b-row>
@@ -195,6 +238,7 @@ import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 import DemoBlock from "./flowy-components/DemoBlock.vue";
+import { VueEditor } from "vue2-editor";
 //import DemoNode from "./flowy-components/DemoNode.vue";
 
 const DemoNode = {
@@ -215,10 +259,10 @@ const DemoNode = {
         },
     },
     template: `
-    <b-card flat bordered class="my-card bg-white q-pa-md">
+    <b-card flat bordered class="my-card bg-white">
         <div class="row items-center no-wrap">
             <div class="col">
-                <div class="text-h6">{{ title }}</div>
+                <div v-html="title" class="text-h6" />
             </div>
 
             <div class="col-auto">
@@ -233,7 +277,7 @@ const DemoNode = {
         <div v-html="description" />
         <div class="d-flex justify-content-around">
             <b-col><b-button variant="warning" @click="editNode()">Editar</b-button></b-col>
-            <b-col><b-button variant="danger" @click="deleteNode()">Eliminar</b-button></b-col>
+            <b-col><b-button variant="danger" v-if="this.$props.node.parentId != -1" @click="deleteNode()">Eliminar</b-button></b-col>
         </div>
     </b-card>
   `,
@@ -246,6 +290,7 @@ export default {
     components: {
         DemoBlock,
         DemoNode,
+        VueEditor,
     },
     data: () => ({
         permissions: [],
@@ -276,7 +321,7 @@ export default {
         dragging: false,
         block: {
             preview: {
-                title: "Nuevo paso a ingresar",
+                title: "<p><strong>Nuevo paso a ingresar</strong></p>",
             },
             node: {
                 title: "",
@@ -382,6 +427,7 @@ export default {
             this.nodes = [];
             this.loadingNodes = true;
             this.loadingFirstNodes = true;
+            this.editNodeForm = false;
 
             axios
                 .get(`${SERVER_ADDRESS}/api/phase3/contingency-plan-detail/`, {
@@ -459,8 +505,6 @@ export default {
                 };
                 contingencyObj.contingency_plan_list.push(nodeObj);
             }
-            console.log("Plan de contingencia a enviar");
-            console.log(contingencyObj.contingency_plan_list);
 
             axios
                 .patch(
@@ -618,7 +662,6 @@ export default {
             const nodeIndex = _.findIndex(this.nodes, { id: node.id });
 
             if (event.node.action == "edit") {
-                console.log("Nodo editado");
                 this.nodeIndex = nodeIndex;
                 this.editNode();
             }
@@ -637,8 +680,6 @@ export default {
                 }
             }
 
-            console.log("node found");
-            console.log(nodeFound);
             this.node.title = nodeFound.data.title;
             this.node.description = nodeFound.data.description;
             this.EditNodeState = {
@@ -649,7 +690,6 @@ export default {
             this.editNodeForm = true;
         },
         saveNode() {
-            console.log("Check node");
             this.EditNodeState.title = null;
             this.EditNodeState.description = null;
 
@@ -657,7 +697,6 @@ export default {
             if (!this.checkNodeValidity()) {
                 return;
             }
-            console.log("Checked");
 
             for (var i = 0; i < this.nodes.length; i++) {
                 if (i == this.nodeIndex) {
