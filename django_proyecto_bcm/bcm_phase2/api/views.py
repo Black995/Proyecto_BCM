@@ -109,7 +109,7 @@ class download_excel_massive_load_staff(ListAPIView):
 class RessourceListViewSet(viewsets.ModelViewSet):
     model = Ressource
     queryset = Ressource.objects.all().order_by('name')
-    serializer_class = RessourceListSerializer()
+    serializer_class = RessourceListSerializer
 
 class RessourceViewSet(viewsets.ModelViewSet):
     model = Ressource
@@ -124,5 +124,5 @@ class R_SOViewSet(viewsets.ModelViewSet):
 
 class RessourceWithServiceOfferedViewSet(viewsets.ModelViewSet):
     model = Ressource
-    queryset =ServiceOffered.objects.all()
+    queryset = Ressource.objects.all()
     serializer_class = RessourceWithServiceOfferedSerializer

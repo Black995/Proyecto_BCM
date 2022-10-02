@@ -100,6 +100,12 @@
                     name="Servicios de Soporte"
                     icon="ti-dropbox"
                 />
+                <sidebar-link
+                
+                    to="/layout/ressources"
+                    name="Recursos"
+                    icon="ti-desktop"
+                />
                 <!--
                     Encabezado Fase 3
                 -->

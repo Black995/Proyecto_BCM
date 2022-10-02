@@ -66,16 +66,16 @@ urlpatterns = [
     path('ressources/', RessourceListViewSet.as_view({
         'get':'list',
         'post':'create'}), name='resource_list'),
-    path('resources/<int:pk>/', RessourceViewSet.as_view({
+    path('ressources/<int:pk>/', RessourceViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='ressource_detail'),
-    path('ressource/service_offered/<int:pk>/', RessourceWithServiceOfferedViewSet.as_view({
+    path('ressources_service_offered1/<int:pk>/', RessourceWithServiceOfferedViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
-        'patch': 'partial_update'}), name='ressource_with_service_offered'),
-    path('ressource_service_offered/', R_SOViewSet.as_view({
+        'patch': 'partial_update',}), name='ressource_with_service_offered'),
+    path('ressources_service_offered/', R_SOViewSet.as_view({
         'get':'list',
         'post':'create'}), name='r_so_list'),
     path('ressource_service_offered/<int:id>/', R_SOViewSet.as_view({
