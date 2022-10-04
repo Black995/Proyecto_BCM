@@ -215,7 +215,20 @@
             </b-col>
         </b-row>
         <b-row
-            v-if="!loadingNodes && loadingFirstNodes"
+            v-if="
+                !loadingNodes &&
+                loadingFirstNodes &&
+                (is_superuser == true ||
+                    (permissions.includes(
+                        'bcm_phase3.add_contingencyplanblock'
+                    ) &&
+                        permissions.includes(
+                            'bcm_phase3.change_contingencyplanblock'
+                        ) &&
+                        permissions.includes(
+                            'bcm_phase3.delete_contingencyplanblock'
+                        )))
+            "
             align-v="center"
             class="mt-3"
         >
