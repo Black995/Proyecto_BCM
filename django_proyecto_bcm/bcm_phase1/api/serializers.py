@@ -7,8 +7,8 @@ from django.db.models import F, Q
     problemas de recursividad de archivos
 """
 def service_offered_staffs_serializer():
-    from bcm_phase2.api.serializers import ServiceOfferedStaffSerializer
-    return ServiceOfferedStaffSerializer
+    from bcm_phase2.api.serializers import ServiceOfferedStaffRessourceSerializer
+    return ServiceOfferedStaffRessourceSerializer
 
 def service_used_list_serializer():
     from bcm_phase2.api.serializers import ServiceUsedListSerializer
