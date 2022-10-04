@@ -25,6 +25,7 @@ import BussinesActivities from "@/pages/Stage2/BussinessActivities.vue"
 import ServicesOffered from "@/pages/Stage2/ServicesOffered.vue";
 import ServicesUsed from "@/pages/Stage2/ServicesUsed.vue";
 import Staffs from "@/pages/Stage2/Staffs.vue";
+import Ressources from "@/pages/Stage2/Ressources.vue"
 // Stage 3
 import IncidentHistory from "@/pages/Stage3/IncidentHistory.vue";
 import IncidentImpact from "@/pages/Stage3/IncidentImpact.vue";
@@ -95,6 +96,11 @@ const routes = [
         path: "servicios-usados",
         name: "Servicios de Soporte",
         component: ServicesUsed
+      },
+      {
+        path: "ressources",
+        name: "Recursos",
+        component: Ressources
       },
       {
         path: "personal",

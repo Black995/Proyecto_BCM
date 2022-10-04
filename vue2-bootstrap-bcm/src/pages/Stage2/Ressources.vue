@@ -6,7 +6,7 @@
                     <div class="card-body table-responsive">
                         <DataTable
                             class="header-table"
-                            :value="parties"
+                            :value="ressources"
                             responsiveLayout="scroll"
                             :paginator="true"
                             :rows="10"
@@ -18,7 +18,7 @@
                             :loading="loading"
                             :globalFilterFields="[
                                 'name',
-                                'type_name',
+                                'amout',
                             ]"
                             :filters="filterGlobal"
                         >
@@ -26,15 +26,15 @@
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
-                                            title="Crear parte interesada"
+                                            title="Crear recurso"
                                             variant="success"
                                             @click="show_modal_create = true"
                                         >
                                             <font-awesome-icon
                                                 icon="fa-solid fa-plus"
                                             />
-                                        </b-button>
-                                    </b-col>
+                                        </b-button>    
+                                    </b-col>        
                                     <b-col sm="4">
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
@@ -50,23 +50,29 @@
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
-                            <Column field="type_name" header="Tipo"></Column>
+                            <Column field="amount" header="Cantidad">
+                                <template #body="slotProps">
+                                        <div v-if="slotProps.data.amount >= 0">
+                                            {{ slotProps.data.amount }}
+                                        </div>
+                                    </template>
+                            </Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
-                                        tittle="Detalle de la parte interesada"
+                                        title="Detalle del recurso"
                                         pill
                                         variant="info"
                                         @click="
                                             show_modal_detail(slotProps.data.id)
-                                        "    
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="fa-solid fa-search"
                                         />
                                     </b-button>
                                     <b-button
-                                        tittle="Editar parte interesada"
+                                        title="Editar recurso"
                                         pill
                                         variant="warning"
                                         @click="
@@ -78,7 +84,7 @@
                                         />
                                     </b-button>
                                     <b-button
-                                        title="Eliminar parte intersada"
+                                        title="Eliminar recurso"
                                         pill
                                         variant="danger"
                                         @click="
@@ -90,38 +96,20 @@
                                         />
                                     </b-button>
                                 </template>
+                                
                             </Column>
-                            <Column field="id_2" header="Asociar servicios de Org.">
+                            <Column field="id_2" header="Asociar servicio">
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
+                                            
                                             pill
-                                            title="Asociar servicios de la organización"
+                                            title="Asociar servicios a este recurso"
                                             variant="primary"
                                             @click="
                                                 show_modal_association_services(
                                                     slotProps.data.id,
-                                                    slotProps.data.name
-                                                )
-                                            "
-                                        >
-                                            <font-awesome-icon
-                                                icon="fa-solid fa-computer"
-                                            />
-                                        </b-button>
-                                    </div>
-                                </template>
-                            </Column>
-                            <Column field="id_3" header="Asociar servicios de soporte">
-                                <template #body="slotProps">
-                                    <div class="text-center">
-                                        <b-button
-                                            pill
-                                            title="Asociar servicios de soporte"
-                                            variant="primary"
-                                            @click="
-                                                show_modal_association_support_services(
-                                                    slotProps.data.id,
+                                                    slotProps.data.amount,
                                                     slotProps.data.name
                                                 )
                                             "
@@ -134,67 +122,63 @@
                                 </template>
                             </Column>
                             <template #empty>
-                                No hay servicios encontradas.
+                                No hay recursos registrados.
                             </template>
                         </DataTable>
                     </div>
                 </div>
-            </div>
+            </div>        
         </div>
         <div class="row"></div>
-
         <!--
-            Modal del detalle
+            Modal del detalle  
         -->
+
         <b-modal
             id="modal-detail"
-            title="Detalle de la parte interesada"
+            title="Detalle del recurso"
             ref="modal"
             size="lg"
             centered
         >
             <h3 class="text-center font-weight-bold">
-                {{ partyDetail.name }}
+                {{ ressourceDetail.name }}
             </h3>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <strong>Tipo: </strong> {{ partyDetail.type_name }}
+                    <strong>Descripción: </strong>
+                    {{ ressourceDetail.description }}
                 </li>
-
                 <li class="list-group-item">
-                    <strong>Descripción: </strong> {{ partyDetail.description }}
+                    <strong>Cantidad: </strong> {{ ressourceDetail.amount }}
                 </li>
             </ul>
             <h4 class="mt-5 text-center font-weight-bold">
-                Servicios de la organización asociados a esta parte interesada
+                Servicios de la organización que dependen de este recurso
             </h4>
             <b-list-group-item
-                class="mt-2 flex-column align-items-start"
-                v-for="item in partyDetail._services_offered"
+                class="mt2 flex-column align-items-start"
+                v-for="item in servicesOfferedDetail"
                 :key="item.key"
             >
-                <h5 class="mb-1">{{item.name}}</h5>
-                <p class="mb-1">Tipo: {{item.type_name}} </p> 
-            
-            </b-list-group-item>
-            <h3 class="mt-3 text-center" v-if="!partyDetail._services_offered.length">
-                No existen servicios de la organización asociados a esta parte interesada
-            </h3>
-            <h4 class="mt-5 text-center font-weight-bold">
-                Servicios de soporte asociados a esta parte interesada
-            </h4>
-            <b-list-group-item
-                class="mt-2 flex-column align-items-start"
-                v-for="item in partyDetail._services_used"
-                :key="item.key"
-            >
-                <h5 class="mb-1">{{item.name}}</h5>
-                <p class="mb-1">Tipo:</p> {{item.type_name}}
-            </b-list-group-item>
-            <h3 class="mt-3 text-center" v-if="!partyDetail._services_used.length">
-                No existen servicios de soporte asociados a esta parte interesada
-            </h3>
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ item.service_name }}</h5>
+            </div>
+            <div class="mb-1 d-flex w-100 justify-content-between">
+                <div>Area: {{ item.service_area }}</div>
+                <div>Tipo: {{ item.service_type }}</div>
+                <div>Ganancia: {{ item.service_profit }}</div>
+                <div>Cant. asignada: {{ item.amount }}</div>
+            </div>
 
+            </b-list-group-item>
+            <h3
+                class="mt-3 text-center"
+                v-if="!servicesOfferedDetail.length"
+            >
+                No existen servicios de la organización asociados a esta
+                actividad
+            </h3>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -206,8 +190,8 @@
                     </b-button>
                 </div>
             </template>
-
         </b-modal>
+
 
         <!--
             Modal de crear  
@@ -215,7 +199,7 @@
         <b-modal
             v-model="show_modal_create"
             id="modal-create"
-            title="Crear parte interesada"
+            title="Crear recurso"
             ref="modal"
             size="lg"
             centered
@@ -223,45 +207,40 @@
         >
             <form ref="form" @submit.stop.prevent="handleSubmitCreate">
                 <b-form-group
-                    label="Ingrese el nombre de la parte interesada"
+                    label="Ingrese el nombre del recurso"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.name"
+                    :state="ressourceState.name"
                 >
                     <b-form-input
-                        v-model="party.name"
-                        :state="partyState.name"
+                        v-model="ressource.name"
+                        :state="ressourceState.name"
                         required
                     >
                     </b-form-input>
                 </b-form-group>
                 <b-form-group
-                    label="Seleccione el tipo"
+                    label="Ingrese la descripción del recurso"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.type"
-                >
-                    <b-form-select
-                        v-model="party.type"
-                        :options="types"
-                        value-field="value"
-                        text-field="name"
-                        :state="partyState.type"
-                        required
-                    ></b-form-select>
-                </b-form-group>
-                <b-form-group
-                    label="Ingrese la descripción de la parte interesada"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.description"
+                    :state="ressourceState.description"
                 >
                     <b-form-textarea
-                        v-model="party.description"
-                        :state="partyState.description"
+                        v-model="ressource.description"
+                        :state="ressourceState.description"
                         required
                         rows="3"
-                    ></b-form-textarea>
+                    ></b-form-textarea>   
                 </b-form-group>
-                
-            </form>   
+                <b-form-group
+                    label="Ingrese la cantidad"
+                    invalid-feedback="La cantidad no puede ser negativo"
+                >
+                    <b-form-input
+                        type="number"
+                        v-model.number="ressource.amount"
+                        required
+                    ></b-form-input>
+                </b-form-group>
+            </form> 
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -269,27 +248,26 @@
                         class="float-right"
                         @click="handleSubmitCreate"
                     >
-                        Crear servicio de la organización
+                        Crear recurso
                     </b-button>
                 </div>
             </template>
         </b-modal>
-
-         <!--
+        <!--
             Modal de confirmar crear  
         -->
         <b-modal
             id="modal-confirm-create"
-            title="Confirmar crear parte interesada"
+            title="Confirmar crear recurso"
             centered
         >
-            <h4>¿Está seguro de crear esta parte interesada?</h4>
+            <h4>¿Está seguro de crear este recurso?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="success"
                         class="float-right"
-                        @click="createParty"
+                        @click="createRessource"
                     >
                         Confirmar
                     </b-button>
@@ -302,49 +280,44 @@
         -->
         <b-modal
             id="modal-update"
-            title="Editar parte interesada"
+            title="Editar servicio de la organización"
             ref="modal"
             size="lg"
             centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitUpdate">
                 <b-form-group
-                    label="Ingrese el título de la parte interesada"
+                    label="Ingrese el nombre del recurso"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.name"
+                    :state="ressourceState.name"
                 >
                     <b-form-input
-                        v-model="party.name"
-                        :state="partyState.name"
+                        v-model="ressource.name"
+                        :state="ressourceState.name"
                         required
                     ></b-form-input>
                 </b-form-group>
-
                 <b-form-group
-                    label="Ingrese la descripción de la parte interesada"
+                    label="Ingrese la descripción del recurso"
                     invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.description"
+                    :state="ressourceState.description"
                 >
                     <b-form-textarea
-                        v-model="party.description"
-                        :state="partyState.description"
+                        v-model="ressource.description"
+                        :state="ressourceState.description"
                         required
                         rows="3"
-                    ></b-form-textarea>
+                    ></b-form-textarea>   
                 </b-form-group>
                 <b-form-group
-                    label="Seleccione el tipo"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.type"
+                    label="Ingrese la cantidad"
+                    invalid-feedback="La cantidad no puede ser negativo"
                 >
-                    <b-form-select
-                        v-model="party.type"
-                        :options="types"
-                        value-field="value"
-                        text-field="name"
-                        :state="partyState.type"
+                    <b-form-input
+                        type="number"
+                        v-model.number="ressource.amount"
                         required
-                    ></b-form-select>
+                    ></b-form-input>
                 </b-form-group>
             </form>
             <template #modal-footer>
@@ -354,28 +327,24 @@
                         class="float-right"
                         @click="handleSubmitUpdate"
                     >
-                        Editar parte interesada
+                        Editar servicio
                     </b-button>
                 </div>
             </template>
-
         </b-modal>
 
-        <!--
-            Modal de confirmar editar  
-        -->
         <b-modal
             id="modal-confirm-update"
-            title="Confirmar editar parte interesada"
+            title="Confirmar crear recurso"
             centered
         >
-            <h4>¿Está seguro de editar esta parte interesada?</h4>
+            <h4>¿Está seguro de editar este recurso?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
-                        variant="warning"
+                        variant="success"
                         class="float-right"
-                        @click="updateParty"
+                        @click="updateRessource"
                     >
                         Confirmar
                     </b-button>
@@ -388,36 +357,36 @@
         -->
         <b-modal
             id="modal-confirm-delete"
-            title="Confirmar eliminar parte interesada"
+            title="Confirmar eliminar recurso"
             centered
         >
-            <h4>¿Está seguro de eliminar esta parte interesada?</h4>
+            <h4>¿Está seguro de eliminar este recurso?</h4>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="danger"
                         class="float-right"
-                        @click="deleteParty"
+                        @click="deleteRessource"
                     >
                         Confirmar
                     </b-button>
                 </div>
             </template>
         </b-modal>
-
         <!--
-            Modal de asociar servicios de la organización con partes interesadas
+            Modal de asociar recurso con servicios de la organización  
         -->
         <b-modal
             id="modal-associate-services"
-            title="Asociar servicios de la organización con la parte interesada"
+            title="Servicios de la organización que usan este recurso"
+            ref="modal"
             size="lg"
             centered
         >
             <multiselect
                 v-model="selectedServicesOffered"
-                placeholder="Buscar servicios de la organización"
-                label="name"
+                placeholder="Buscar servicio de la organización"
+                label="service_name"
                 track-by="id"
                 :options="servicesOffered"
                 :multiple="true"
@@ -431,12 +400,12 @@
                     :key="item.key"
                 >
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{ item.name }}</h5>
+                        <h5 class="mb-1">{{ item.service_name }}</h5>
                         <!--small class="text-muted">3 days ago</small-->
                     </div>
                     <div class="mb-1 d-flex w-100 justify-content-between">
-                        <div>Area: {{ item.area_name }}</div>
-                        <div>Tipo: {{ item.type_name }}</div>
+                        <div>Area: {{ item.service_area }}</div>
+                        <div>Tipo: {{ item.service_type }}</div>
                         <div v-if="!item.scale_max_value">
                             Criticidad: {{ item.criticality }}
                         </div>
@@ -445,14 +414,14 @@
                                 item.scale_max_value
                             }}
                         </div>
+                        <div> Cant. asignada: {{ item.amount }}</div>
                     </div>
                 </b-list-group-item>
             </b-list-group>
-
             <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
-                No existen servicios de la organización asociados a esta parte interesada
+                No existen servicios de la organización asociados a este
+                recurso
             </h3>
-
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -465,7 +434,58 @@
                 </div>
             </template>
         </b-modal>
-
+        <!--
+            Modal ingresar cantidad de recurso
+        -->
+        <b-modal
+            id="modal-amount-ressources"
+            title="Cantidad del recurso a asignar"
+            ref="modal"
+            centered
+        > 
+            <h3 class="text-center font-weight-bold">
+                {{ ressourceName }}
+            </h3>
+            <h5 class="text-center font-weight-bold"> 
+                Cantidad disponible: {{ ressourceAmount }}
+            </h5>
+            <form ref="form" @submit.stop.prevent="showAmount"></form>
+            <b-list-group-item
+                href="#"
+                class="flex-column align-items-start"
+                v-for="item in selectedServicesOffered"
+                :key="item.id"
+            >
+                <div class="d-flex w-100 justify-content-between">
+                    <h4 class="mb-1">{{ item.service_name }}</h4>
+                    
+                </div>
+                
+                <b-form-group
+                    label="Ingrese la cantidad"
+                    invalid-feedback="La cantidad no puede ser negativo o mayor a la cantidad disponible"
+                    :state="serviceAmountState"
+                >
+                    <b-form-input
+                        type="number"
+                        v-model.number="item.amount"
+                        required
+                    ></b-form-input>
+                </b-form-group>
+            </b-list-group-item>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="showAmount"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+    
         <!--
             Modal de confirmar asociar servicios  
         -->
@@ -475,9 +495,7 @@
             centered
         >
             <h4>
-                ¿Está seguro de asociar estos servicios de la organización a la
-                parte interesada?                
-                
+                ¿Está seguro de asociar estos servicios de la organización al recurso?
             </h4>
             <template #modal-footer>
                 <div class="w-100">
@@ -491,96 +509,8 @@
                 </div>
             </template>
         </b-modal>
-
-
-        <b-modal
-            id="modal-associate-support-services"
-            title="Asociar servicios de la organización con la parte interesada"
-            size="lg"
-            centered
-        >
-            <multiselect
-                v-model="selectedServicesUsed"
-                placeholder="Buscar servicios de la organización"
-                label="name"
-                track-by="id"
-                :options="servicesUsed"
-                :multiple="true"
-            ></multiselect>
-
-            <b-list-group v-if="selectedServicesUsed.length" class="mt-3">
-                <b-list-group-item
-                    href="#"
-                    class="flex-column align-items-start"
-                    v-for="item in selectedServicesUsed"
-                    :key="item.key"
-                >
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{ item.name }}</h5>
-                        <!--small class="text-muted">3 days ago</small-->
-                    </div>
-                    <div class="mb-1 d-flex w-100 justify-content-between">
-                        <div>Area: {{ item.area_name }}</div>
-                        <div>Tipo: {{ item.type_name }}</div>
-                        <div v-if="!item.scale_max_value">
-                            Criticidad: {{ item.criticality }}
-                        </div>
-                        <div v-if="item.scale_max_value">
-                            Criticidad: {{ item.criticality }}/{{
-                                item.scale_max_value
-                            }}
-                        </div>
-                    </div>
-                </b-list-group-item>
-            </b-list-group>
-
-            <h3 class="mt-3 text-center" v-if="!selectedServicesUsed.length">
-                No existen servicios de soporte asociados a esta parte interesada
-            </h3>
-
-            <template #modal-footer>
-                <div class="w-100">
-                    <b-button
-                        variant="primary"
-                        class="float-right"
-                        @click="show_modal_confirm_association_support_services"
-                    >
-                        Asociar servicios de soporte
-                    </b-button>
-                </div>
-            </template>
-        </b-modal>
-
-        <!--
-            Modal de confirmar asociar servicios  
-        -->
-        <b-modal
-            id="modal-confirm-associate-support-services"
-            title="Confirmar asociar servicios de la organización"
-            centered
-        >
-            <h4>
-                ¿Está seguro de asociar estos servicios de la soporte a la
-                parte interesada?                
-                
-            </h4>
-            <template #modal-footer>
-                <div class="w-100">
-                    <b-button
-                        variant="primary"
-                        class="float-right"
-                        @click="associateSupportServices"
-                    >
-                        Confirmar
-                    </b-button>
-                </div>
-            </template>
-        </b-modal>
-
     </div>
-
 </template>
-
 <script>
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
@@ -594,75 +524,52 @@ import {
 } from "../../helpers/helpers";
 
 export default {
-    name: "InterestedParties",
+    name: "Ressources",
     components: {
         Multiselect,
     },
     data: () => ({
-        loading:false,
+        loading: false,
         filterGlobal: {
-             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
-        permissions: [],
-        is_superuser: false,
 
         show_modal_create: false,
 
-        parties: [],
-        partyId: 0,
-        partyName: "",
-        type:"",
-
-        party:{
+        ressources: [],
+        ressourceId: 0,
+        ressourceName: "",
+        ressourceAmount: 0,
+        amount: 0,
+        ressource: {
             name:"",
-            description:"",
-            type:0,
-            type_name:""
+            amount:0,
+        },
+        ressourceDetail: {
+            name:"",
+            description: 0,
+            amount: 0,
         },
 
-        partyDetail:{
-            name:"",
-            description:"",
-            type_name:"",
-            _services_offered:[],
-            _services_used:[],
-        },
-
-        partyState: {
+        ressourceState: {
             name: null,
-            description:null,
-            type:null,
+            description: null,
+            amount: null,
         },
-        types:[
-            {
-                value:1,
-                name:"Proveedor",
-            },
-            {
-                value:3,
-                name:"Cliente",
-            },
-            {
-                value:2,
-                name:"Inversionista",
-
-            }
-        ],
-
+        services: [],
         servicesOffered: [],
         selectedServicesOffered: [],
 
-        servicesUsed: [],
-        selectedServicesUsed: []
+        servicesOfferedDetail: [],
+
+        serviceAmountState: null
+
     }),
     mounted() {
-        this.getParties()
+        this.getRessources()
         this.getServicesOffered()
-        this.getServicesUsed()
-        this.permissions = JSON.parse(localStorage.getItem("permissions"));
-        this.is_superuser = localStorage.getItem("is_superuser");
     },
-    methods: {
+    methods:{
         successMessage(successText) {
             this.$notify({
                 component: NotificationTemplate,
@@ -677,16 +584,55 @@ export default {
             this.$notify({
                 component: NotificationTemplate,
                 title: errorText,
-                icon: "ti-check",
+                icon: "ti-close",
                 horizontalAlign: "right",
                 verticalAlign: "top",
                 type: "danger",
             });
         },
+        async getRessources() {
+            this.loading = true,
+            this.ressources = []
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/ressources/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    }
+                })
+                .then((res)=>{
+                    this.ressources = []
+                    this.ressources = res.data
+                    this.loading = false
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });    
+        },
         /**
          * Filtros que se manejan en Prime Vue
          */
-        clearFilter1() {
+         clearFilter1() {
             this.initFilters1();
         },
         initFilters1() {
@@ -694,73 +640,59 @@ export default {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             };
         },
-        checkFormValidity(){
-            let valid = true
-            console.log(this.party.name)
-            if (!this.party.name){
-                console.log(1)
-                valid = false,
-                this.partyState.name = false
-            }
-            if(this.party.type == 0){
-                console.log(2)
+        checkFormValidity() {
+            let valid = true;
+            if (!this.ressource.name){
                 valid = false
-                this.partyState.type = false
+                this.ressourceState.name = false
             }
-            if(!this.party.description){
-                console.log(3)
+            if (!this.ressource.description){
                 valid = false
-                this.partyState.description = false
+                this.ressourceState.description = false
+            }
+            if (this.ressource.amount < 0){
+                valid = false
+                this.ressourceState.amount = false
             }
             return valid
         },
-        resetModal(){
-            this.party.name =""
-            this.party.type=0
-            this.party.description=""
-            this.party.type_name=""
-            this.partyState.name = null
-            this.partyState.type= null
-            this.partyState.description=null
-        },
-        handleSubmitCreate(){
-            this.partyState.name = null
-            this.partyState.type = null
-            this.partyState.description = null
+        handleSubmitCreate() {
+            this.ressourceState.name = null
+            this.ressourceState.description = null
+            this.ressourceState.amount = null
 
-            if(!this.checkFormValidity()){
-                console.log("entrando")
+            if (!this.checkFormValidity()){
                 return
-                
             }
             
-            this.$nextTick(()=>{
+            this.$nextTick(() =>{
                 this.$bvModal.show("modal-confirm-create")
             })
         },
-        createParty(){
+        createRessource(){
+
             axios
                 .post(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParties/`,
-                    this.party,
+                    `${SERVER_ADDRESS}/api/phase2/ressources/`,
+                    this.ressource,
                     {
                         withCredentials:true,
-                        headers:{
-                            Authorization: TOKEN,
-                        },
+                        headers: {
+                            Authorization: TOKEN
+                        }
                     }
                 )
-                .then((res)=>{
+                .then((res) => {
                     this.successMessage(
-                        "¡La parte interesada ha sido creada con exito!"
-                    )
+                        "¡La actividad ha sido creada exitosamente!"
+                    );
 
-                    this.$nextTick(()=>{
+                    this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-create");
                         this.$bvModal.hide("modal-create");
-                    })
+                    });
 
-                    this.getParties()
+                    this.getRessources()
                 })
                 .catch((err) => {
                     try {
@@ -785,133 +717,69 @@ export default {
                     }
                 });
         },
-        handleSubmitUpdate(){
-            this.partyState.name = null
-            this.partyState.type = null
-            this.partyState.description = null
-
-            if(!this.checkFormValidity()){
-                console.log("entrando")
-                return
-                
-            }
-            
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-update")
-            })
+        resetModal(){
+            this.ressource.name = ""
+            this.ressourceState.name = null
+            this.ressource.description = ""
+            this.ressourceState.description = null
+            this.ressource.amount = 0
+            this.ressourceState.amount = null
         },
-        async getParties(){
-            this.loading = true
-            this.parties = []
+        async show_modal_detail(id){
+            this.ressourceDetail = {
+                name:"",
+                desciption: "",
+                amount: 0,
+            }
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/interestedParties/`,{
+                .get(`${SERVER_ADDRESS}/api/phase2/ressources/${id}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        }
+                    }   
+                )
+                .then((res) => {
+                    this.ressourceDetail = res.data
+                    this.getServiceDetail(id)
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getServiceDetail(id){
+            this.servicesOfferedDetail = []
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/ressources_service_offered/`, {
+                    params: { ressource_id : id },
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
-                .then((res)=>{
-                    
-                    for(var i = 0; i<res.data.length; i++){
-                        this.parties.push(res.data[i])
-                    }
-                    console.log(this.parties)
-                    this.loading = false
-                })
-        },
-        show_modal_update(id){
-            this.partyId = id,
-
-            axios   
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
-                    {
-                        withCredentials:true,
-                        headers:{
-                            Authorization: TOKEN,
-                        }
-                    },
-                )
-                .then((res)=>{
-                    this.party=res.data
-                    this.$nextTick(()=>{
-                        this.$bvModal.show("modal-update")
-                    })
-                    
-                })
-        },
-        updateParty(){
-            axios
-                .patch(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
-                    this.party,
-                    {
-                        withCredentials:true,
-                        headers:{
-                            Authorization: TOKEN
-                        }
-                    },
-                )
-                .then((res)=>{
-                    this.successMessage(
-                        "¡La parte interesada ha sido actualizado exitosamente!"
-                    );
-
-                    //Ocultamos los modales
-                    this.$nextTick(() => {
-                        this.$bvModal.hide("modal-confirm-update");
-                        this.$bvModal.hide("modal-update");
-                    });
-
-                    this.getParties()
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
-                        } else {
-                            // Servidor no disponible
-                            this.errorMessage(
-                                "Ups! Ha ocurrido un error en el servidor"
-                            );
-                        }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
-        },
-        async show_modal_detail(id){
-            this.partyDetail ={
-                id:0,
-                name:"",
-                description:"",
-                type:0,
-                type_name:"",
-                _services_offered:[],
-                _services_used:[],
-            }
-            axios
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`,
-                    {
-                        withCredentials: true,
-                        headers:{
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
-                .then((res)=>{
-                    console.log(res.data)
-                    this.partyDetail = res.data
-                    console.log(this.partyDetail._services_offered)
+                .then((res) => {
+                    this.servicesOfferedDetail = res.data
                     this.$bvModal.show("modal-detail")
                 })
                 .catch((err) => {
@@ -937,30 +805,126 @@ export default {
                     }
                 });
         },
-        show_modal_delete(id){
-            this.partyId = id
+        show_modal_update(id){
+            this.ressourceId = id
 
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-delete")
+            axios 
+                .get(`${SERVER_ADDRESS}/api/phase2/ressources/${id}/`,{
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN
+                    }
+
+                })
+                .then((res) => {
+                    this.ressource = res.data
+                    this.$bvModal.show("modal-update")
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        handleSubmitUpdate(){
+            this.ressourceState.name = null
+            this.ressourceState.description = null
+            this.ressourceState.amount = null
+
+            if (!this.checkFormValidity()){
+                return
+            }
+            
+            this.$nextTick(() =>{
+                this.$bvModal.show("modal-confirm-update")
             })
         },
-        async deleteParty(){
+        async updateRessource(){
             axios
-                .delete(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
+                .patch(`${SERVER_ADDRESS}/api/phase2/ressources/${this.ressourceId}/`,
+                    this.ressource,
                     {
                         withCredentials: true,
                         headers: {
-                            Authorization: TOKEN,
-                        },
+                            Authorization: TOKEN
+                        }
                     }
                 )
                 .then((res) => {
-                    // Mensaje de éxito
                     this.successMessage(
-                        "¡LA parte interesada ha sido eliminada exitosamente!"
+                        "¡El recurso ha sido actualizado exitosamente!"
                     );
-                    this.getParties();
+
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-update");
+                        this.$bvModal.hide("modal-update");
+                    });
+                    
+                    this.getRessources()
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                })
+        },
+        show_modal_delete(id) {
+            this.ressourceId = id
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-delete")
+            })
+            
+        },
+        async deleteRessource(){
+            axios
+                .delete(`${SERVER_ADDRESS}/api/phase2/ressources/${this.ressourceId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN
+                        }
+                    }
+                )
+                .then((res) => {
+                     // Mensaje de éxito
+                     this.successMessage(
+                        "¡El recurso ha sido eliminado exitosamente!"
+                    );
+                    this.getRessources()
 
                     this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-delete");
@@ -989,41 +953,6 @@ export default {
                     }
                 });
         },
-        async show_modal_association_services(id) {
-            this.partyId = id;
-            this.selectedServicesOffered = [];
-
-            axios
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
-                .then((res) => {
-                    for (
-                        let i = 0;
-                        i < res.data._services_offered.length;
-                        i++
-                    ) {
-                        this.selectedServicesOffered.push(
-                            res.data._services_offered[i]
-                        );
-                    }
-
-                    this.$nextTick(() => {
-                        this.$bvModal.show("modal-associate-services");
-                    });
-                });
-        },
-         show_modal_confirm_association_services() {
-            this.$nextTick(() => {
-                this.$bvModal.show("modal-confirm-associate-services");
-            });
-        },
         async getServicesOffered() {
             this.servicesOffered = [];
 
@@ -1035,7 +964,19 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.servicesOffered = res.data;
+                    console.log(res.data)
+                    for(let i = 0; i< res.data.length; i++){
+                        let service = {
+                            id: res.data[i].id,
+                            service_name: res.data[i].name,
+                            service_area: res.data[i].area_name,
+                            service_type: res.data[i].type_name,
+                            criticality: res.data[i].criticality,
+                            scale_max_value: res.data[i].scale_max_value
+                        }
+                        this.servicesOffered.push(service)
+                    }
+
                 })
                 .catch((err) => {
                     try {
@@ -1060,157 +1001,26 @@ export default {
                     }
                 });
         },
-    
-        async associateServices() {
-            let servicesIds = [];
-            for (let i = 0; i < this.selectedServicesOffered.length; i++) {
-                servicesIds.push(this.selectedServicesOffered[i].id);
-            }
-            let ids = {
-                services_offered: servicesIds,
-            };
-            axios
-                .patch(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
-                    ids,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
-                .then((res) => {
-                    this.successMessage(
-                        "¡Los servicios fueron asociados a la parte interesada exitosamente!"
-                    );
-
-                    this.$nextTick(() => {
-                        this.$bvModal.hide("modal-confirm-associate-services");
-                        this.$bvModal.hide("modal-associate-services");
-                    });
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
-                        } else {
-                            // Servidor no disponible
-                            this.errorMessage(
-                                "Ups! Ha ocurrido un error en el servidor"
-                            );
-                        }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
-        },
-        async show_modal_association_support_services(id) {
-            this.partyId = id;
-            this.selectedServicesUsed = [];
+        async show_modal_association_services(id, amount, name){
+            this.ressourceId = id
+            this.selectedServicesOffered = []
+            this.ressourceAmount = amount
+            console.log(this.ressourceAmount, amount)
+            this.ressourceName = name
 
             axios
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
-                .then((res) => {
-                    for (
-                        let i = 0;
-                        i < res.data._services_used.length;
-                        i++
-                    ) {
-                        this.selectedServicesUsed.push(
-                            res.data._services_used[i]
-                        );
-                    }
-
-                    this.$nextTick(() => {
-                        this.$bvModal.show("modal-associate-support-services");
-                    });
-                });
-        },
-        async getServicesUsed() {
-            this.servicesUsed = [];
-
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase2/services/used/`, {
-                    withCredentials: true,
+                .get(`${SERVER_ADDRESS}/api/phase2/ressources_service_offered/`,{
+                    params: { ressource_id: this.ressourceId },
+                    withCredentials:true,
                     headers: {
                         Authorization: TOKEN,
-                    },
+                    }
                 })
                 .then((res) => {
-                    this.servicesUsed = res.data;
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
-                        } else {
-                            // Servidor no disponible
-                            this.errorMessage(
-                                "Ups! Ha ocurrido un error en el servidor"
-                            );
-                        }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
-        },
-        show_modal_confirm_association_support_services() {
-            this.$nextTick(() => {
-                this.$bvModal.show("modal-confirm-associate-support-services");
-            });
-        },
-        async associateSupportServices() {
-            let servicesIds = [];
-            for (let i = 0; i < this.selectedServicesUsed.length; i++) {
-                servicesIds.push(this.selectedServicesUsed[i].id);
-            }
-            let ids = {
-                services_used: servicesIds,
-            };
-            axios
-                .patch(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
-                    ids,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
-                .then((res) => {
-                    this.successMessage(
-                        "¡Los servicios fueron asociados a la parte interesada exitosamente!"
-                    );
-
+                    this.selectedServicesOffered = res.data
+                    console.log(this.selectedServicesOffered)
                     this.$nextTick(() => {
-                        this.$bvModal.hide("modal-confirm-associate-services");
-                        this.$bvModal.hide("modal-associate-services");
+                        this.$bvModal.show("modal-associate-services");
                     });
                 })
                 .catch((err) => {
@@ -1236,9 +1046,90 @@ export default {
                     }
                 });
         },
-    },
-}
-</script>
+        show_modal_confirm_association_services() {
+            this.serviceAmountState = null
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-amount-ressources");
+            });
+        },
+        async showAmount(){
+            this.services = []
+            let amount = 0
+            this.serviceAmountState = null
+            let valid = true
+            for (let i = 0; i< this.selectedServicesOffered.length; i++){
+                let service = {
+                    service_offered: this.selectedServicesOffered[i].id,
+                    amount: this.selectedServicesOffered[i].amount 
+                }
+                if( (this.ressourceAmount < service.amount)|| (service.amount < 0)){
+                    valid = false
+                    this.serviceAmountState = false
+                    return
+                }   
 
-<style lang="scss">
-</style>
+                this.services.push(service)
+            }
+            this.$bvModal.show("modal-confirm-associate-services")
+        },
+        
+        async associateServices(){
+            
+            let ids = {
+                services_json: this.services
+            }
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase2/ressources_service_offered1/${this.ressourceId}/`,
+                    ids,
+                    {
+                        withCredentials:true,
+                        headers: {
+                            Authorization: TOKEN
+                        }
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡El recurso fue asignado al servicio de la organización exitosamente!"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-associate-services");
+                        this.$bvModal.hide("modal-associate-services");
+                        this.$bvModal.hide("modal-amount-ressources")
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+
+        },
+
+    }
+    
+}
+
+</script>

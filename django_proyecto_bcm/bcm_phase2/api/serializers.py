@@ -1,7 +1,7 @@
 from curses.ascii import SO
 from wsgiref.simple_server import server_version
 from numpy import delete
-from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity, SO_S
+from bcm_phase2.models import ServiceOffered, ServiceUsed, Staff, InterestedParty,OrganizationActivity, SO_S, Ressource, R_SO
 from configuration.models import ScaleView
 from rest_framework import serializers
 from django.db.models import F, Q
@@ -462,4 +462,83 @@ class ServiceOfferedStaffSerializer(serializers.ModelSerializer):
 
     def get_type_name(self, obj):
         return dict(ServiceOffered.TYPE).get(obj.type)
+
+class RessourceListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ressource
+        fields = [
+            'id',
+            'name',
+            'amount',
+            'description'
+        ]
+
+class RessourceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ressource
+        fields =[
+            'id',
+            'name',
+            'amount',
+            'description'
+        ]
+class RessourceWithServiceOfferedSerializer(serializers.ModelSerializer):
+
+    services_json = serializers.ListField(
+        child = serializers.JSONField(), required=False)
+
+    class Meta:
+        model = Ressource
+        fields = [
+            'id',
+            'services_json'
+        ]
+    
+    def update(self, instance, validated_data):
+        id_ressource = validated_data.get('id',instance.id)
+        services_json = validated_data.get('services_json')
+        ressource = Ressource.objects.get(id=id_ressource)
+
+
+        if services_json is not None:
+            R_SO.objects.filter(ressource=id_ressource).delete()
+
+            for s in services_json:
+                service = ServiceOffered.objects.get(id=s['service_offered'])
+                R_SO.objects.create(
+                    amount=s['amount'],
+                    ressource = ressource,
+                    service_offered = service
+                )
+
+        instance.save()
+        return instance
+
+class R_SOSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(read_only=True, source="service_offered.name")
+    service_type =serializers.SerializerMethodField(read_only=True, source="service_offered.type")
+    service_profit = serializers.CharField(read_only=True, source="service_offered.profit")
+    service_area = serializers.CharField(read_only=True, source="service_offered.area.name")
+    scale_max_value = serializers.IntegerField(read_only=True, source="service_offered.scale.max_value")
+    criticality = serializers.IntegerField(read_only = True, source="service_offered.criticality")
+    class Meta:
+        model = R_SO
+        fields = [
+            'id',
+            'amount',
+            'service_name',
+            'service_type',
+            'service_profit',
+            'service_area',
+            'scale_max_value',
+            'criticality'
+
+        ]
+
+    def get_service_type(self,obj):
+        return dict(ServiceOffered.TYPE).get(obj.service_offered.type)
+
+    
 

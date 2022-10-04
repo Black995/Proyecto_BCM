@@ -1,17 +1,17 @@
 import csv
 import os
 from django.conf import settings
-from bcm_phase2.models import (InterestedParty, ServiceOffered, ServiceUsed, Staff, 
+from bcm_phase2.models import (R_SO, InterestedParty, Ressource, ServiceOffered, ServiceUsed, Staff, 
                                 OrganizationActivity, SO_S)
 from django.shortcuts import get_object_or_404
-from .serializers import (InterestedPartyListSerializer, OrganizationActivityListSerializer, OrganizationActivitySerializer, 
+from .serializers import (InterestedPartyListSerializer, OrganizationActivityListSerializer, OrganizationActivitySerializer, R_SOSerializer, RessourceListSerializer, RessourceSerializer, RessourceWithServiceOfferedSerializer, 
                             ServiceOfferedListSerializer, ServiceOfferedSerializer, ServiceUsedListSerializer, 
                             ServiceUsedSerializer, StaffListSerializer, StaffSerializer, interestedPartySerializer,
                             SO_SSerializer, ServiceOfferedWithStaffsSerializer)
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.db.models import Q, F
-from bcm_phase2.api.filters import (SO_SFilterBackend)
+from bcm_phase2.api.filters import (R_SOFilterBackend, SO_SFilterBackend)
 from rest_framework.generics import (ListAPIView)
 from django.http.response import Http404
 from django.shortcuts import HttpResponse
@@ -105,3 +105,24 @@ class download_excel_massive_load_staff(ListAPIView):
                     os.path.basename(file_path)
                 return response
         raise Http404
+
+class RessourceListViewSet(viewsets.ModelViewSet):
+    model = Ressource
+    queryset = Ressource.objects.all().order_by('name')
+    serializer_class = RessourceListSerializer
+
+class RessourceViewSet(viewsets.ModelViewSet):
+    model = Ressource
+    queryset = Ressource.objects.all()
+    serializer_class = RessourceSerializer 
+
+class R_SOViewSet(viewsets.ModelViewSet):
+    model = R_SO
+    queryset = R_SO.objects.all()
+    serializer_class = R_SOSerializer
+    filter_backends = [R_SOFilterBackend]
+
+class RessourceWithServiceOfferedViewSet(viewsets.ModelViewSet):
+    model = Ressource
+    queryset = Ressource.objects.all()
+    serializer_class = RessourceWithServiceOfferedSerializer

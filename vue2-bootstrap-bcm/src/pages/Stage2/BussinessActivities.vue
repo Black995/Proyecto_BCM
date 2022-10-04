@@ -803,7 +803,7 @@ export default {
             _headquarters: [],
         },
         activityState: {
-            nam: null,
+            name: null,
             description: null,
             criticality: null,
         },
