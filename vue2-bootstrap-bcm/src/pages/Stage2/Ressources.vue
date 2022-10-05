@@ -964,7 +964,6 @@ export default {
                     },
                 })
                 .then((res) => {
-                    console.log(res.data)
                     for(let i = 0; i< res.data.length; i++){
                         let service = {
                             id: res.data[i].id,
@@ -1002,11 +1001,11 @@ export default {
                 });
         },
         async show_modal_association_services(id, amount, name){
-            this.services = []
+
             this.ressourceId = id
             this.selectedServicesOffered = []
+            this.services = []
             this.ressourceAmount = amount
-            console.log(this.ressourceAmount, amount)
             this.ressourceName = name
 
             axios
@@ -1018,8 +1017,8 @@ export default {
                     }
                 })
                 .then((res) => {
+                    console.log(res.data)
                     this.selectedServicesOffered = res.data
-                    console.log(this.selectedServicesOffered)
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-associate-services");
                     });
@@ -1058,9 +1057,10 @@ export default {
             let amount = 0
             this.serviceAmountState = null
             let valid = true
+            console.log(this.selectedServicesOffered)
             for (let i = 0; i< this.selectedServicesOffered.length; i++){
                 let service = {
-                    service_offered: this.selectedServicesOffered[i].id,
+                    service_offered: this.selectedServicesOffered[i].service_id,
                     amount: this.selectedServicesOffered[i].amount 
                 }
                 if( (this.ressourceAmount < service.amount)|| (service.amount < 0)){
@@ -1079,7 +1079,6 @@ export default {
             let ids = {
                 services_json: this.services
             }
-            console.log(this.services)
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/phase2/ressources_service_offered1/${this.ressourceId}/`,
