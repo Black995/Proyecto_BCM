@@ -11,6 +11,8 @@ def run():
         {'name': 'Can associate risks to services offered', 'codename': 'associate_risks_to_serviceoffered', 'content_type_id': 'serviceoffered'},
         {'name': 'Can associate services offered to services used', 'codename': 'associate_servicesoffered_to_serviceused', 'content_type_id': 'serviceused'},
         {'name': 'Can associate risks to services used', 'codename': 'associate_risks_to_serviceused', 'content_type_id': 'serviceused'},
+        {'name': 'Can view incident impact', 'codename': 'view_incident_impact', 'content_type_id': 'incidenthistory'},
+        {'name': 'Can view risk heat map', 'codename': 'view_risk_heatmap', 'content_type_id': 'incidenthistory'},
     ]
     for p in permissions:
         content_type_id = ContentType.objects.get(model=p['content_type_id']).id
