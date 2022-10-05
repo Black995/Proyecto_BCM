@@ -47,9 +47,7 @@
                     v-if="
                         loadingServicesOffered &&
                         loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingOrgActivities
                     "
                     class="text-center"
                 >
@@ -59,9 +57,7 @@
                     v-if="
                         loadingServicesOffered &&
                         loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingOrgActivities
                     "
                     id="services-used"
                 >
@@ -78,9 +74,7 @@
                     v-if="
                         loadingServicesOffered &&
                         loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingOrgActivities
                     "
                     class="text-center"
                 >
@@ -90,9 +84,7 @@
                     v-if="
                         loadingServicesOffered &&
                         loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingOrgActivities
                     "
                     id="organization-activities"
                 >
@@ -111,34 +103,17 @@
                     v-if="
                         loadingServicesOffered &&
                         loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingOrgActivities
                     "
                     class="text-center"
                 >
                     Criticidad de los servicios de la organización afectados
                 </h5>
-                <!--
-                    En caso de colocar la clase que facilite el scroll
-                -->
-                <!--div
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea
-                    "
-                    id="services-offered"
-                    class="chart"
-                -->
                 <div
                     v-if="
                         loadingServicesOffered &&
                         loadingServicesUsed &&
-                        loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingOrgActivities
                     "
                     id="services-offered"
                 >
@@ -158,8 +133,7 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingStaffsArea
                     "
                     class="text-center"
                 >
@@ -170,8 +144,7 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources
+                        loadingStaffsArea
                     "
                     id="staffs-area"
                 >
@@ -189,7 +162,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
                         loadingRessources
                     "
                     class="text-center"
@@ -201,7 +173,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
                         loadingRessources
                     "
                     id="ressources"
@@ -222,8 +193,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -237,8 +206,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -260,8 +227,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -275,8 +240,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -296,8 +259,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -311,8 +272,6 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea &&
-                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -1458,6 +1417,7 @@ export default {
                 );
                 this.seriesStaffsArea.push(this.staffsArea[i].occurrence);
             }
+
             this.loadingStaffsArea = true;
         },
         /**
@@ -1487,10 +1447,6 @@ export default {
                     break;
                 }
             }
-
-            console.log("Ressources");
-            console.log(this.chartOptionsRessources.labels);
-            console.log(this.seriesRessources);
 
             this.loadingRessources = true;
         },
@@ -1882,7 +1838,6 @@ export default {
 
                     this.countStaffsArea();
                     this.loadingServicesOffered = true;
-                    this.loadingRessources = true;
 
                     if (this.incidentDurationTime) {
                         this.countServicesMinimumRTO();

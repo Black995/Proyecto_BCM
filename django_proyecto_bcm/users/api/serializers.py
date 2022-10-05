@@ -87,6 +87,19 @@ class GroupSerializer(serializers.ModelSerializer):
                 codename__in=permissions).values_list('pk', flat=True)
             instance.permissions.clear()
             instance.permissions.add(*permissions)
+
+            # Una vez actualizados los permisos de los grupos, actualizamos 
+            # los permisos de los usuarios
+            users = User.objects.all()
+
+            for user in users:
+                groups = user.groups.all()
+                user.user_permissions.clear()
+
+                for group in groups:
+                    for perm in group.permissions.all():
+                        user.user_permissions.add(perm)
+
         return super().update(instance, validated_data)
 
 
