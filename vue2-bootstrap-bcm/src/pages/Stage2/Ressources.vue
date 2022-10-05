@@ -1002,6 +1002,7 @@ export default {
                 });
         },
         async show_modal_association_services(id, amount, name){
+            this.services = []
             this.ressourceId = id
             this.selectedServicesOffered = []
             this.ressourceAmount = amount
@@ -1078,7 +1079,7 @@ export default {
             let ids = {
                 services_json: this.services
             }
-
+            console.log(this.services)
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/phase2/ressources_service_offered1/${this.ressourceId}/`,
