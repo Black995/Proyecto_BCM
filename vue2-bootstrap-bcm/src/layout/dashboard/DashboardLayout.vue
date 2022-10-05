@@ -157,7 +157,9 @@
                 <sidebar-link
                     v-if="
                         is_superuser == true ||
-                        permissions.includes('bcm_phase3.view_incidenthistory')
+                        permissions.includes(
+                            'bcm_phase3.view_contingencyplanblock'
+                        )
                     "
                     to="/layout/planes-contingencia"
                     name="Planes de Contingencia"

@@ -16,10 +16,7 @@
                             :responsive="true"
                             :reorderableColumns="true"
                             :loading="loading"
-                            :globalFilterFields="[
-                                'name',
-                                'type_name',
-                            ]"
+                            :globalFilterFields="['name', 'type_name']"
                             :filters="filterGlobal"
                         >
                             <template #header>
@@ -59,7 +56,7 @@
                                         variant="info"
                                         @click="
                                             show_modal_detail(slotProps.data.id)
-                                        "    
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="fa-solid fa-search"
@@ -91,7 +88,10 @@
                                     </b-button>
                                 </template>
                             </Column>
-                            <Column field="id_2" header="Asociar servicios de Org.">
+                            <Column
+                                field="id_2"
+                                header="Asociar servicios de Org."
+                            >
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
@@ -112,7 +112,10 @@
                                     </div>
                                 </template>
                             </Column>
-                            <Column field="id_3" header="Asociar servicios de soporte">
+                            <Column
+                                field="id_3"
+                                header="Asociar servicios de soporte"
+                            >
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
@@ -173,12 +176,15 @@
                 v-for="item in partyDetail._services_offered"
                 :key="item.key"
             >
-                <h5 class="mb-1">{{item.name}}</h5>
-                <p class="mb-1">Tipo: {{item.type_name}} </p> 
-            
+                <h5 class="mb-1">{{ item.name }}</h5>
+                <p class="mb-1">Tipo: {{ item.type_name }}</p>
             </b-list-group-item>
-            <h3 class="mt-3 text-center" v-if="!partyDetail._services_offered.length">
-                No existen servicios de la organización asociados a esta parte interesada
+            <h3
+                class="mt-3 text-center"
+                v-if="!partyDetail._services_offered.length"
+            >
+                No existen servicios de la organización asociados a esta parte
+                interesada
             </h3>
             <h4 class="mt-5 text-center font-weight-bold">
                 Servicios de soporte asociados a esta parte interesada
@@ -188,11 +194,16 @@
                 v-for="item in partyDetail._services_used"
                 :key="item.key"
             >
-                <h5 class="mb-1">{{item.name}}</h5>
-                <p class="mb-1">Tipo:</p> {{item.type_name}}
+                <h5 class="mb-1">{{ item.name }}</h5>
+                <p class="mb-1">Tipo:</p>
+                {{ item.type_name }}
             </b-list-group-item>
-            <h3 class="mt-3 text-center" v-if="!partyDetail._services_used.length">
-                No existen servicios de soporte asociados a esta parte interesada
+            <h3
+                class="mt-3 text-center"
+                v-if="!partyDetail._services_used.length"
+            >
+                No existen servicios de soporte asociados a esta parte
+                interesada
             </h3>
 
             <template #modal-footer>
@@ -206,7 +217,6 @@
                     </b-button>
                 </div>
             </template>
-
         </b-modal>
 
         <!--
@@ -260,8 +270,7 @@
                         rows="3"
                     ></b-form-textarea>
                 </b-form-group>
-                
-            </form>   
+            </form>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -275,7 +284,7 @@
             </template>
         </b-modal>
 
-         <!--
+        <!--
             Modal de confirmar crear  
         -->
         <b-modal
@@ -319,19 +328,6 @@
                         required
                     ></b-form-input>
                 </b-form-group>
-
-                <b-form-group
-                    label="Ingrese la descripción de la parte interesada"
-                    invalid-feedback="Este campo es obligatorio"
-                    :state="partyState.description"
-                >
-                    <b-form-textarea
-                        v-model="party.description"
-                        :state="partyState.description"
-                        required
-                        rows="3"
-                    ></b-form-textarea>
-                </b-form-group>
                 <b-form-group
                     label="Seleccione el tipo"
                     invalid-feedback="Este campo es obligatorio"
@@ -346,6 +342,18 @@
                         required
                     ></b-form-select>
                 </b-form-group>
+                <b-form-group
+                    label="Ingrese la descripción de la parte interesada"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="partyState.description"
+                >
+                    <b-form-textarea
+                        v-model="party.description"
+                        :state="partyState.description"
+                        required
+                        rows="3"
+                    ></b-form-textarea>
+                </b-form-group>
             </form>
             <template #modal-footer>
                 <div class="w-100">
@@ -358,7 +366,6 @@
                     </b-button>
                 </div>
             </template>
-
         </b-modal>
 
         <!--
@@ -450,7 +457,8 @@
             </b-list-group>
 
             <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
-                No existen servicios de la organización asociados a esta parte interesada
+                No existen servicios de la organización asociados a esta parte
+                interesada
             </h3>
 
             <template #modal-footer>
@@ -476,8 +484,7 @@
         >
             <h4>
                 ¿Está seguro de asociar estos servicios de la organización a la
-                parte interesada?                
-                
+                parte interesada?
             </h4>
             <template #modal-footer>
                 <div class="w-100">
@@ -491,7 +498,6 @@
                 </div>
             </template>
         </b-modal>
-
 
         <b-modal
             id="modal-associate-support-services"
@@ -535,7 +541,8 @@
             </b-list-group>
 
             <h3 class="mt-3 text-center" v-if="!selectedServicesUsed.length">
-                No existen servicios de soporte asociados a esta parte interesada
+                No existen servicios de soporte asociados a esta parte
+                interesada
             </h3>
 
             <template #modal-footer>
@@ -560,9 +567,8 @@
             centered
         >
             <h4>
-                ¿Está seguro de asociar estos servicios de la soporte a la
-                parte interesada?                
-                
+                ¿Está seguro de asociar estos servicios de la soporte a la parte
+                interesada?
             </h4>
             <template #modal-footer>
                 <div class="w-100">
@@ -576,9 +582,7 @@
                 </div>
             </template>
         </b-modal>
-
     </div>
-
 </template>
 
 <script>
@@ -599,9 +603,9 @@ export default {
         Multiselect,
     },
     data: () => ({
-        loading:false,
+        loading: false,
         filterGlobal: {
-             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
         permissions: [],
         is_superuser: false,
@@ -611,54 +615,53 @@ export default {
         parties: [],
         partyId: 0,
         partyName: "",
-        type:"",
+        type: "",
 
-        party:{
-            name:"",
-            description:"",
-            type:0,
-            type_name:""
+        party: {
+            name: "",
+            description: "",
+            type: 0,
+            type_name: "",
         },
 
-        partyDetail:{
-            name:"",
-            description:"",
-            type_name:"",
-            _services_offered:[],
-            _services_used:[],
+        partyDetail: {
+            name: "",
+            description: "",
+            type_name: "",
+            _services_offered: [],
+            _services_used: [],
         },
 
         partyState: {
             name: null,
-            description:null,
-            type:null,
+            description: null,
+            type: null,
         },
-        types:[
+        types: [
             {
-                value:1,
-                name:"Proveedor",
+                value: 1,
+                name: "Proveedor",
             },
             {
-                value:3,
-                name:"Cliente",
+                value: 3,
+                name: "Cliente",
             },
             {
-                value:2,
-                name:"Inversionista",
-
-            }
+                value: 2,
+                name: "Inversionista",
+            },
         ],
 
         servicesOffered: [],
         selectedServicesOffered: [],
 
         servicesUsed: [],
-        selectedServicesUsed: []
+        selectedServicesUsed: [],
     }),
     mounted() {
-        this.getParties()
-        this.getServicesOffered()
-        this.getServicesUsed()
+        this.getParties();
+        this.getServicesOffered();
+        this.getServicesUsed();
         this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
     },
@@ -694,73 +697,71 @@ export default {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             };
         },
-        checkFormValidity(){
-            let valid = true
-            console.log(this.party.name)
-            if (!this.party.name){
-                console.log(1)
-                valid = false,
-                this.partyState.name = false
+        checkFormValidity() {
+            let valid = true;
+            console.log(this.party.name);
+            if (!this.party.name) {
+                console.log(1);
+                (valid = false), (this.partyState.name = false);
             }
-            if(this.party.type == 0){
-                console.log(2)
-                valid = false
-                this.partyState.type = false
+            if (this.party.type == 0) {
+                console.log(2);
+                valid = false;
+                this.partyState.type = false;
             }
-            if(!this.party.description){
-                console.log(3)
-                valid = false
-                this.partyState.description = false
+            if (!this.party.description) {
+                console.log(3);
+                valid = false;
+                this.partyState.description = false;
             }
-            return valid
+            return valid;
         },
-        resetModal(){
-            this.party.name =""
-            this.party.type=0
-            this.party.description=""
-            this.party.type_name=""
-            this.partyState.name = null
-            this.partyState.type= null
-            this.partyState.description=null
+        resetModal() {
+            this.party.name = "";
+            this.party.type = 0;
+            this.party.description = "";
+            this.party.type_name = "";
+            this.partyState.name = null;
+            this.partyState.type = null;
+            this.partyState.description = null;
         },
-        handleSubmitCreate(){
-            this.partyState.name = null
-            this.partyState.type = null
-            this.partyState.description = null
+        handleSubmitCreate() {
+            this.partyState.name = null;
+            this.partyState.type = null;
+            this.partyState.description = null;
 
-            if(!this.checkFormValidity()){
-                console.log("entrando")
-                return
-                
+            if (!this.checkFormValidity()) {
+                console.log("entrando");
+                return;
             }
-            
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-create")
-            })
+
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-create");
+            });
         },
-        createParty(){
+        createParty() {
             axios
                 .post(
                     `${SERVER_ADDRESS}/api/phase2/interestedParties/`,
                     this.party,
                     {
-                        withCredentials:true,
-                        headers:{
+                        withCredentials: true,
+                        headers: {
                             Authorization: TOKEN,
                         },
                     }
                 )
-                .then((res)=>{
+                .then((res) => {
                     this.successMessage(
                         "¡La parte interesada ha sido creada con exito!"
-                    )
+                    );
 
-                    this.$nextTick(()=>{
+                    this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-create");
                         this.$bvModal.hide("modal-create");
-                    })
+                    });
 
-                    this.getParties()
+                    this.getParties();
                 })
                 .catch((err) => {
                     try {
@@ -785,74 +786,70 @@ export default {
                     }
                 });
         },
-        handleSubmitUpdate(){
-            this.partyState.name = null
-            this.partyState.type = null
-            this.partyState.description = null
+        handleSubmitUpdate() {
+            this.partyState.name = null;
+            this.partyState.type = null;
+            this.partyState.description = null;
 
-            if(!this.checkFormValidity()){
-                console.log("entrando")
-                return
-                
+            if (!this.checkFormValidity()) {
+                console.log("entrando");
+                return;
             }
-            
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-update")
-            })
+
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-update");
+            });
         },
-        async getParties(){
-            this.loading = true
-            this.parties = []
+        async getParties() {
+            this.loading = true;
+            this.parties = [];
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/interestedParties/`,{
+                .get(`${SERVER_ADDRESS}/api/phase2/interestedParties/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
-                .then((res)=>{
-                    
-                    for(var i = 0; i<res.data.length; i++){
-                        this.parties.push(res.data[i])
+                .then((res) => {
+                    for (var i = 0; i < res.data.length; i++) {
+                        this.parties.push(res.data[i]);
                     }
-                    console.log(this.parties)
-                    this.loading = false
-                })
+                    console.log(this.parties);
+                    this.loading = false;
+                });
         },
-        show_modal_update(id){
-            this.partyId = id,
-
-            axios   
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
-                    {
-                        withCredentials:true,
-                        headers:{
-                            Authorization: TOKEN,
+        show_modal_update(id) {
+            (this.partyId = id),
+                axios
+                    .get(
+                        `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
+                        {
+                            withCredentials: true,
+                            headers: {
+                                Authorization: TOKEN,
+                            },
                         }
-                    },
-                )
-                .then((res)=>{
-                    this.party=res.data
-                    this.$nextTick(()=>{
-                        this.$bvModal.show("modal-update")
-                    })
-                    
-                })
+                    )
+                    .then((res) => {
+                        this.party = res.data;
+                        this.$nextTick(() => {
+                            this.$bvModal.show("modal-update");
+                        });
+                    });
         },
-        updateParty(){
+        updateParty() {
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
                     this.party,
                     {
-                        withCredentials:true,
-                        headers:{
-                            Authorization: TOKEN
-                        }
-                    },
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
                 )
-                .then((res)=>{
+                .then((res) => {
                     this.successMessage(
                         "¡La parte interesada ha sido actualizado exitosamente!"
                     );
@@ -863,7 +860,7 @@ export default {
                         this.$bvModal.hide("modal-update");
                     });
 
-                    this.getParties()
+                    this.getParties();
                 })
                 .catch((err) => {
                     try {
@@ -888,31 +885,28 @@ export default {
                     }
                 });
         },
-        async show_modal_detail(id){
-            this.partyDetail ={
-                id:0,
-                name:"",
-                description:"",
-                type:0,
-                type_name:"",
-                _services_offered:[],
-                _services_used:[],
-            }
+        async show_modal_detail(id) {
+            this.partyDetail = {
+                id: 0,
+                name: "",
+                description: "",
+                type: 0,
+                type_name: "",
+                _services_offered: [],
+                _services_used: [],
+            };
             axios
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`,
-                    {
-                        withCredentials: true,
-                        headers:{
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
-                .then((res)=>{
-                    console.log(res.data)
-                    this.partyDetail = res.data
-                    console.log(this.partyDetail._services_offered)
-                    this.$bvModal.show("modal-detail")
+                .get(`${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    console.log(res.data);
+                    this.partyDetail = res.data;
+                    console.log(this.partyDetail._services_offered);
+                    this.$bvModal.show("modal-detail");
                 })
                 .catch((err) => {
                     try {
@@ -937,14 +931,14 @@ export default {
                     }
                 });
         },
-        show_modal_delete(id){
-            this.partyId = id
+        show_modal_delete(id) {
+            this.partyId = id;
 
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-confirm-delete")
-            })
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-delete");
+            });
         },
-        async deleteParty(){
+        async deleteParty() {
             axios
                 .delete(
                     `${SERVER_ADDRESS}/api/phase2/interestedParty/${this.partyId}/`,
@@ -994,15 +988,12 @@ export default {
             this.selectedServicesOffered = [];
 
             axios
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
+                .get(`${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
                 .then((res) => {
                     for (
                         let i = 0;
@@ -1019,7 +1010,7 @@ export default {
                     });
                 });
         },
-         show_modal_confirm_association_services() {
+        show_modal_confirm_association_services() {
             this.$nextTick(() => {
                 this.$bvModal.show("modal-confirm-associate-services");
             });
@@ -1060,7 +1051,7 @@ export default {
                     }
                 });
         },
-    
+
         async associateServices() {
             let servicesIds = [];
             for (let i = 0; i < this.selectedServicesOffered.length; i++) {
@@ -1118,21 +1109,14 @@ export default {
             this.selectedServicesUsed = [];
 
             axios
-                .get(
-                    `${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        },
-                    }
-                )
+                .get(`${SERVER_ADDRESS}/api/phase2/interestedParty/${id}/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
                 .then((res) => {
-                    for (
-                        let i = 0;
-                        i < res.data._services_used.length;
-                        i++
-                    ) {
+                    for (let i = 0; i < res.data._services_used.length; i++) {
                         this.selectedServicesUsed.push(
                             res.data._services_used[i]
                         );
@@ -1237,7 +1221,7 @@ export default {
                 });
         },
     },
-}
+};
 </script>
 
 <style lang="scss">

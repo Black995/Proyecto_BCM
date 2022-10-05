@@ -364,6 +364,18 @@ msgstr "Puede actualizar recursos asignados al servicio de la org."
 msgid "Can delete r_so"
 msgstr "Puede eliminar recursos al servicio de la org."
 
+msgid "Can add contingency plan block"
+msgstr "Puede agregar planes de contingencia"
+
+msgid "Can view contingency plan block"
+msgstr "Puede ver planes de contingencia"
+
+msgid "Can change contingency plan block"
+msgstr "Puede actualizar planes de contingencia"
+
+msgid "Can delete contingency plan block"
+msgstr "Puede eliminar planes de contingencia"
+
 # Models name
 
 msgid "area"
@@ -446,3 +458,6 @@ msgstr "Municipios"
 
 msgid "user"
 msgstr "Usuarios"
+
+msgid "contingencyplanblock"
+msgstr "Planes de Contingencia"

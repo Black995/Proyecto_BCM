@@ -1,53 +1,243 @@
 <template>
-    <div class="container-fluid">
-        <b-row align-v="center">
-            <h4>Planes de contingencia</h4>
-        </b-row>
-        <b-row align-v="center">
+    <div>
+        <b-row class="mt-3" align-v="center">
             <b-col>
-                <b-row align-v="center">
-                    <button type="button" @click="addNode">Add</button>
-                    <button type="button" @click="$refs.chart.remove()">
-                        Del
-                    </button>
-                    <button type="button" @click="$refs.chart.editCurrent()">
-                        Edit
-                    </button>
-                    <button type="button" @click="$refs.chart.save()">
-                        Save
-                    </button>
-                    <button
-                        type="button"
-                        v-if="showRemovingConfirmation"
-                        @click="confirmRemoving"
-                    >
-                        Confirm removing
-                    </button>
-                    <button
-                        type="button"
-                        v-if="showRemovingConfirmation"
-                        @click="showRemovingConfirmation = false"
-                    >
-                        Reject removing
-                    </button>
+                <h5>Seleccione uno de los escenarios críticos</h5>
+                <div class="text-center">
+                    <b-spinner
+                        v-if="loadingCrisisScenarios"
+                        type="grow"
+                    ></b-spinner>
+                    <b-form-select
+                        v-if="!loadingCrisisScenarios"
+                        v-model="crisisScenarioId"
+                        :options="crisisScenarios"
+                        value-field="id"
+                        text-field="name"
+                        label="Escenarios críticos"
+                        @change="getContingencyPlanBlockNodes"
+                    ></b-form-select>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row align-v="center" class="mt-3">
+            <b-col>
+                <div class="text-center">
+                    <b-spinner v-if="loadingNodes" type="grow"></b-spinner>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row
+            v-if="!loadingNodes && loadingFirstNodes"
+            align-v="center"
+            class="mt-5"
+        >
+            <b-col>
+                <b-row>
+                    <b-col cols="9">
+                        <h5 class="text-center">
+                            Arrastre bloques al árbol de nodos usando el botón
+                            de menú
+                        </h5>
+                    </b-col>
+                    <b-col cols="3">
+                        <div class="w-100">
+                            <b-button
+                                variant="warning"
+                                class="float-right"
+                                @click="editMainBlock = !editMainBlock"
+                            >
+                                Editar bloque principal
+                            </b-button>
+                        </div>
+                    </b-col>
                 </b-row>
-                <b-row align-v="center">
-                    <flowchart
-                        width="1500"
-                        height="1000"
-                        :nodes="nodes"
-                        :connections="connections"
-                        :remove-requires-confirmation="true"
-                        @editnode="handleEditNode"
-                        @dblclick="handleDblClick"
-                        @editconnection="handleEditConnection"
-                        @removeconfirmationrequired="initRemovingConfirmation"
-                        @save="handleChartSave"
-                        ref="chart"
-                        class="chart"
-                    >
-                    </flowchart>
+                <b-row v-if="editMainBlock" class="mt-5">
+                    <b-col>
+                        <div class="card">
+                            <div class="card-body">
+                                <b-row align-v="center">
+                                    <b-col>
+                                        <b-form-group
+                                            label="Ingrese el título del bloque"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="blockState.title"
+                                        >
+                                            <vue-editor
+                                                v-model="block.preview.title"
+                                                :state="blockState.title"
+                                            ></vue-editor>
+                                            <!--b-form-input
+                                                v-model="block.preview.title"
+                                                :state="blockState.title"
+                                                required
+                                            ></b-form-input-->
+                                        </b-form-group>
+                                        <b-form-group
+                                            label="Ingrese la descripción del bloque"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="blockState.description"
+                                        >
+                                            <vue-editor
+                                                v-model="block.node.description"
+                                                :state="blockState.description"
+                                            ></vue-editor>
+                                            <!--b-form-textarea
+                                                v-model="block.node.description"
+                                                :state="blockState.description"
+                                                required
+                                                rows="3"
+                                            ></b-form-textarea-->
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                            </div>
+                        </div>
+                    </b-col>
                 </b-row>
+
+                <b-row v-if="editNodeForm" class="mt-5">
+                    <b-col>
+                        <div class="card">
+                            <div class="card-body">
+                                <b-row>
+                                    <b-col>
+                                        <h5 class="text-center">Editar nodo</h5>
+                                    </b-col>
+                                </b-row>
+                                <b-row align-v="center">
+                                    <b-col>
+                                        <b-form-group
+                                            label="Ingrese el título del nodo"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="EditNodeState.title"
+                                        >
+                                            <vue-editor
+                                                v-model="node.title"
+                                                :state="EditNodeState.title"
+                                            ></vue-editor>
+                                            <!--b-form-input
+                                            v-model="node.title"
+                                            :state="EditNodeState.title"
+                                            required
+                                        ></b-form-input-->
+                                        </b-form-group>
+                                        <b-form-group
+                                            label="Ingrese la descripción del nodo"
+                                            invalid-feedback="Este campo es obligatorio"
+                                            :state="EditNodeState.description"
+                                        >
+                                            <vue-editor
+                                                v-model="node.description"
+                                                :state="
+                                                    EditNodeState.description
+                                                "
+                                            ></vue-editor>
+                                            <!--b-form-textarea
+                                            v-model="node.description"
+                                            :state="EditNodeState.description"
+                                            required
+                                            rows="3"
+                                        ></b-form-textarea-->
+                                        </b-form-group>
+                                    </b-col>
+                                </b-row>
+                                <b-row>
+                                    <b-col>
+                                        <div class="w-100">
+                                            <b-button
+                                                variant="warning"
+                                                class="float-right"
+                                                @click="saveNode"
+                                            >
+                                                Editar nodo
+                                            </b-button>
+                                        </div>
+                                    </b-col>
+                                </b-row>
+                            </div>
+                        </div>
+                    </b-col>
+                </b-row>
+                <b-row v-if="!editNodeForm" align-v="center">
+                    <b-col>
+                        <div class="d-flex justify-content-center">
+                            <!--flowy-new-block
+                                v-for="(block, index) in blocks"
+                                :key="index"
+                                @drag-start="onDragStartNewBlock"
+                                @drag-stop="onDragStopNewBlock"
+                            -->
+                            <flowy-new-block
+                                @drag-start="onDragStartNewBlock"
+                                @drag-stop="onDragStopNewBlock"
+                            >
+                                <template v-slot:preview="{}">
+                                    <demo-block
+                                        :title="block.preview.title"
+                                        :description="block.preview.description"
+                                    />
+                                </template>
+                                <template v-slot:node="{}">
+                                    <demo-node
+                                        :title="block.node.title"
+                                        :description="block.node.description"
+                                        :custom-attribute="
+                                            block.node.canBeAdded
+                                        "
+                                    />
+                                </template>
+                            </flowy-new-block>
+                        </div>
+                    </b-col>
+                </b-row>
+
+                <b-row align-v="center" class="mt-5">
+                    <b-col>
+                        <h5 class="text-center">
+                            Plan de contingencia para el Escenario Crítico
+                        </h5>
+                    </b-col>
+                </b-row>
+                <b-row class="justify-content-md-center mt-3" align-v="center">
+                    <b-col md="auto">
+                        <flowy
+                            :nodes="nodes"
+                            :beforeMove="beforeMove"
+                            :beforeAdd="beforeAdd"
+                            @add="add"
+                            @move="move"
+                            @remove="remove"
+                            @drag-start="onDragStart"
+                        ></flowy>
+                    </b-col>
+                </b-row>
+            </b-col>
+        </b-row>
+        <b-row
+            v-if="
+                !loadingNodes &&
+                loadingFirstNodes &&
+                (is_superuser == true ||
+                    (permissions.includes(
+                        'bcm_phase3.add_contingencyplanblock'
+                    ) &&
+                        permissions.includes(
+                            'bcm_phase3.change_contingencyplanblock'
+                        ) &&
+                        permissions.includes(
+                            'bcm_phase3.delete_contingencyplanblock'
+                        )))
+            "
+            align-v="center"
+            class="mt-3"
+        >
+            <b-col>
+                <div class="text-right">
+                    <b-button variant="success" @click="saveContingencyPlan">
+                        Guardar plan de contingencia
+                    </b-button>
+                </div>
             </b-col>
         </b-row>
     </div>
@@ -55,78 +245,134 @@
 
 
 <script>
+import Vue from "vue";
+import _ from "lodash";
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
-import FlowChart from "flowchart-vue";
+import DemoBlock from "./flowy-components/DemoBlock.vue";
+import { VueEditor } from "vue2-editor";
+//import DemoNode from "./flowy-components/DemoNode.vue";
+
+const DemoNode = {
+    data() {
+        return {
+            text: "This is component A",
+        };
+    },
+    props: ["remove", "node", "title", "description"],
+    methods: {
+        editNode() {
+            this.$props.node.action = "edit";
+            this.remove();
+        },
+        deleteNode() {
+            this.$props.node.action = "delete";
+            this.remove();
+        },
+    },
+    template: `
+    <b-card flat bordered class="my-card bg-white">
+        <div class="row items-center no-wrap">
+            <div class="col">
+                <div v-html="title" class="text-h6" />
+            </div>
+
+            <div class="col-auto">
+                <flowy-drag-handle>
+                    <b-button variant="light">
+                        <b-icon-justify></b-icon-justify>
+                    </b-button>
+                </flowy-drag-handle>
+            </div>
+        </div>
+
+        <div v-html="description" />
+        <div class="d-flex justify-content-around">
+            <b-col><b-button variant="warning" @click="editNode()">Editar</b-button></b-col>
+            <b-col><b-button variant="danger" v-if="this.$props.node.parentId != -1" @click="deleteNode()">Eliminar</b-button></b-col>
+        </div>
+    </b-card>
+  `,
+};
+
+Vue.component("demo-node", DemoNode);
 
 export default {
     name: "ContingencyPlans",
-    components: {},
+    components: {
+        DemoBlock,
+        DemoNode,
+        VueEditor,
+    },
     data: () => ({
         permissions: [],
         is_superuser: false,
 
-        nodes: [
-            // Basic fields
-            { id: 1, x: 140, y: 270, name: "Start", type: "start" },
-            // You can add any generic fields to node, for example: description
-            // It will be passed to @save, @editnode
-            {
-                id: 2,
-                x: 540,
-                y: 270,
-                name: "End",
-                type: "end",
+        loadingCrisisScenarios: false,
+
+        crisisScenarios: [],
+        crisisScenarioId: 0,
+
+        editMainBlock: false,
+        blockState: {
+            title: null,
+            description: null,
+        },
+
+        node: {
+            title: "",
+            description: "",
+        },
+        nodeIndex: 0,
+        editNodeForm: false,
+        editNodeState: {
+            title: null,
+            description: null,
+        },
+
+        dragging: false,
+        block: {
+            preview: {
+                title: "<p><strong>Nuevo paso a ingresar</strong></p>",
             },
-            {
-                id: 3,
-                x: 340,
-                y: 270,
-                name: "Opción A",
-                type: "operation",
-                description: "I'm here",
-                approvers: [{ name: "Joyce" }, { name: "Alan" }],
+            node: {
+                title: "",
+                description: ".",
             },
-            {
-                id: 4,
-                x: 340,
-                y: 360,
-                name: "Opción B",
-                type: "operation",
-                description: "I'm here",
-                approvers: [{ name: "Emma" }],
+        },
+        /*
+        {
+            preview: {
+                title: "Cannot be added",
             },
-        ],
-        connections: [
-            {
-                source: { id: 1, position: "right" },
-                destination: { id: 3, position: "left" },
-                id: 1,
-                type: "pass",
+            node: {
+                title: "Time has passed",
+                description:
+                    "Triggers after a specified <b>amount</b> of time",
+                canBeAdded: false,
             },
-            {
-                source: { id: 1, position: "right" },
-                destination: { id: 4, position: "left" },
-                id: 1,
-                type: "pass",
+        },
+        */
+        loadingNodes: false,
+        loadingFirstNodes: false,
+        nodes: [],
+        /*
+        {
+            id: "3",
+            parentId: "1",
+            nodeComponent: "demo-node",
+            data: {
+                text: "Parent block",
+                title: "New Visitor",
+                description:
+                    "<span>When a <b>new visitor</b> goes to <i>Site 1</i></span>",
             },
-            {
-                source: { id: 3, position: "right" },
-                destination: { id: 2, position: "left" },
-                id: 2,
-                type: "pass",
-            },
-            {
-                source: { id: 4, position: "right" },
-                destination: { id: 2, position: "left" },
-                id: 2,
-                type: "pass",
-            },
-        ],
-        showRemovingConfirmation: false,
+        },
+        */
     }),
     mounted() {
+        this.getCrisisScenarios();
         this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
     },
@@ -152,49 +398,359 @@ export default {
             });
         },
 
-        handleChartSave(nodes, connections) {
-            // axios.post(url, {nodes, connections}).then(resp => {
-            //   this.nodes = resp.data.nodes;
-            //   this.connections = resp.data.connections;
-            //   // Flowchart will refresh after this.nodes and this.connections changed
-            // });
+        async getCrisisScenarios() {
+            this.crisisScenarios = [];
+            this.loadingCrisisScenarios = true;
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase1/crisis_scenarios_list/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.crisisScenarios = res.data;
+                    this.loadingCrisisScenarios = false;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
         },
-        addNode() {
-            this.$refs.chart.add({
-                id: +new Date(),
-                x: 10,
-                y: 10,
-                name: "New",
-                type: "operation",
-                approvers: [],
+        async getContingencyPlanBlockNodes() {
+            this.nodes = [];
+            this.loadingNodes = true;
+            this.loadingFirstNodes = true;
+            this.editNodeForm = false;
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase3/contingency-plan-detail/`, {
+                    params: { crisis_scenario: this.crisisScenarioId },
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    if (res.data.length) {
+                        for (var i = 0; i < res.data.length; i++) {
+                            let nodeObj = {
+                                id: res.data[i].block_id,
+                                parentId: res.data[i].parent_block_id,
+                                nodeComponent: "demo-node",
+                                data: {
+                                    text: res.data[i].title,
+                                    title: res.data[i].title,
+                                    description: res.data[i].description,
+                                },
+                            };
+                            this.nodes.push(nodeObj);
+                        }
+                    } else {
+                        let nodeObj = {
+                            id: 1,
+                            parentId: -1,
+                            nodeComponent: "demo-node",
+                            data: {
+                                text: "Ejemplo de plan de contingencia",
+                                title: "Ejemplo de plan de contingencia",
+                                description:
+                                    "Este escenario crítico todavía no posee un plan de contingencia",
+                            },
+                        };
+                        this.nodes.push(nodeObj);
+                    }
+                    this.loadingNodes = false;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        saveContingencyPlan() {
+            let contingencyObj = {
+                contingency_plan_list: [],
+            };
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                let nodeObj = {
+                    block_id: this.nodes[i].id,
+                    parent_block_id: this.nodes[i].parentId,
+                    title: this.nodes[i].data.title,
+                    description: this.nodes[i].data.description,
+                };
+                contingencyObj.contingency_plan_list.push(nodeObj);
+            }
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase3/contingency-plans-create/${this.crisisScenarioId}/`,
+                    contingencyObj,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡El plan de contingencia ha sido guardado exitosamente!"
+                    );
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Métodos para manejar el diagrama
+         */
+        onDragStartNewBlock(event) {
+            // console.log("onDragStartNewBlock", event);
+            // contains all the props and attributes passed to demo-node
+            const { props } = event;
+            this.newDraggingBlock = props;
+        },
+        onDragStopNewBlock(event) {
+            // console.log("onDragStopNewBlock", event);
+            this.newDraggingBlock = null;
+        },
+        // REQUIRED
+        beforeMove({ to, from }) {
+            // called before moving node (during drag and after drag)
+            // indicator will turn red when we return false
+            // from is null when we're not dragging from the current node tree
+            // console.log("beforeMove", to, from);
+
+            // we cannot drag upper parent nodes in this demo
+            if (from && from.parentId === -1) {
+                return false;
+            }
+            // we're adding a new node (not moving an existing one)
+            if (from === null) {
+                // we've passed this attribute to the demo-node
+                if (this.newDraggingBlock["custom-attribute"] === false) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+        // REQUIRED
+        beforeAdd({ to, from }) {
+            // called before moving node (during drag and after drag)
+            // indicator will turn red when we return false
+            // from is null when we're not dragging from the current node tree
+            // console.log("beforeAdd", to, from);
+
+            // Inicializamos variables de estados
+            this.blockState.title = null;
+            this.blockState.description = null;
+
+            // Exit when the form isn't valid
+            if (!this.checkBlockValidity()) {
+                return false;
+            }
+
+            // we've passed this attribute to the demo-node
+            if (this.newDraggingBlock["custom-attribute"] === false) {
+                return false;
+            }
+
+            return true;
+        },
+        randomInteger() {
+            return Math.floor(Math.random() * 10000) + 1;
+        },
+        generateId(nodes) {
+            let id = this.randomInteger();
+            // _.find is a lodash function
+            while (_.find(nodes, { id }) !== undefined) {
+                id = this.randomInteger();
+            }
+            return id;
+        },
+        addNode(_event) {
+            const id = this.generateId();
+            this.nodes.push({
+                ..._event.node,
+                id,
             });
-            console.log("Nodes");
-            console.log(this.nodes);
-            console.log("Connections");
-            console.log(this.connections);
         },
-        handleEditNode(node) {
-            if (node.id === 2) {
-                console.log(node.description);
+        move(event) {
+            // console.log("move", event);
+
+            // node we're dragging to and node we've just dragged
+            const { dragged, to } = event;
+
+            // change panentId to id of node we're dragging to
+            dragged.parentId = to.id;
+        },
+        add(event) {
+            // every node needs an ID
+            const id = this.generateId();
+
+            // Le asignamos la pre visualización al título
+            this.block.node.title = this.block.preview.title;
+
+            // Le agregamos a la variable de evento la información del bloque
+            event.node.data.title = this.block.node.title;
+            event.node.data.description = this.block.node.description;
+
+            // add to array of nodes
+            this.nodes.push({
+                id,
+                ...event.node,
+            });
+        },
+        onDragStart(event) {
+            // console.log("onDragStart", event);
+            this.dragging = true;
+        },
+        remove(event) {
+            // console.log("remove", event);
+
+            // node we're dragging to
+            const { node } = event;
+
+            // we use lodash in this demo to remove node from the array
+            const nodeIndex = _.findIndex(this.nodes, { id: node.id });
+
+            if (event.node.action == "edit") {
+                this.nodeIndex = nodeIndex;
+                this.editNode();
+            }
+            if (event.node.action == "delete") {
+                this.nodes.splice(nodeIndex, 1);
             }
         },
-        handleEditConnection(connection) {},
-        handleDblClick(position) {
-            this.$refs.chart.add({
-                id: +new Date(),
-                x: position.x,
-                y: position.y,
-                name: "New",
-                type: "operation",
-                approvers: [],
-            });
+        editNode() {
+            this.editMainBlock = false;
+
+            let nodeFound;
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (i == this.nodeIndex) {
+                    nodeFound = this.nodes[i];
+                    break;
+                }
+            }
+
+            this.node.title = nodeFound.data.title;
+            this.node.description = nodeFound.data.description;
+            this.EditNodeState = {
+                title: null,
+                description: null,
+            };
+
+            this.editNodeForm = true;
         },
-        initRemovingConfirmation() {
-            this.showRemovingConfirmation = true;
+        saveNode() {
+            this.EditNodeState.title = null;
+            this.EditNodeState.description = null;
+
+            // Exit when the form isn't valid
+            if (!this.checkNodeValidity()) {
+                return;
+            }
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (i == this.nodeIndex) {
+                    this.nodes[i].data.title = this.node.title;
+                    this.nodes[i].data.description = this.node.description;
+                    break;
+                }
+            }
+
+            this.editNodeForm = false;
+            this.editMainBlock = true;
         },
-        confirmRemoving() {
-            this.$refs.chart.confirmRemove();
-            this.showRemovingConfirmation = false;
+
+        /**
+         * Validar formularios
+         */
+        checkBlockValidity() {
+            let valid = true;
+            if (!this.block.preview.title) {
+                this.blockState.title = false;
+                valid = false;
+            }
+            if (!this.block.node.description) {
+                this.blockState.description = false;
+                valid = false;
+            }
+
+            return valid;
+        },
+        checkNodeValidity() {
+            let valid = true;
+            if (!this.node.title) {
+                this.editNodeState.title = false;
+                valid = false;
+            }
+            if (!this.node.description) {
+                this.editNodeState.description = false;
+                valid = false;
+            }
+
+            return valid;
         },
     },
 };
@@ -203,6 +759,25 @@ export default {
 .chart {
     overflow: auto;
     width: "100%";
+}
+
+.gojs-diagram {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#myDiagramDiv {
+    width: 100%;
+    height: 500px;
+}
+
+.flowy-drag-handle button {
+    cursor: grab;
+}
+
+.flowy-block.draggable-mirror {
+    opacity: 0.6;
 }
 </style>
 

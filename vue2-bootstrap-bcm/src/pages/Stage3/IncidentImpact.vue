@@ -8,9 +8,7 @@
                     </b-col> </b-row
                 ><b-row class="text-right">
                     <b-col>
-                        <b-button
-                            variant="outline-primary"
-                            @click="countStaffsArea"
+                        <b-button variant="outline-primary" @click="clearFilter"
                             >Limpiar filtro de las gráficas
                             <b-icon icon="filter"></b-icon></b-button
                     ></b-col> </b-row
@@ -50,7 +48,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     class="text-center"
                 >
@@ -61,7 +60,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     id="services-used"
                 >
@@ -79,7 +79,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     class="text-center"
                 >
@@ -90,7 +91,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     id="organization-activities"
                 >
@@ -110,7 +112,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     class="text-center"
                 >
@@ -134,7 +137,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     id="services-offered"
                 >
@@ -154,7 +158,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     class="text-center"
                 >
@@ -165,7 +170,8 @@
                         loadingServicesOffered &&
                         loadingServicesUsed &&
                         loadingOrgActivities &&
-                        loadingStaffsArea
+                        loadingStaffsArea &&
+                        loadingRessources
                     "
                     id="staffs-area"
                 >
@@ -184,6 +190,40 @@
                         loadingServicesUsed &&
                         loadingOrgActivities &&
                         loadingStaffsArea &&
+                        loadingRessources
+                    "
+                    class="text-center"
+                >
+                    Cantidad de recursos afectados
+                </h5>
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea &&
+                        loadingRessources
+                    "
+                    id="ressources"
+                >
+                    <apexchart
+                        type="donut"
+                        height="500"
+                        :options="chartOptionsRessources"
+                        :series="seriesRessources"
+                    ></apexchart>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row class="mt-3" align-v="center">
+            <b-col>
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities &&
+                        loadingStaffsArea &&
+                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -198,6 +238,7 @@
                         loadingServicesUsed &&
                         loadingOrgActivities &&
                         loadingStaffsArea &&
+                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -220,6 +261,7 @@
                         loadingServicesUsed &&
                         loadingOrgActivities &&
                         loadingStaffsArea &&
+                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -234,6 +276,7 @@
                         loadingServicesUsed &&
                         loadingOrgActivities &&
                         loadingStaffsArea &&
+                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -254,6 +297,7 @@
                         loadingServicesUsed &&
                         loadingOrgActivities &&
                         loadingStaffsArea &&
+                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -268,6 +312,7 @@
                         loadingServicesUsed &&
                         loadingOrgActivities &&
                         loadingStaffsArea &&
+                        loadingRessources &&
                         loadingServicesOnlyMinimumRTO &&
                         loadingServicesMinimunRTO
                     "
@@ -608,6 +653,54 @@ export default {
             ],
             noData: {
                 text: "No se encontró personal asignado a los servicios de la organización",
+                align: "center",
+                verticalAlign: "middle",
+                style: {
+                    fontSize: "14px",
+                },
+            },
+        },
+        loadingRessources: false,
+        seriesRessources: [],
+        chartOptionsRessources: {
+            chart: {
+                id: "ressources",
+                height: 200,
+                width: 400,
+                type: "donut",
+            },
+            stroke: {
+                colors: ["#fff"],
+            },
+            fill: {
+                opacity: 0.8,
+            },
+            yaxis: {
+                labels: {
+                    rotate: 0,
+                    rotateAlways: false,
+                    formatter: function (val) {
+                        return val.toFixed(0);
+                    },
+                },
+                decimalsInFloat: 0,
+            },
+            labels: [],
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 350,
+                        },
+                        legend: {
+                            position: "bottom",
+                        },
+                    },
+                },
+            ],
+            noData: {
+                text: "No se encontraron recursos asignados para el servicio seleccionado",
                 align: "center",
                 verticalAlign: "middle",
                 style: {
@@ -1050,6 +1143,7 @@ export default {
             );
 
             this.countStaffsAreaByService(service.id);
+            this.countRessources(service.id);
         },
         async getIncidents() {
             this.incidents = [];
@@ -1244,6 +1338,11 @@ export default {
             this.getServicesUsed();
             this.getOrganizationActivities();
         },
+        clearFilter() {
+            this.countStaffsArea();
+            this.chartOptionsRessources.labels = [];
+            this.seriesRessources = [];
+        },
         countStaffsArea() {
             this.staffsArea = [];
 
@@ -1361,6 +1460,40 @@ export default {
             }
             this.loadingStaffsArea = true;
         },
+        /**
+         * Manejar lógica de recursos por servicio
+         */
+        countRessources(serviceId) {
+            this.loadingRessources = false;
+
+            for (var i = 0; i < this.servicesOffered.length; i++) {
+                if (this.servicesOffered[i].id == serviceId) {
+                    this.chartOptionsRessources.labels = [];
+                    this.seriesRessources = [];
+
+                    for (
+                        var j = 0;
+                        j < this.servicesOffered[i].ressources_service.length;
+                        j++
+                    ) {
+                        this.chartOptionsRessources.labels.push(
+                            this.servicesOffered[i].ressources_service[j]
+                                .ressource_name
+                        );
+                        this.seriesRessources.push(
+                            this.servicesOffered[i].ressources_service[j].amount
+                        );
+                    }
+                    break;
+                }
+            }
+
+            console.log("Ressources");
+            console.log(this.chartOptionsRessources.labels);
+            console.log(this.seriesRessources);
+
+            this.loadingRessources = true;
+        },
         countServicesMinimumRTO() {
             let countExceedRTO = 0;
             let countNotExceedRTO = 0;
@@ -1428,6 +1561,7 @@ export default {
             this.loadingStaffsArea = false;
             this.loadingServicesMinimunRTO = false;
             this.loadingServicesOnlyMinimumRTO = false;
+            this.loadingRessources = false;
             this.incidentDurationTime = 0;
             this.timeNow = "";
             this.servicesOffered = [];
@@ -1748,6 +1882,7 @@ export default {
 
                     this.countStaffsArea();
                     this.loadingServicesOffered = true;
+                    this.loadingRessources = true;
 
                     if (this.incidentDurationTime) {
                         this.countServicesMinimumRTO();

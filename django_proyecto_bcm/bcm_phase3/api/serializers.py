@@ -1,4 +1,4 @@
-from bcm_phase3.models import IncidentHistory, ContingencyPlan
+from bcm_phase3.models import IncidentHistory, ContingencyPlanBlock
 from bcm_phase1.models import CrisisScenario
 from rest_framework import serializers
 from django.db.models import F, Q
@@ -120,61 +120,55 @@ class OrganizationActivitiesAffectedByIncidentSerializer(serializers.ModelSerial
         ]
 
 
-class ContingencyPlanSerializer(serializers.ModelSerializer):
-    #contingency_father = serializers.SerializerMethodField()
-    contingency_children = serializers.ListField(child=RecursiveField())
+class ContingencyPlanBlockSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = ContingencyPlan
+        model = ContingencyPlanBlock
         fields = [
             'id',
-            'number_order',
+            'block_id',
+            'parent_block_id',
+            'title',
             'description',
-            'contingency_children'
         ]
 
 
-class ContingencyPlanCreateSerializer(serializers.ModelSerializer):
+class ContingencyPlanBlockCreateSerializer(serializers.ModelSerializer):
     contingency_plan_list = serializers.ListField(
         child=serializers.JSONField(), required=False)
 
     class Meta:
-        model = ContingencyPlan
+        model = CrisisScenario
         fields = [
             'id',
-            'number_order',
+            'name',
             'description',
-            'crisis_scenario',
             'contingency_plan_list'
         ]
 
 
     def update(self, instance, validated_data):
-        crisis_scenario = validated_data.get('crisis_scenario', instance.crisis_scenario)
+        crisis_scenario = validated_data.get('crisis_scenario', instance)
         contingency_plan_list = validated_data.get('contingency_plan_list')
         
         """
-            Si se envía el campo contingency_plan entonces se procede a crear los registros en 
-            el modelo ContingencyPlan
+            Si se envía el campo contingency_plan_list entonces se procede a crear los registros en 
+            el modelo ContingencyPlanBlocks
         """
-        print('Escenario crítico')
-        print(crisis_scenario)
-        print('Plan de contingencia')
-        print(contingency_plan_list)
-        """
-        if staffs_json is not None:
-            SO_S.objects.filter(service_offered=service).delete()
+        # Primero se eliminan los registros anteriores asociados al escenario crítico
+        ContingencyPlanBlock.objects.filter(crisis_scenario=instance.id).delete()
 
-            for s in staffs_json:
-                staff = Staff.objects.get(id=s['staff'])
-
-                SO_S.objects.create(
-                    relevant=s['relevant'],
-                    service_offered=service,
-                    staff=staff
-                )
-        """
-                
-        instance.save()
+        contingency_block_plans = [
+            ContingencyPlanBlock(
+                block_id = e['block_id'],
+                parent_block_id = e['parent_block_id'],
+                title = e['title'],
+                description = e['description'],
+                crisis_scenario = crisis_scenario
+            )
+            for e in contingency_plan_list
+        ]
+        ContingencyPlanBlock.objects.bulk_create(contingency_block_plans)
+        
         return instance
 

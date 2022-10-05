@@ -542,3 +542,48 @@ class R_SOSerializer(serializers.ModelSerializer):
 
     
 
+
+class Ressources_R_SOSerializer(serializers.ModelSerializer):
+    ressource_name = serializers.CharField(read_only=True, source="ressource.name")
+    ressource_description = serializers.CharField(read_only=True, source="ressource.description")
+    ressource_amount = serializers.CharField(read_only=True, source="ressource.amount")
+
+    class Meta:
+        model = R_SO
+        fields = [
+            'id',
+            'amount',
+            'ressource_name',
+            'ressource_description',
+            'ressource_amount',
+        ]
+
+
+class ServiceOfferedStaffRessourceSerializer(serializers.ModelSerializer):
+    type_name = serializers.SerializerMethodField(read_only=True)
+    area_name = serializers.CharField(read_only=True, source="area.name")
+    # Serializer aninado
+    staffs_service = SO_SSerializer(many=True, read_only=True, source="service_offered_so_s")
+    ressources_service = Ressources_R_SOSerializer(many=True, read_only=True, source="service_offered_r_so")
+    # Serializer aninado
+    service_offered_service_used = ServiceUsedListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ServiceOffered
+        fields = [
+            'id',
+            'name',
+            'type_name',
+            'profit',
+            'recovery_time',
+            'recovery_point',
+            'maximum_recovery_time',
+            'criticality',
+            'area_name',
+            'staffs_service',
+            'ressources_service',
+            'service_offered_service_used'
+        ]
+
+    def get_type_name(self, obj):
+        return dict(ServiceOffered.TYPE).get(obj.type)
