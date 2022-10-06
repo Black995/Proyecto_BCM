@@ -27,7 +27,8 @@
                     v-model="user.password"
                     required
                 ></b-form-input>
-                <button v-if="activation.state"
+                <button
+                    v-if="activation.state"
                     type="submit"
                     class="fadeIn fourth"
                     :disabled="loadingButton && activation.state"
@@ -35,26 +36,32 @@
                     <div v-if="!loadingButton">Iniciar sesión</div>
                     <b-spinner v-if="loadingButton" small></b-spinner>
                 </button>
-                <h6 v-if="!activation.state" style="color: red;">Sistema descativado. Ingrese una llave para activarlo.</h6>
+                <h6 v-if="!activation.state" style="color: red">
+                    Sistema descativado. Ingrese una llave para activarlo.
+                </h6>
             </form>
 
             <!-- Remind Passowrd -->
             <div id="formFooter">
                 <a class="underlineHover" href="#">¿Olvidó su contraseña?</a>
                 <div class="row"></div>
-                <a class="underlineHover" href="#" @click="show_modal_activation">Activar producto</a>
+                <a
+                    class="underlineHover"
+                    href="#"
+                    @click="show_modal_activation"
+                    >Activar producto</a
+                >
             </div>
-            
         </div>
         <div class="row"></div>
-    <!--
+        <!--
         Modal activación de producto
     -->
         <b-modal
-        id="modal-activate-product"
-        title="Activar producto"
-        ref="mmodal"
-        centered
+            id="modal-activate-product"
+            title="Activar producto"
+            ref="mmodal"
+            centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitActivate">
                 <b-form-group
@@ -62,14 +69,13 @@
                     invalid-feedback="Este campo no puede estar vacio"
                     :state="keyState"
                 >
-                    <b-row align-v="center">
+                    <div class="text-center">
                         <b-form-input
-                        v-model="key"
-                        :state="keyState"
-                        required
+                            v-model="key"
+                            :state="keyState"
+                            required
                         ></b-form-input>
-                    </b-row>
-                    
+                    </div>
                 </b-form-group>
             </form>
             <template #modal-footer>
@@ -106,8 +112,6 @@
             </template>
         </b-modal>
     </div>
-    
-
 </template>
 
 <script>
@@ -125,20 +129,19 @@ export default {
             password: "",
         },
         loadingButton: false,
-        activation:{
+        activation: {
             id: 0,
             state: null,
             activation_date: null,
         },
-        key:"",
+        key: "",
         keyState: null,
-
     }),
     /**
      * Se deja el mounted termporalmente
      */
     mounted() {
-        this.getActivationState()
+        this.getActivationState();
         /*
         this.user = {
             email: "alansaul25@gmail.com",
@@ -149,6 +152,16 @@ export default {
     },
 
     methods: {
+        successMessage(successText) {
+            this.$notify({
+                component: NotificationTemplate,
+                title: successText,
+                icon: "ti-check",
+                horizontalAlign: "right",
+                verticalAlign: "top",
+                type: "success",
+            });
+        },
         errorMessage(errorText) {
             this.$notify({
                 component: NotificationTemplate,
@@ -245,24 +258,21 @@ export default {
                 });
             //}
         },
-        async getActivationState(){
+        async getActivationState() {
             axios
                 .get(`${SERVER_ADDRESS}/api/config/get_activation_state/`)
                 .then((res) => {
-                    
-                    if(res.data.length){
-                        this.activation ={
+                    if (res.data.length) {
+                        this.activation = {
                             state: res.data[0].state,
-                            activation_date: res.data[0].activation_date
-                        }
-                    }
-                    else{
-                        this.activation ={
+                            activation_date: res.data[0].activation_date,
+                        };
+                    } else {
+                        this.activation = {
                             state: false,
-                            activation_date: null
-                        }
+                            activation_date: null,
+                        };
                     }
-                    console.log(this.activation)
                 })
                 .catch((err) => {
                     try {
@@ -287,33 +297,38 @@ export default {
                     }
                 });
         },
-        show_modal_activation(){
-            this.keyState= null
-            this.key = ''
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-activate-product")
-            })
+        show_modal_activation() {
+            this.keyState = null;
+            this.key = "";
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-activate-product");
+            });
         },
-        handleSubmitActivate(){
-            this.keyState = null
-            if(!this.key){
-                this.keyState=false
+        handleSubmitActivate() {
+            this.keyState = null;
+            if (!this.key) {
+                this.keyState = false;
+            } else {
+                this.$nextTick(() => {
+                    this.$bvModal.show("modal-confirm-activate");
+                });
             }
-            else{
-                this.$nextTick(()=>{
-                    this.$bvModal.show("modal-confirm-activate")
-                })
-            }
-
         },
-        async activateProduct(){
-            let usedKey ={
-                key: this.key
-            }
+        async activateProduct() {
+            let usedKey = {
+                key: this.key,
+            };
             axios
                 .post(`${SERVER_ADDRESS}/api/config/activate/`, usedKey)
-                .then((res)=>{
-                    console.log(res)
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡El sistema ha sido activado exitosamente!"
+                    );
+
+                    // Recargamos la vista del login
+                    // this.$router.push("/layout/perfil");
+                    location.reload();
                 })
                 .catch((err) => {
                     try {
@@ -337,8 +352,7 @@ export default {
                         );
                     }
                 });
-        }
-
+        },
     },
 };
 </script>

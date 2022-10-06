@@ -12,3 +12,7 @@ admin.site.register(models.State)
 admin.site.register(models.City)
 admin.site.register(models.Township)
 admin.site.register(models.Parish)
+
+# Deben ocultarse estos modelos cuando el sistema esté en producción
+admin.site.register(models.ProductActivation)
+admin.site.register(models.UsedKeys)

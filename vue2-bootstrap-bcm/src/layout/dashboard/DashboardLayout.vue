@@ -130,7 +130,7 @@
                     name="Histórico de Incidentes"
                     icon="ti-exchange-vertical"
                 />
-                <sidebar-link
+                <!--sidebar-link
                     v-if="
                         is_superuser == true ||
                         permissions.includes('bcm_phase3.view_incident_impact')
@@ -138,7 +138,7 @@
                     to="/layout/impacto-incidentes"
                     name="Impacto Incidentes (all)"
                     icon="ti-blackboard"
-                />
+                /-->
                 <sidebar-link
                     v-if="
                         is_superuser == true ||

@@ -115,11 +115,16 @@ const routes = [
         name: "Histórico de Incidentes",
         component: IncidentHistory
       },
+
+      // Esta vista no se muestra debido a que se desvirtúan ciertos elementos cuando hay 
+      // más de una incidencia
+      /*
       {
         path: "impacto-incidentes",
         name: "Impacto Incidentes (all)",
         component: IncidentImpactAll
       },
+      */
       {
         path: "impacto-incidente",
         name: "Impacto del Incidente",

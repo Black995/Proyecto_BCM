@@ -26,6 +26,39 @@
         </b-row>
         <b-row class="mt-3" align-v="center">
             <b-col>
+                <b-form-group
+                    label="Fecha inicio del filtro"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="incidentDateFilterState.start_date"
+                >
+                    <b-form-datepicker
+                        v-model="incidentDateFilter.start_date"
+                        :state="incidentDateFilterState.start_date"
+                        locale="es"
+                    ></b-form-datepicker>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-form-group
+                    label="Fecha fin del filtro"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="incidentDateFilterState.end_date"
+                >
+                    <b-form-datepicker
+                        v-model="incidentDateFilter.end_date"
+                        :state="incidentDateFilterState.end_date"
+                        locale="es"
+                    ></b-form-datepicker>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-button variant="info" block @click="getIncidents">
+                    Filtrar incidentes
+                </b-button>
+            </b-col>
+        </b-row>
+        <b-row class="mt-3" align-v="center">
+            <b-col>
                 <h5>Seleccione una de las incidencias</h5>
                 <div class="text-center">
                     <b-spinner v-if="loadingIncidents" type="grow"></b-spinner>
@@ -109,6 +142,18 @@
                 >
                     Criticidad de los servicios de la organización afectados
                 </h5>
+                <h6
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities
+                    "
+                    class="text-center"
+                >
+                    <strong>Nota:</strong> seleccione uno de los servicios para
+                    poder visualizar el personal afectado por área y los
+                    recursos afectados por servicio
+                </h6>
                 <div
                     v-if="
                         loadingServicesOffered &&
@@ -361,6 +406,14 @@ export default {
         is_superuser: false,
 
         loadingIncidents: false,
+        incidentDateFilter: {
+            start_date: "",
+            end_date: "",
+        },
+        incidentDateFilterState: {
+            start_date: null,
+            end_date: null,
+        },
 
         incidents: [],
         incidentId: 0,
@@ -1104,72 +1157,115 @@ export default {
             this.countStaffsAreaByService(service.id);
             this.countRessources(service.id);
         },
+        checkFormValidityFilters() {
+            let valid = true;
+            if (
+                !this.incidentDateFilter.start_date &&
+                this.incidentDateFilter.end_date
+            ) {
+                this.incidentDateFilterState.start_date = false;
+                valid = false;
+            }
+            if (
+                this.incidentDateFilter.start_date &&
+                !this.incidentDateFilter.end_date
+            ) {
+                this.incidentDateFilterState.end_date = false;
+                valid = false;
+            }
+            if (
+                this.incidentDateFilter.start_date &&
+                this.incidentDateFilter.end_date &&
+                this.incidentDateFilter.start_date >
+                    this.incidentDateFilter.end_date
+            ) {
+                this.errorMessage(
+                    "La fecha inicio no puede ser superior a la fecha fin"
+                );
+                valid = false;
+            }
+            return valid;
+        },
         async getIncidents() {
-            this.incidents = [];
+            this.incidentDateFilterState.start_date = null;
+            this.incidentDateFilterState.end_date = null;
             this.loadingIncidents = true;
 
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase3/incident-histories/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
-                .then((res) => {
-                    for (var i = 0; i < res.data.length; i++) {
-                        let name = "";
-                        if (res.data[i].end_date) {
-                            name =
-                                res.data[i].crisis_scenario_name +
-                                " (Fecha de inicio: " +
-                                res.data[i].start_date.slice(0, 10) +
-                                " " +
-                                res.data[i].start_date.slice(11, 16) +
-                                " - Fecha fin: " +
-                                res.data[i].end_date.slice(0, 10) +
-                                " " +
-                                res.data[i].end_date.slice(11, 16) +
-                                ")";
-                        } else {
-                            name =
-                                res.data[i].crisis_scenario_name +
-                                " (Fecha de inicio: " +
-                                res.data[i].start_date.slice(0, 10) +
-                                " " +
-                                res.data[i].start_date.slice(11, 16) +
-                                " - Fecha fin: - )";
+            // Exit when the filter isn't valid
+            if (!this.checkFormValidityFilters()) {
+                this.loadingIncidents = false;
+                return;
+            } else {
+                this.incidents = [];
+                this.loadingIncidents = true;
+
+                axios
+                    .get(`${SERVER_ADDRESS}/api/phase3/incident-histories/`, {
+                        params: {
+                            start_date: this.incidentDateFilter.start_date,
+                            end_date: this.incidentDateFilter.end_date,
+                        },
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    })
+                    .then((res) => {
+                        for (var i = 0; i < res.data.length; i++) {
+                            let name = "";
+                            if (res.data[i].end_date) {
+                                name =
+                                    res.data[i].crisis_scenario_name +
+                                    " (Fecha de inicio: " +
+                                    res.data[i].start_date.slice(0, 10) +
+                                    " " +
+                                    res.data[i].start_date.slice(11, 16) +
+                                    " - Fecha fin: " +
+                                    res.data[i].end_date.slice(0, 10) +
+                                    " " +
+                                    res.data[i].end_date.slice(11, 16) +
+                                    ")";
+                            } else {
+                                name =
+                                    res.data[i].crisis_scenario_name +
+                                    " (Fecha de inicio: " +
+                                    res.data[i].start_date.slice(0, 10) +
+                                    " " +
+                                    res.data[i].start_date.slice(11, 16) +
+                                    " - Fecha fin: - )";
+                            }
+                            let inc = {
+                                id: res.data[i].id,
+                                name: name,
+                                description: res.data[i].description,
+                            };
+                            this.incidents.push(inc);
                         }
-                        let inc = {
-                            id: res.data[i].id,
-                            name: name,
-                            description: res.data[i].description,
-                        };
-                        this.incidents.push(inc);
-                    }
-                    this.loadingIncidents = false;
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
+                        this.loadingIncidents = false;
+                    })
+                    .catch((err) => {
+                        try {
+                            // Error 400 por unicidad o 500 generico
+                            if (err.response.status == 400) {
+                                for (let e in err.response.data) {
+                                    this.errorMessage(
+                                        e + ": " + err.response.data[e]
+                                    );
+                                }
+                            } else {
+                                // Servidor no disponible
                                 this.errorMessage(
-                                    e + ": " + err.response.data[e]
+                                    "Ups! Ha ocurrido un error en el servidor"
                                 );
                             }
-                        } else {
+                        } catch {
                             // Servidor no disponible
                             this.errorMessage(
                                 "Ups! Ha ocurrido un error en el servidor"
                             );
                         }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
+                    });
+            }
         },
         async getServiceOfferedScale() {
             axios
@@ -1335,12 +1431,22 @@ export default {
             this.chartOptionsStaffsArea.labels = [];
             this.seriesStaffsArea = [];
 
+            // Ordenamos el array de json por orden alfabético del nombre del área
+            this.staffsArea.sort(function (a, b) {
+                return a.staff_area_name < b.staff_area_name
+                    ? -1
+                    : a.staff_area_name > b.staff_area_name
+                    ? 1
+                    : 0;
+            });
+
             for (var i = 0; i < this.staffsArea.length; i++) {
                 this.chartOptionsStaffsArea.labels.push(
                     this.staffsArea[i].staff_area_name
                 );
                 this.seriesStaffsArea.push(this.staffsArea[i].occurrence);
             }
+
             this.loadingStaffsArea = true;
         },
         countStaffsAreaByService(serviceId) {
@@ -1410,6 +1516,15 @@ export default {
 
             this.chartOptionsStaffsArea.labels = [];
             this.seriesStaffsArea = [];
+
+            // Ordenamos el array de json por orden alfabético del nombre del área
+            this.staffsArea.sort(function (a, b) {
+                return a.staff_area_name < b.staff_area_name
+                    ? -1
+                    : a.staff_area_name > b.staff_area_name
+                    ? 1
+                    : 0;
+            });
 
             for (var i = 0; i < this.staffsArea.length; i++) {
                 this.chartOptionsStaffsArea.labels.push(
@@ -1517,7 +1632,7 @@ export default {
             this.loadingStaffsArea = false;
             this.loadingServicesMinimunRTO = false;
             this.loadingServicesOnlyMinimumRTO = false;
-            this.loadingRessources = false;
+            // this.loadingRessources = false;
             this.incidentDurationTime = 0;
             this.timeNow = "";
             this.servicesOffered = [];
