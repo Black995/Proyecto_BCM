@@ -1,3 +1,4 @@
+amount: 
 <template>
     <div class="container-fluid">
         <div class="row">
@@ -387,7 +388,7 @@
                 v-model="selectedServicesOffered"
                 placeholder="Buscar servicio de la organización"
                 label="service_name"
-                track-by="id"
+                track-by="service_id"
                 :options="servicesOffered"
                 :multiple="true"
             ></multiselect>
@@ -442,6 +443,7 @@
             title="Cantidad del recurso a asignar"
             ref="modal"
             centered
+
         > 
             <h3 class="text-center font-weight-bold">
                 {{ ressourceName }}
@@ -449,30 +451,32 @@
             <h5 class="text-center font-weight-bold"> 
                 Cantidad disponible: {{ ressourceAmount }}
             </h5>
-            <form ref="form" @submit.stop.prevent="showAmount"></form>
-            <b-list-group-item
-                href="#"
-                class="flex-column align-items-start"
-                v-for="item in selectedServicesOffered"
-                :key="item.id"
-            >
-                <div class="d-flex w-100 justify-content-between">
-                    <h4 class="mb-1">{{ item.service_name }}</h4>
-                    
-                </div>
-                
-                <b-form-group
-                    label="Ingrese la cantidad"
-                    invalid-feedback="La cantidad no puede ser negativo o mayor a la cantidad disponible"
-                    :state="serviceAmountState"
+            <form ref="form" @submit.stop.prevent="showAmount">
+                <b-list-group-item
+                    href="#"
+                    class="flex-column align-items-start"
+                    v-for="item in selectedServicesOffered"
+                    :key="item.key"
                 >
-                    <b-form-input
-                        type="number"
-                        v-model.number="item.amount"
-                        required
-                    ></b-form-input>
-                </b-form-group>
-            </b-list-group-item>
+                    <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">{{ item.service_name }}</h4>
+                    
+                    </div>
+                
+                    <b-form-group
+                        label="Ingrese la cantidad"
+                        invalid-feedback="La cantidad no puede ser negativa o mayor a la cantidad disponible"
+                        :state="item.amountState"
+                    >
+                        <b-form-input
+                            type="number"
+                            v-model.number="item.amount"
+                            :state="item.amountState"
+                            required
+                        ></b-form-input>
+                    </b-form-group>
+                </b-list-group-item>
+            </form>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -559,6 +563,7 @@ export default {
         services: [],
         servicesOffered: [],
         selectedServicesOffered: [],
+        
 
         servicesOfferedDetail: [],
 
@@ -955,7 +960,8 @@ export default {
         },
         async getServicesOffered() {
             this.servicesOffered = [];
-
+            this.selectedServicesOffered = []
+            this.services = []
             axios
                 .get(`${SERVER_ADDRESS}/api/phase2/services/offered/`, {
                     withCredentials: true,
@@ -966,12 +972,13 @@ export default {
                 .then((res) => {
                     for(let i = 0; i< res.data.length; i++){
                         let service = {
-                            id: res.data[i].id,
+                            service_id: res.data[i].id,
                             service_name: res.data[i].name,
                             service_area: res.data[i].area_name,
                             service_type: res.data[i].type_name,
                             criticality: res.data[i].criticality,
-                            scale_max_value: res.data[i].scale_max_value
+                            scale_max_value: res.data[i].scale_max_value,
+                            amount: 0
                         }
                         this.servicesOffered.push(service)
                     }
@@ -1003,11 +1010,10 @@ export default {
         async show_modal_association_services(id, amount, name){
 
             this.ressourceId = id
-            this.selectedServicesOffered = []
-            this.services = []
             this.ressourceAmount = amount
             this.ressourceName = name
-
+            this.getServicesOffered()
+            
             axios
                 .get(`${SERVER_ADDRESS}/api/phase2/ressources_service_offered/`,{
                     params: { ressource_id: this.ressourceId },
@@ -1017,8 +1023,22 @@ export default {
                     }
                 })
                 .then((res) => {
-                    console.log(res.data)
-                    this.selectedServicesOffered = res.data
+                    this.selectedServicesOffered = []
+                    for(var i = 0; i < res.data.length; i++){
+                        let service = {
+                            amount: res.data[i].amount,
+                            criticality:res.data[i].criticality, 
+                            id: res.data[i].id, 
+                            scale_max_value:res.data[i].scale_max_value, 
+                            service_area: res.data[i].service_area,
+                            service_id: res.data[i].service_id,
+                            service_name: res.data[i].service_name,
+                            service_profit: res.data[i].service_profit,
+                            service_type: res.data[i].service_type,
+                            amountState: null,
+                        }
+                        this.selectedServicesOffered.push(service)
+                    }
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-associate-services");
                     });
@@ -1047,31 +1067,36 @@ export default {
                 });
         },
         show_modal_confirm_association_services() {
-            this.serviceAmountState = null
+            for(var i = 0; i< this.selectedServicesOffered.length; i++){
+                this.selectedServicesOffered[i].amountState = null
+            }
             this.$nextTick(() => {
                 this.$bvModal.show("modal-amount-ressources");
             });
         },
         async showAmount(){
+            
             this.services = []
-            let amount = 0
-            this.serviceAmountState = null
+            
             let valid = true
-            console.log(this.selectedServicesOffered)
             for (let i = 0; i< this.selectedServicesOffered.length; i++){
+                
                 let service = {
                     service_offered: this.selectedServicesOffered[i].service_id,
                     amount: this.selectedServicesOffered[i].amount 
                 }
-                if( (this.ressourceAmount < service.amount)|| (service.amount < 0)){
+                if( (this.ressourceAmount < service.amount) || (service.amount < 0)){
                     valid = false
-                    this.serviceAmountState = false
-                    return
+                    this.selectedServicesOffered[i].amountState = false
                 }   
 
                 this.services.push(service)
             }
+            if (!valid){
+                return
+            }
             this.$bvModal.show("modal-confirm-associate-services")
+            
         },
         
         async associateServices(){

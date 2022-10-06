@@ -647,8 +647,8 @@ export default {
                 name: "Cliente",
             },
             {
-                value: 2,
-                name: "Inversionista",
+                value: 4,
+                name: "Stakeholder",
             },
         ],
 
