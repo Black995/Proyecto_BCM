@@ -1,12 +1,13 @@
-from configuration.models import Area, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish, Organization
+from configuration.models import Area, ProductActivation, Scale, ScaleView, Position, Headquarter, State, City, Township, Parish, Organization, UsedKeys
 from bcm_phase2.models import ServiceOffered, ServiceUsed, OrganizationActivity
 from django.shortcuts import get_object_or_404
-from .serializers import AreaSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer, StateSerializer, CitySerializer, TownshipSerializer, ParishSerializer, OrganizationSerializer
+from .serializers import AreaSerializer, ProductActivationListSerializer, ScaleSerializer, ScaleViewSerializer, PositionSerializer, HeadquarterSerializer, StateSerializer, CitySerializer, TownshipSerializer, ParishSerializer, OrganizationSerializer, UsedKeysSerializer
 from rest_framework import viewsets, serializers, status
 from rest_framework.response import Response
 from django.db.models import Q, F
 from configuration.api.filters import (ScaleViewFilterBackend, CityTownshipFilterBackend, ParishFilterBackend)
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 
 
 class AreaViewSet(viewsets.ModelViewSet):
@@ -119,3 +120,14 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
 
 
+class ProductActivatationListViewSet(viewsets.ModelViewSet):
+    model = ProductActivation
+    queryset = ProductActivation.objects.all()
+    serializer_class = ProductActivationListSerializer
+
+class UsedKeysViewSet(viewsets.ModelViewSet):
+    model = UsedKeys
+    queryset = UsedKeys.objects.all()
+    serializer_class = UsedKeysSerializer
+    http_method_names = ['post']
+    permission_classes=[AllowAny]
