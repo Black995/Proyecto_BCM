@@ -27,22 +27,87 @@
                     v-model="user.password"
                     required
                 ></b-form-input>
-                <button
+                <button v-if="activation.state"
                     type="submit"
                     class="fadeIn fourth"
-                    :disabled="loadingButton"
+                    :disabled="loadingButton && activation.state"
                 >
                     <div v-if="!loadingButton">Iniciar sesión</div>
                     <b-spinner v-if="loadingButton" small></b-spinner>
                 </button>
+                <h6 v-if="!activation.state" style="color: red;">Sistema descativado. Ingrese una llave para activarlo.</h6>
             </form>
 
             <!-- Remind Passowrd -->
             <div id="formFooter">
                 <a class="underlineHover" href="#">¿Olvidó su contraseña?</a>
+                <div class="row"></div>
+                <a class="underlineHover" href="#" @click="show_modal_activation">Activar producto</a>
             </div>
+            
         </div>
+        <div class="row"></div>
+    <!--
+        Modal activación de producto
+    -->
+        <b-modal
+        id="modal-activate-product"
+        title="Activar producto"
+        ref="mmodal"
+        centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitActivate">
+                <b-form-group
+                    label="Ingrese la llave de activación"
+                    invalid-feedback="Este campo no puede estar vacio"
+                    :state="keyState"
+                >
+                    <b-row align-v="center">
+                        <b-form-input
+                        v-model="key"
+                        :state="keyState"
+                        required
+                        ></b-form-input>
+                    </b-row>
+                    
+                </b-form-group>
+            </form>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="handleSubmitActivate"
+                    >
+                        Activar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+        <!--
+            Modal confirmar activar
+        -->
+        <b-modal
+            id="modal-confirm-activate"
+            title="Confirmar activación del producto"
+            centered
+        >
+            <h4>¿Está seguro que desea activar el producto?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="activateProduct"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </div>
+    
+
 </template>
 
 <script>
@@ -60,11 +125,20 @@ export default {
             password: "",
         },
         loadingButton: false,
+        activation:{
+            id: 0,
+            state: null,
+            activation_date: null,
+        },
+        key:"",
+        keyState: null,
+
     }),
     /**
      * Se deja el mounted termporalmente
      */
     mounted() {
+        this.getActivationState()
         /*
         this.user = {
             email: "alansaul25@gmail.com",
@@ -171,6 +245,100 @@ export default {
                 });
             //}
         },
+        async getActivationState(){
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/get_activation_state/`)
+                .then((res) => {
+                    
+                    if(res.data.length){
+                        this.activation ={
+                            state: res.data[0].state,
+                            activation_date: res.data[0].activation_date
+                        }
+                    }
+                    else{
+                        this.activation ={
+                            state: false,
+                            activation_date: null
+                        }
+                    }
+                    console.log(this.activation)
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        show_modal_activation(){
+            this.keyState= null
+            this.key = ''
+            this.$nextTick(()=>{
+                this.$bvModal.show("modal-activate-product")
+            })
+        },
+        handleSubmitActivate(){
+            this.keyState = null
+            if(!this.key){
+                this.keyState=false
+            }
+            else{
+                this.$nextTick(()=>{
+                    this.$bvModal.show("modal-confirm-activate")
+                })
+            }
+
+        },
+        async activateProduct(){
+            let usedKey ={
+                key: this.key
+            }
+            axios
+                .post(`${SERVER_ADDRESS}/api/config/activate/`, usedKey)
+                .then((res)=>{
+                    console.log(res)
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        }
+
     },
 };
 </script>

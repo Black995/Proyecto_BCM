@@ -88,3 +88,11 @@ class ScaleView(models.Model):
     minimum_recovery_time = models.DurationField(blank=True, null=True)
     minimum_scale_value = models.SmallIntegerField(blank=True, null=True)
 
+
+class ProductActivation(models.Model):
+    state = models.BooleanField(default=False)
+    activation_date = models.DateField(blank=True, null=True)
+
+class UsedKeys(models.Model):
+    key = models.CharField(max_length=500, unique=True)
+

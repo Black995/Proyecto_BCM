@@ -1,8 +1,7 @@
 from django.urls import path
-
-from .views import (AreaViewSet, ScaleViewSet, ScaleviewViewSet, PositionViewSet, 
+from .views import (AreaViewSet, ProductActivatationListViewSet, ScaleViewSet, ScaleviewViewSet, PositionViewSet, 
     HeadquarterViewSet, StateViewSet, CityViewSet, TownshipViewSet, ParishViewSet,
-    OrganizationViewSet)
+    OrganizationViewSet,UsedKeysViewSet)
 
 
 urlpatterns = [
@@ -66,5 +65,12 @@ urlpatterns = [
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',}), name='organization_detail'),
+    #Request para activacion del producto
+    path('activate/',UsedKeysViewSet.as_view({
+        'get':'list',
+        'post': 'create'}),name='activate_product'),
+    path('get_activation_state/',ProductActivatationListViewSet.as_view({
+        'get':'list'}),name='get_product_activation')
+
     
 ]
