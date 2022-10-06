@@ -30,7 +30,7 @@ export default {
 
 <style lang="scss">
 .login {
-    background-image: url("./assets/img/business_image.jpg");
+    background-image: url("./assets/img/login_wallpaper.jpeg");
     background-repeat: no-repeat;
     /* Full height */
     height: 100%;
