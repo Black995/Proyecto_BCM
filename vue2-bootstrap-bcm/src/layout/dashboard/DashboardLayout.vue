@@ -101,6 +101,10 @@
                     icon="ti-dropbox"
                 />
                 <sidebar-link
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes('bcm_phase2.view_ressource')
+                    "
                     to="/layout/ressources"
                     name="Recursos"
                     icon="ti-desktop"

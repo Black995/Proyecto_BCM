@@ -17,16 +17,19 @@ amount:
                             :responsive="true"
                             :reorderableColumns="true"
                             :loading="loading"
-                            :globalFilterFields="[
-                                'name',
-                                'amout',
-                            ]"
+                            :globalFilterFields="['name', 'amout']"
                             :filters="filterGlobal"
                         >
                             <template #header>
                                 <b-row class="justify-content-between">
                                     <b-col sm="4">
                                         <b-button
+                                            v-if="
+                                                is_superuser == true ||
+                                                permissions.includes(
+                                                    'bcm_phase2.add_ressource'
+                                                )
+                                            "
                                             title="Crear recurso"
                                             variant="success"
                                             @click="show_modal_create = true"
@@ -34,8 +37,8 @@ amount:
                                             <font-awesome-icon
                                                 icon="fa-solid fa-plus"
                                             />
-                                        </b-button>    
-                                    </b-col>        
+                                        </b-button>
+                                    </b-col>
                                     <b-col sm="4">
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
@@ -53,10 +56,10 @@ amount:
                             <Column field="name" header="Nombre"></Column>
                             <Column field="amount" header="Cantidad">
                                 <template #body="slotProps">
-                                        <div v-if="slotProps.data.amount >= 0">
-                                            {{ slotProps.data.amount }}
-                                        </div>
-                                    </template>
+                                    <div v-if="slotProps.data.amount >= 0">
+                                        {{ slotProps.data.amount }}
+                                    </div>
+                                </template>
                             </Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
@@ -73,6 +76,12 @@ amount:
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase2.change_ressource'
+                                            )
+                                        "
                                         title="Editar recurso"
                                         pill
                                         variant="warning"
@@ -85,6 +94,12 @@ amount:
                                         />
                                     </b-button>
                                     <b-button
+                                        v-if="
+                                            is_superuser == true ||
+                                            permissions.includes(
+                                                'bcm_phase2.delete_ressource'
+                                            )
+                                        "
                                         title="Eliminar recurso"
                                         pill
                                         variant="danger"
@@ -97,13 +112,26 @@ amount:
                                         />
                                     </b-button>
                                 </template>
-                                
                             </Column>
                             <Column field="id_2" header="Asociar servicio">
                                 <template #body="slotProps">
                                     <div class="text-center">
                                         <b-button
-                                            
+                                            v-if="
+                                                is_superuser == true ||
+                                                (permissions.includes(
+                                                    'bcm_phase2.view_r_so'
+                                                ) &&
+                                                    permissions.includes(
+                                                        'bcm_phase2.add_r_so'
+                                                    ) &&
+                                                    permissions.includes(
+                                                        'bcm_phase2.change_r_so'
+                                                    ) &&
+                                                    permissions.includes(
+                                                        'bcm_phase2.delete_r_so'
+                                                    ))
+                                            "
                                             pill
                                             title="Asociar servicios a este recurso"
                                             variant="primary"
@@ -128,7 +156,7 @@ amount:
                         </DataTable>
                     </div>
                 </div>
-            </div>        
+            </div>
         </div>
         <div class="row"></div>
         <!--
@@ -154,32 +182,39 @@ amount:
                     <strong>Cantidad: </strong> {{ ressourceDetail.amount }}
                 </li>
             </ul>
-            <h4 class="mt-5 text-center font-weight-bold">
-                Servicios de la organización que dependen de este recurso
-            </h4>
-            <b-list-group-item
-                class="mt2 flex-column align-items-start"
-                v-for="item in servicesOfferedDetail"
-                :key="item.key"
+            <div
+                v-if="
+                    is_superuser == true ||
+                    permissions.includes('bcm_phase2.view_r_so')
+                "
             >
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ item.service_name }}</h5>
-            </div>
-            <div class="mb-1 d-flex w-100 justify-content-between">
-                <div>Area: {{ item.service_area }}</div>
-                <div>Tipo: {{ item.service_type }}</div>
-                <div>Ganancia: {{ item.service_profit }}</div>
-                <div>Cant. asignada: {{ item.amount }}</div>
+                <h4 class="mt-5 text-center font-weight-bold">
+                    Servicios de la organización que dependen de este recurso
+                </h4>
+                <b-list-group-item
+                    class="mt2 flex-column align-items-start"
+                    v-for="item in servicesOfferedDetail"
+                    :key="item.key"
+                >
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ item.service_name }}</h5>
+                    </div>
+                    <div class="mb-1 d-flex w-100 justify-content-between">
+                        <div>Area: {{ item.service_area }}</div>
+                        <div>Tipo: {{ item.service_type }}</div>
+                        <div>Ganancia: {{ item.service_profit }}</div>
+                        <div>Cant. asignada: {{ item.amount }}</div>
+                    </div>
+                </b-list-group-item>
+                <h3
+                    class="mt-3 text-center"
+                    v-if="!servicesOfferedDetail.length"
+                >
+                    No existen servicios de la organización asociados a esta
+                    actividad
+                </h3>
             </div>
 
-            </b-list-group-item>
-            <h3
-                class="mt-3 text-center"
-                v-if="!servicesOfferedDetail.length"
-            >
-                No existen servicios de la organización asociados a esta
-                actividad
-            </h3>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -192,7 +227,6 @@ amount:
                 </div>
             </template>
         </b-modal>
-
 
         <!--
             Modal de crear  
@@ -229,7 +263,7 @@ amount:
                         :state="ressourceState.description"
                         required
                         rows="3"
-                    ></b-form-textarea>   
+                    ></b-form-textarea>
                 </b-form-group>
                 <b-form-group
                     label="Ingrese la cantidad"
@@ -241,7 +275,7 @@ amount:
                         required
                     ></b-form-input>
                 </b-form-group>
-            </form> 
+            </form>
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
@@ -308,7 +342,7 @@ amount:
                         :state="ressourceState.description"
                         required
                         rows="3"
-                    ></b-form-textarea>   
+                    ></b-form-textarea>
                 </b-form-group>
                 <b-form-group
                     label="Ingrese la cantidad"
@@ -415,13 +449,12 @@ amount:
                                 item.scale_max_value
                             }}
                         </div>
-                        <div> Cant. asignada: {{ item.amount }}</div>
+                        <div>Cant. asignada: {{ item.amount }}</div>
                     </div>
                 </b-list-group-item>
             </b-list-group>
             <h3 class="mt-3 text-center" v-if="!selectedServicesOffered.length">
-                No existen servicios de la organización asociados a este
-                recurso
+                No existen servicios de la organización asociados a este recurso
             </h3>
             <template #modal-footer>
                 <div class="w-100">
@@ -443,12 +476,11 @@ amount:
             title="Cantidad del recurso a asignar"
             ref="modal"
             centered
-
-        > 
+        >
             <h3 class="text-center font-weight-bold">
                 {{ ressourceName }}
             </h3>
-            <h5 class="text-center font-weight-bold"> 
+            <h5 class="text-center font-weight-bold">
                 Cantidad disponible: {{ ressourceAmount }}
             </h5>
             <form ref="form" @submit.stop.prevent="showAmount">
@@ -460,9 +492,8 @@ amount:
                 >
                     <div class="d-flex w-100 justify-content-between">
                         <h4 class="mb-1">{{ item.service_name }}</h4>
-                    
                     </div>
-                
+
                     <b-form-group
                         label="Ingrese la cantidad"
                         invalid-feedback="La cantidad no puede ser negativa o mayor a la cantidad disponible"
@@ -489,7 +520,7 @@ amount:
                 </div>
             </template>
         </b-modal>
-    
+
         <!--
             Modal de confirmar asociar servicios  
         -->
@@ -499,7 +530,8 @@ amount:
             centered
         >
             <h4>
-                ¿Está seguro de asociar estos servicios de la organización al recurso?
+                ¿Está seguro de asociar estos servicios de la organización al
+                recurso?
             </h4>
             <template #modal-footer>
                 <div class="w-100">
@@ -537,6 +569,8 @@ export default {
         filterGlobal: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         },
+        permissions: [],
+        is_superuser: false,
 
         show_modal_create: false,
 
@@ -546,11 +580,11 @@ export default {
         ressourceAmount: 0,
         amount: 0,
         ressource: {
-            name:"",
-            amount:0,
+            name: "",
+            amount: 0,
         },
         ressourceDetail: {
-            name:"",
+            name: "",
             description: 0,
             amount: 0,
         },
@@ -563,18 +597,18 @@ export default {
         services: [],
         servicesOffered: [],
         selectedServicesOffered: [],
-        
 
         servicesOfferedDetail: [],
 
-        serviceAmountState: null
-
+        serviceAmountState: null,
     }),
     mounted() {
-        this.getRessources()
-        this.getServicesOffered()
+        this.getRessources();
+        this.getServicesOffered();
+        this.permissions = JSON.parse(localStorage.getItem("permissions"));
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
-    methods:{
+    methods: {
         successMessage(successText) {
             this.$notify({
                 component: NotificationTemplate,
@@ -596,20 +630,19 @@ export default {
             });
         },
         async getRessources() {
-            this.loading = true,
-            this.ressources = []
+            (this.loading = true), (this.ressources = []);
 
             axios
                 .get(`${SERVER_ADDRESS}/api/phase2/ressources/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
-                    }
+                    },
                 })
-                .then((res)=>{
-                    this.ressources = []
-                    this.ressources = res.data
-                    this.loading = false
+                .then((res) => {
+                    this.ressources = [];
+                    this.ressources = res.data;
+                    this.loading = false;
                 })
                 .catch((err) => {
                     try {
@@ -632,12 +665,12 @@ export default {
                             "Ups! Ha ocurrido un error en el servidor"
                         );
                     }
-                });    
+                });
         },
         /**
          * Filtros que se manejan en Prime Vue
          */
-         clearFilter1() {
+        clearFilter1() {
             this.initFilters1();
         },
         initFilters1() {
@@ -647,44 +680,43 @@ export default {
         },
         checkFormValidity() {
             let valid = true;
-            if (!this.ressource.name){
-                valid = false
-                this.ressourceState.name = false
+            if (!this.ressource.name) {
+                valid = false;
+                this.ressourceState.name = false;
             }
-            if (!this.ressource.description){
-                valid = false
-                this.ressourceState.description = false
+            if (!this.ressource.description) {
+                valid = false;
+                this.ressourceState.description = false;
             }
-            if (this.ressource.amount < 0){
-                valid = false
-                this.ressourceState.amount = false
+            if (this.ressource.amount < 0) {
+                valid = false;
+                this.ressourceState.amount = false;
             }
-            return valid
+            return valid;
         },
         handleSubmitCreate() {
-            this.ressourceState.name = null
-            this.ressourceState.description = null
-            this.ressourceState.amount = null
+            this.ressourceState.name = null;
+            this.ressourceState.description = null;
+            this.ressourceState.amount = null;
 
-            if (!this.checkFormValidity()){
-                return
+            if (!this.checkFormValidity()) {
+                return;
             }
-            
-            this.$nextTick(() =>{
-                this.$bvModal.show("modal-confirm-create")
-            })
-        },
-        createRessource(){
 
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-create");
+            });
+        },
+        createRessource() {
             axios
                 .post(
                     `${SERVER_ADDRESS}/api/phase2/ressources/`,
                     this.ressource,
                     {
-                        withCredentials:true,
+                        withCredentials: true,
                         headers: {
-                            Authorization: TOKEN
-                        }
+                            Authorization: TOKEN,
+                        },
                     }
                 )
                 .then((res) => {
@@ -697,7 +729,7 @@ export default {
                         this.$bvModal.hide("modal-create");
                     });
 
-                    this.getRessources()
+                    this.getRessources();
                 })
                 .catch((err) => {
                     try {
@@ -722,70 +754,30 @@ export default {
                     }
                 });
         },
-        resetModal(){
-            this.ressource.name = ""
-            this.ressourceState.name = null
-            this.ressource.description = ""
-            this.ressourceState.description = null
-            this.ressource.amount = 0
-            this.ressourceState.amount = null
+        resetModal() {
+            this.ressource.name = "";
+            this.ressourceState.name = null;
+            this.ressource.description = "";
+            this.ressourceState.description = null;
+            this.ressource.amount = 0;
+            this.ressourceState.amount = null;
         },
-        async show_modal_detail(id){
+        async show_modal_detail(id) {
             this.ressourceDetail = {
-                name:"",
+                name: "",
                 desciption: "",
                 amount: 0,
-            }
+            };
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/ressources/${id}/`,
-                    {
-                        withCredentials: true,
-                        headers: {
-                            Authorization: TOKEN,
-                        }
-                    }   
-                )
-                .then((res) => {
-                    this.ressourceDetail = res.data
-                    this.getServiceDetail(id)
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
-                        } else {
-                            // Servidor no disponible
-                            this.errorMessage(
-                                "Ups! Ha ocurrido un error en el servidor"
-                            );
-                        }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
-        },
-        async getServiceDetail(id){
-            this.servicesOfferedDetail = []
-
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase2/ressources_service_offered/`, {
-                    params: { ressource_id : id },
+                .get(`${SERVER_ADDRESS}/api/phase2/ressources/${id}/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.servicesOfferedDetail = res.data
-                    this.$bvModal.show("modal-detail")
+                    this.ressourceDetail = res.data;
+                    this.getServiceDetail(id);
                 })
                 .catch((err) => {
                     try {
@@ -810,20 +802,60 @@ export default {
                     }
                 });
         },
-        show_modal_update(id){
-            this.ressourceId = id
+        async getServiceDetail(id) {
+            this.servicesOfferedDetail = [];
 
-            axios 
-                .get(`${SERVER_ADDRESS}/api/phase2/ressources/${id}/`,{
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/ressources_service_offered/`,
+                    {
+                        params: { ressource_id: id },
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    this.servicesOfferedDetail = res.data;
+                    this.$bvModal.show("modal-detail");
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        show_modal_update(id) {
+            this.ressourceId = id;
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/ressources/${id}/`, {
                     withCredentials: true,
                     headers: {
-                        Authorization: TOKEN
-                    }
-
+                        Authorization: TOKEN,
+                    },
                 })
                 .then((res) => {
-                    this.ressource = res.data
-                    this.$bvModal.show("modal-update")
+                    this.ressource = res.data;
+                    this.$bvModal.show("modal-update");
                 })
                 .catch((err) => {
                     try {
@@ -848,28 +880,29 @@ export default {
                     }
                 });
         },
-        handleSubmitUpdate(){
-            this.ressourceState.name = null
-            this.ressourceState.description = null
-            this.ressourceState.amount = null
+        handleSubmitUpdate() {
+            this.ressourceState.name = null;
+            this.ressourceState.description = null;
+            this.ressourceState.amount = null;
 
-            if (!this.checkFormValidity()){
-                return
+            if (!this.checkFormValidity()) {
+                return;
             }
-            
-            this.$nextTick(() =>{
-                this.$bvModal.show("modal-confirm-update")
-            })
+
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-update");
+            });
         },
-        async updateRessource(){
+        async updateRessource() {
             axios
-                .patch(`${SERVER_ADDRESS}/api/phase2/ressources/${this.ressourceId}/`,
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase2/ressources/${this.ressourceId}/`,
                     this.ressource,
                     {
                         withCredentials: true,
                         headers: {
-                            Authorization: TOKEN
-                        }
+                            Authorization: TOKEN,
+                        },
                     }
                 )
                 .then((res) => {
@@ -881,8 +914,8 @@ export default {
                         this.$bvModal.hide("modal-confirm-update");
                         this.$bvModal.hide("modal-update");
                     });
-                    
-                    this.getRessources()
+
+                    this.getRessources();
                 })
                 .catch((err) => {
                     try {
@@ -905,31 +938,31 @@ export default {
                             "Ups! Ha ocurrido un error en el servidor"
                         );
                     }
-                })
+                });
         },
         show_modal_delete(id) {
-            this.ressourceId = id
+            this.ressourceId = id;
             this.$nextTick(() => {
-                this.$bvModal.show("modal-confirm-delete")
-            })
-            
+                this.$bvModal.show("modal-confirm-delete");
+            });
         },
-        async deleteRessource(){
+        async deleteRessource() {
             axios
-                .delete(`${SERVER_ADDRESS}/api/phase2/ressources/${this.ressourceId}/`,
+                .delete(
+                    `${SERVER_ADDRESS}/api/phase2/ressources/${this.ressourceId}/`,
                     {
                         withCredentials: true,
                         headers: {
-                            Authorization: TOKEN
-                        }
+                            Authorization: TOKEN,
+                        },
                     }
                 )
                 .then((res) => {
-                     // Mensaje de éxito
-                     this.successMessage(
+                    // Mensaje de éxito
+                    this.successMessage(
                         "¡El recurso ha sido eliminado exitosamente!"
                     );
-                    this.getRessources()
+                    this.getRessources();
 
                     this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-delete");
@@ -960,8 +993,8 @@ export default {
         },
         async getServicesOffered() {
             this.servicesOffered = [];
-            this.selectedServicesOffered = []
-            this.services = []
+            this.selectedServicesOffered = [];
+            this.services = [];
             axios
                 .get(`${SERVER_ADDRESS}/api/phase2/services/offered/`, {
                     withCredentials: true,
@@ -970,7 +1003,7 @@ export default {
                     },
                 })
                 .then((res) => {
-                    for(let i = 0; i< res.data.length; i++){
+                    for (let i = 0; i < res.data.length; i++) {
                         let service = {
                             service_id: res.data[i].id,
                             service_name: res.data[i].name,
@@ -978,11 +1011,10 @@ export default {
                             service_type: res.data[i].type_name,
                             criticality: res.data[i].criticality,
                             scale_max_value: res.data[i].scale_max_value,
-                            amount: 0
-                        }
-                        this.servicesOffered.push(service)
+                            amount: 0,
+                        };
+                        this.servicesOffered.push(service);
                     }
-
                 })
                 .catch((err) => {
                     try {
@@ -1007,37 +1039,39 @@ export default {
                     }
                 });
         },
-        async show_modal_association_services(id, amount, name){
+        async show_modal_association_services(id, amount, name) {
+            this.ressourceId = id;
+            this.ressourceAmount = amount;
+            this.ressourceName = name;
+            this.getServicesOffered();
 
-            this.ressourceId = id
-            this.ressourceAmount = amount
-            this.ressourceName = name
-            this.getServicesOffered()
-            
             axios
-                .get(`${SERVER_ADDRESS}/api/phase2/ressources_service_offered/`,{
-                    params: { ressource_id: this.ressourceId },
-                    withCredentials:true,
-                    headers: {
-                        Authorization: TOKEN,
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/ressources_service_offered/`,
+                    {
+                        params: { ressource_id: this.ressourceId },
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
                     }
-                })
+                )
                 .then((res) => {
-                    this.selectedServicesOffered = []
-                    for(var i = 0; i < res.data.length; i++){
+                    this.selectedServicesOffered = [];
+                    for (var i = 0; i < res.data.length; i++) {
                         let service = {
                             amount: res.data[i].amount,
-                            criticality:res.data[i].criticality, 
-                            id: res.data[i].id, 
-                            scale_max_value:res.data[i].scale_max_value, 
+                            criticality: res.data[i].criticality,
+                            id: res.data[i].id,
+                            scale_max_value: res.data[i].scale_max_value,
                             service_area: res.data[i].service_area,
                             service_id: res.data[i].service_id,
                             service_name: res.data[i].service_name,
                             service_profit: res.data[i].service_profit,
                             service_type: res.data[i].service_type,
                             amountState: null,
-                        }
-                        this.selectedServicesOffered.push(service)
+                        };
+                        this.selectedServicesOffered.push(service);
                     }
                     this.$nextTick(() => {
                         this.$bvModal.show("modal-associate-services");
@@ -1067,52 +1101,51 @@ export default {
                 });
         },
         show_modal_confirm_association_services() {
-            for(var i = 0; i< this.selectedServicesOffered.length; i++){
-                this.selectedServicesOffered[i].amountState = null
+            for (var i = 0; i < this.selectedServicesOffered.length; i++) {
+                this.selectedServicesOffered[i].amountState = null;
             }
             this.$nextTick(() => {
                 this.$bvModal.show("modal-amount-ressources");
             });
         },
-        async showAmount(){
-            
-            this.services = []
-            
-            let valid = true
-            for (let i = 0; i< this.selectedServicesOffered.length; i++){
-                
+        async showAmount() {
+            this.services = [];
+
+            let valid = true;
+            for (let i = 0; i < this.selectedServicesOffered.length; i++) {
                 let service = {
                     service_offered: this.selectedServicesOffered[i].service_id,
-                    amount: this.selectedServicesOffered[i].amount 
+                    amount: this.selectedServicesOffered[i].amount,
+                };
+                if (
+                    this.ressourceAmount < service.amount ||
+                    service.amount < 0
+                ) {
+                    valid = false;
+                    this.selectedServicesOffered[i].amountState = false;
                 }
-                if( (this.ressourceAmount < service.amount) || (service.amount < 0)){
-                    valid = false
-                    this.selectedServicesOffered[i].amountState = false
-                }   
 
-                this.services.push(service)
+                this.services.push(service);
             }
-            if (!valid){
-                return
+            if (!valid) {
+                return;
             }
-            this.$bvModal.show("modal-confirm-associate-services")
-            
+            this.$bvModal.show("modal-confirm-associate-services");
         },
-        
-        async associateServices(){
-            
+
+        async associateServices() {
             let ids = {
-                services_json: this.services
-            }
+                services_json: this.services,
+            };
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/phase2/ressources_service_offered1/${this.ressourceId}/`,
                     ids,
                     {
-                        withCredentials:true,
+                        withCredentials: true,
                         headers: {
-                            Authorization: TOKEN
-                        }
+                            Authorization: TOKEN,
+                        },
                     }
                 )
                 .then((res) => {
@@ -1125,7 +1158,7 @@ export default {
                     this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-associate-services");
                         this.$bvModal.hide("modal-associate-services");
-                        this.$bvModal.hide("modal-amount-ressources")
+                        this.$bvModal.hide("modal-amount-ressources");
                     });
                 })
                 .catch((err) => {
@@ -1150,11 +1183,7 @@ export default {
                         );
                     }
                 });
-
         },
-
-    }
-    
-}
-
+    },
+};
 </script>
