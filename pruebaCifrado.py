@@ -35,6 +35,6 @@ cipher = PKCS1_OAEP.new(public_key)
 
 msj_enc = cipher.encrypt(mensaje)
 
-print(mensaje, msj_enc)
+print('Llave: ', msj_enc.decode('unicode-escape').encode('ISO-8859-1'))
 
 

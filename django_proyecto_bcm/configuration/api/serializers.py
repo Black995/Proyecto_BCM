@@ -215,19 +215,20 @@ class UsedKeysSerializer(serializers.ModelSerializer):
 
         key2 = cipher.decrypt(kbyte)
         keyStr = key2.decode("utf-8")
-        print(type(keyStr))
-        
+
         activated = ProductActivation.objects.all()
         if activated:
             for a in activated:
                 if (a):
+                    keySaved = UsedKeys.objects.create(key=key1)
                     new_date = a.activation_date + timedelta(weeks=52)
                     a.activation_date = new_date
                     a.save()
-                    keySaved = UsedKeys.objects.create(key=key1)
+                    
                 else:
                     activated = ProductActivation.objects.create(state=True,activation_date=timezone.now().date() )
         else:
-            activated = ProductActivation.objects.create(state=True,activation_date=timezone.now().date() )
             keySaved = UsedKeys.objects.create(key=key1)
+            activated = ProductActivation.objects.create(state=True,activation_date=timezone.now().date() )
+            
         return keySaved
