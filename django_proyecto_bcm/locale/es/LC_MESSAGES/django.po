@@ -244,6 +244,12 @@ msgstr "Puede actualizar historial de incidentes"
 msgid "Can delete incident history"
 msgstr "Puede eliminar historial de incidentes"
 
+msgid "Can view incident impact"
+msgstr "Puede ver el impacto de los incidentes"
+
+msgid "Can view risk heat map"
+msgstr "Puede ver el mapa de calor de los riesgos"
+
 msgid "Can add city"
 msgstr "Puede agregar ciudad"
 

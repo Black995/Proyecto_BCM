@@ -101,7 +101,6 @@
                     icon="ti-dropbox"
                 />
                 <sidebar-link
-                
                     to="/layout/ressources"
                     name="Recursos"
                     icon="ti-desktop"
@@ -130,7 +129,7 @@
                 <sidebar-link
                     v-if="
                         is_superuser == true ||
-                        permissions.includes('bcm_phase3.view_incidenthistory')
+                        permissions.includes('bcm_phase3.view_incident_impact')
                     "
                     to="/layout/impacto-incidentes"
                     name="Impacto Incidentes (all)"
@@ -139,7 +138,7 @@
                 <sidebar-link
                     v-if="
                         is_superuser == true ||
-                        permissions.includes('bcm_phase3.view_incidenthistory')
+                        permissions.includes('bcm_phase3.view_incident_impact')
                     "
                     to="/layout/impacto-incidente"
                     name="Impacto del Incidente"
@@ -148,7 +147,7 @@
                 <sidebar-link
                     v-if="
                         is_superuser == true ||
-                        permissions.includes('bcm_phase3.view_incidenthistory')
+                        permissions.includes('bcm_phase3.view_risk_heatmap')
                     "
                     to="/layout/mapa-calor"
                     name="Mapa de Calor Riesgos"
