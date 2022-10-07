@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container-fluid">
         <b-row class="mt-3" align-v="center">
             <b-col>
                 <h5>Seleccione uno de los escenarios críticos</h5>
@@ -33,11 +33,18 @@
             class="mt-5"
         >
             <b-col>
-                <b-row>
+                <b-row
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes(
+                            'bcm_phase3.add_contingencyplanblock'
+                        )
+                    "
+                >
                     <b-col cols="9">
                         <h5 class="text-center">
-                            Arrastre bloques al árbol de nodos usando el botón
-                            de menú
+                            Arrastre el bloque al nivel de diagrama que
+                            corresponda
                         </h5>
                     </b-col>
                     <b-col cols="3">
@@ -67,11 +74,6 @@
                                                 v-model="block.preview.title"
                                                 :state="blockState.title"
                                             ></vue-editor>
-                                            <!--b-form-input
-                                                v-model="block.preview.title"
-                                                :state="blockState.title"
-                                                required
-                                            ></b-form-input-->
                                         </b-form-group>
                                         <b-form-group
                                             label="Ingrese la descripción del bloque"
@@ -82,12 +84,6 @@
                                                 v-model="block.node.description"
                                                 :state="blockState.description"
                                             ></vue-editor>
-                                            <!--b-form-textarea
-                                                v-model="block.node.description"
-                                                :state="blockState.description"
-                                                required
-                                                rows="3"
-                                            ></b-form-textarea-->
                                         </b-form-group>
                                     </b-col>
                                 </b-row>
@@ -96,7 +92,7 @@
                     </b-col>
                 </b-row>
 
-                <b-row v-if="editNodeForm" class="mt-5">
+                <!--b-row v-if="editNodeForm" class="mt-5">
                     <b-col>
                         <div class="card">
                             <div class="card-body">
@@ -110,35 +106,24 @@
                                         <b-form-group
                                             label="Ingrese el título del nodo"
                                             invalid-feedback="Este campo es obligatorio"
-                                            :state="EditNodeState.title"
+                                            :state="editNodeState.title"
                                         >
                                             <vue-editor
                                                 v-model="node.title"
-                                                :state="EditNodeState.title"
+                                                :state="editNodeState.title"
                                             ></vue-editor>
-                                            <!--b-form-input
-                                            v-model="node.title"
-                                            :state="EditNodeState.title"
-                                            required
-                                        ></b-form-input-->
                                         </b-form-group>
                                         <b-form-group
                                             label="Ingrese la descripción del nodo"
                                             invalid-feedback="Este campo es obligatorio"
-                                            :state="EditNodeState.description"
+                                            :state="editNodeState.description"
                                         >
                                             <vue-editor
                                                 v-model="node.description"
                                                 :state="
-                                                    EditNodeState.description
+                                                    editNodeState.description
                                                 "
                                             ></vue-editor>
-                                            <!--b-form-textarea
-                                            v-model="node.description"
-                                            :state="EditNodeState.description"
-                                            required
-                                            rows="3"
-                                        ></b-form-textarea-->
                                         </b-form-group>
                                     </b-col>
                                 </b-row>
@@ -158,8 +143,16 @@
                             </div>
                         </div>
                     </b-col>
-                </b-row>
-                <b-row v-if="!editNodeForm" align-v="center">
+                </b-row-->
+                <b-row
+                    v-if="
+                        is_superuser == true ||
+                        permissions.includes(
+                            'bcm_phase3.add_contingencyplanblock'
+                        )
+                    "
+                    align-v="center"
+                >
                     <b-col>
                         <div class="d-flex justify-content-center">
                             <!--flowy-new-block
@@ -182,9 +175,6 @@
                                     <demo-node
                                         :title="block.node.title"
                                         :description="block.node.description"
-                                        :custom-attribute="
-                                            block.node.canBeAdded
-                                        "
                                     />
                                 </template>
                             </flowy-new-block>
@@ -219,27 +209,124 @@
                 !loadingNodes &&
                 loadingFirstNodes &&
                 (is_superuser == true ||
-                    (permissions.includes(
+                    permissions.includes(
                         'bcm_phase3.add_contingencyplanblock'
-                    ) &&
-                        permissions.includes(
-                            'bcm_phase3.change_contingencyplanblock'
-                        ) &&
-                        permissions.includes(
-                            'bcm_phase3.delete_contingencyplanblock'
-                        )))
+                    ) ||
+                    permissions.includes(
+                        'bcm_phase3.change_contingencyplanblock'
+                    ) ||
+                    permissions.includes(
+                        'bcm_phase3.delete_contingencyplanblock'
+                    ))
             "
             align-v="center"
             class="mt-3"
         >
             <b-col>
                 <div class="text-right">
-                    <b-button variant="success" @click="saveContingencyPlan">
+                    <b-button
+                        variant="success"
+                        size="lg"
+                        @click="saveContingencyPlan"
+                    >
                         Guardar plan de contingencia
                     </b-button>
                 </div>
             </b-col>
         </b-row>
+
+        <!--
+            Modal de editar  
+        -->
+        <b-modal
+            id="modal-update"
+            title="Editar servicio"
+            ref="modal"
+            size="lg"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="saveNode">
+                <b-form-group
+                    label="Ingrese el título del nodo"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="editNodeState.title"
+                >
+                    <vue-editor
+                        v-model="node.title"
+                        :state="editNodeState.title"
+                    ></vue-editor>
+                </b-form-group>
+                <b-form-group
+                    label="Ingrese la descripción del nodo"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="editNodeState.description"
+                >
+                    <vue-editor
+                        v-model="node.description"
+                        :state="editNodeState.description"
+                    ></vue-editor>
+                </b-form-group>
+            </form>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="saveNode"
+                    >
+                        Editar nodo
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar editar  
+        -->
+        <b-modal
+            id="modal-confirm-update"
+            title="Confirmar editar nodo"
+            centered
+        >
+            <h4>¿Está seguro de editar este nodo?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="confirmSaveNode"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar eliminar  
+        -->
+        <b-modal
+            id="modal-confirm-delete"
+            title="Confirmar eliminar nodo"
+            centered
+        >
+            <h4>
+                ¿Está seguro de eliminar este nodo? Tenga en cuenta que si este
+                nodo posee <strong>nodos hijos</strong> entonces los nodos hijos
+                también serán eliminados
+            </h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="danger"
+                        class="float-right"
+                        @click="deleteNode"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </div>
 </template>
 
@@ -267,6 +354,9 @@ const DemoNode = {
             this.remove();
         },
         deleteNode() {
+            console.log("Permisos");
+            console.log(this.$props);
+            console.log(this.$props.permissions);
             this.$props.node.action = "delete";
             this.remove();
         },
@@ -276,6 +366,7 @@ const DemoNode = {
         <div class="row items-center no-wrap">
             <div class="col">
                 <div v-html="title" class="text-h6" />
+                {{ this.$props.permissions }}
             </div>
 
             <div class="col-auto">
@@ -289,8 +380,8 @@ const DemoNode = {
 
         <div v-html="description" />
         <div class="d-flex justify-content-around">
-            <b-col><b-button variant="warning" @click="editNode()">Editar</b-button></b-col>
-            <b-col><b-button variant="danger" v-if="this.$props.node.parentId != -1" @click="deleteNode()">Eliminar</b-button></b-col>
+            <b-col><b-button variant="warning" v-if="(this.$props.node.canBeEdited)" @click="editNode()">Editar</b-button></b-col>
+            <b-col><b-button variant="danger" v-if="(this.$props.node.parentId != -1) && (this.$props.node.canBeDeleted)" @click="deleteNode()">Eliminar</b-button></b-col>
         </div>
     </b-card>
   `,
@@ -325,7 +416,7 @@ export default {
             description: "",
         },
         nodeIndex: 0,
-        editNodeForm: false,
+        nodeIndexDelete: 0,
         editNodeState: {
             title: null,
             description: null,
@@ -440,7 +531,6 @@ export default {
             this.nodes = [];
             this.loadingNodes = true;
             this.loadingFirstNodes = true;
-            this.editNodeForm = false;
 
             axios
                 .get(`${SERVER_ADDRESS}/api/phase3/contingency-plan-detail/`, {
@@ -451,12 +541,31 @@ export default {
                     },
                 })
                 .then((res) => {
+                    let canBeEdited = false;
+                    let canBeDeleted = false;
+                    if (
+                        this.permissions.includes(
+                            "bcm_phase3.change_contingencyplanblock"
+                        )
+                    ) {
+                        canBeEdited = true;
+                    }
+                    if (
+                        this.permissions.includes(
+                            "bcm_phase3.delete_contingencyplanblock"
+                        )
+                    ) {
+                        canBeDeleted = true;
+                    }
+
                     if (res.data.length) {
                         for (var i = 0; i < res.data.length; i++) {
                             let nodeObj = {
                                 id: res.data[i].block_id,
                                 parentId: res.data[i].parent_block_id,
                                 nodeComponent: "demo-node",
+                                canBeEdited: canBeEdited,
+                                canBeDeleted: canBeDeleted,
                                 data: {
                                     text: res.data[i].title,
                                     title: res.data[i].title,
@@ -655,6 +764,25 @@ export default {
             event.node.data.title = this.block.node.title;
             event.node.data.description = this.block.node.description;
 
+            if (
+                this.permissions.includes(
+                    "bcm_phase3.change_contingencyplanblock"
+                )
+            ) {
+                event.node.canBeEdited = true;
+            } else {
+                event.node.canBeEdited = false;
+            }
+            if (
+                this.permissions.includes(
+                    "bcm_phase3.delete_contingencyplanblock"
+                )
+            ) {
+                event.node.canBeDeleted = true;
+            } else {
+                event.node.canBeDeleted = false;
+            }
+
             // add to array of nodes
             this.nodes.push({
                 id,
@@ -679,7 +807,10 @@ export default {
                 this.editNode();
             }
             if (event.node.action == "delete") {
-                this.nodes.splice(nodeIndex, 1);
+                this.nodeIndexDelete = nodeIndex;
+                this.$nextTick(() => {
+                    this.$bvModal.show("modal-confirm-delete");
+                });
             }
         },
         editNode() {
@@ -695,22 +826,40 @@ export default {
 
             this.node.title = nodeFound.data.title;
             this.node.description = nodeFound.data.description;
-            this.EditNodeState = {
+            this.editNodeState = {
                 title: null,
                 description: null,
             };
 
-            this.editNodeForm = true;
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-update");
+            });
+        },
+        deleteNode() {
+            this.nodes.splice(this.nodeIndexDelete, 1);
+
+            // Mensaje de éxito
+            this.successMessage(
+                "¡El nodo o grupo de nodos ha sido eliminado exitosamente!"
+            );
+            this.$nextTick(() => {
+                this.$bvModal.hide("modal-confirm-delete");
+            });
         },
         saveNode() {
-            this.EditNodeState.title = null;
-            this.EditNodeState.description = null;
+            this.editNodeState.title = null;
+            this.editNodeState.description = null;
 
             // Exit when the form isn't valid
             if (!this.checkNodeValidity()) {
                 return;
             }
 
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-update");
+            });
+        },
+        confirmSaveNode() {
             for (var i = 0; i < this.nodes.length; i++) {
                 if (i == this.nodeIndex) {
                     this.nodes[i].data.title = this.node.title;
@@ -719,10 +868,14 @@ export default {
                 }
             }
 
-            this.editNodeForm = false;
-            this.editMainBlock = true;
-        },
+            // Mensaje de éxito
+            this.successMessage("¡El nodo ha sido editado exitosamente!");
 
+            this.$nextTick(() => {
+                this.$bvModal.hide("modal-confirm-update");
+                this.$bvModal.hide("modal-update");
+            });
+        },
         /**
          * Validar formularios
          */

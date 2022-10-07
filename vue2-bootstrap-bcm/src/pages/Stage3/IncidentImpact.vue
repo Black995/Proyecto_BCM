@@ -223,6 +223,7 @@
                     id="ressources"
                 >
                     <apexchart
+                        ref="ressources"
                         type="donut"
                         height="500"
                         :options="chartOptionsRessources"
@@ -399,7 +400,7 @@ import VueApexCharts from "vue-apexcharts";
 export default {
     name: "IncidentHistory",
     components: {
-        VueApexCharts,
+        apexchart: VueApexCharts,
     },
     data: () => ({
         permissions: [],
@@ -1395,8 +1396,8 @@ export default {
         },
         clearFilter() {
             this.countStaffsArea();
-            this.chartOptionsRessources.labels = [];
-            this.seriesRessources = [];
+            this.chartOptionsRessources.labels = [""];
+            this.seriesRessources = [0];
         },
         countStaffsArea() {
             this.staffsArea = [];
@@ -1540,6 +1541,7 @@ export default {
          */
         countRessources(serviceId) {
             this.loadingRessources = false;
+            let ressources = [];
 
             for (var i = 0; i < this.servicesOffered.length; i++) {
                 if (this.servicesOffered[i].id == serviceId) {
@@ -1551,16 +1553,31 @@ export default {
                         j < this.servicesOffered[i].ressources_service.length;
                         j++
                     ) {
-                        this.chartOptionsRessources.labels.push(
-                            this.servicesOffered[i].ressources_service[j]
-                                .ressource_name
-                        );
-                        this.seriesRessources.push(
-                            this.servicesOffered[i].ressources_service[j].amount
-                        );
+                        let objRessource = {
+                            label: this.servicesOffered[i].ressources_service[j]
+                                .ressource_name,
+                            serie: this.servicesOffered[i].ressources_service[j]
+                                .amount,
+                        };
+                        ressources.push(objRessource);
                     }
                     break;
                 }
+            }
+
+            // Ordenamos el array de json por orden alfabético del nombre del área
+            ressources.sort(function (a, b) {
+                return a.label < b.label ? -1 : a.label > b.label ? 1 : 0;
+            });
+            for (var i = 0; i < ressources.length; i++) {
+                this.chartOptionsRessources.labels.push(ressources[i].label);
+                this.seriesRessources.push(ressources[i].serie);
+            }
+
+            // Si no hay elementos que mostrar en el chart entonces se muestra vacío
+            if (!ressources.length) {
+                this.chartOptionsRessources.labels = [""];
+                this.seriesRessources = [0];
             }
 
             this.loadingRessources = true;
@@ -1679,6 +1696,13 @@ export default {
                         end_date_incident = Date.now();
                         this.timeNow = Date.now();
                     }
+
+                    console.log("HORA INICIO INCIDENTE");
+                    console.log(start_date_incident);
+                    console.log(res.data.start_date);
+                    console.log("HORA FIN DEL INCIDENTE");
+                    console.log(Date(Date.now()).toString());
+                    console.log(this.timeNow);
 
                     // Duración del incidente en milisegundos
                     this.incidentDurationTime =

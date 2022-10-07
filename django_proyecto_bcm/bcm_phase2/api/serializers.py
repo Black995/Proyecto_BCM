@@ -42,6 +42,10 @@ class StaffSerializer(serializers.ModelSerializer):
     area_name = serializers.CharField(read_only=True, source="area.name")
     position_name = serializers.CharField(read_only=True, source="position.name")
     headquarter_name = serializers.CharField(read_only=True, source="headquarter.name")
+    headquarter_city = serializers.CharField(read_only=True, source="headquarter.city.name")
+    headquarter_parish = serializers.CharField(read_only=True, source="headquarter.parish.name")
+    headquarter_township = serializers.CharField(read_only=True, source="headquarter.parish.township.name")
+    headquarter_state = serializers.CharField(read_only=True, source="headquarter.city.state.name")
     user_email = serializers.CharField(read_only=True, source="user_staff.email")
 
     class Meta:
@@ -64,6 +68,10 @@ class StaffSerializer(serializers.ModelSerializer):
             'position_name',
             'headquarter',
             'headquarter_name',
+            'headquarter_city',
+            'headquarter_parish',
+            'headquarter_township',
+            'headquarter_state',
             #'user_staff',
             'user_email'
         ]

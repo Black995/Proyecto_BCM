@@ -176,7 +176,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -206,6 +206,16 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'configuration', 'locale'),
     os.path.join(BASE_DIR, 'users', 'locale'),
 )
+
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = int(env('EMAIL_PORT'))
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+PASSWORD_RESET_LINK = env('PASSWORD_RESET_LINK')
 
 ### LDAP Settings ###
 """

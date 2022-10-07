@@ -2,11 +2,15 @@
     <div class="row">
         <div class="col-xl-4 col-lg-5 col-md-6">
             <card class="card-user">
-                <b-img
-                    src="user_profile.png"
-                    fluid
-                    :alt="profile.names"
-                ></b-img>
+                <div class="text-center">
+                    <b-img
+                        height="150"
+                        width="150"
+                        src="user_profile.png"
+                        fluid
+                        :alt="profile.names"
+                    ></b-img>
+                </div>
 
                 <div class="mt-3">
                     <h3 class="text-center">
