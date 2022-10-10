@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFoundPage.vue";
 
 // Login
 import Login from "@/pages/Login/Login.vue";
+// Reset password
+import ResetPassword from "@/pages/ResetPassword/ResetPassword.vue";
 // Admin pages
 import UserProfile from "@/pages/UserProfile.vue";
 import Notifications from "@/pages/Notifications.vue";
@@ -47,6 +49,11 @@ const routes = [
     path: '/',
     name: 'Login',
     component: Login,
+  },
+  {
+    path: '/restablecer-contrasenna/:token',
+    name: 'ResetPassword',
+    component: ResetPassword,
   },
   {
     path: "/layout",
@@ -98,7 +105,7 @@ const routes = [
         component: ServicesUsed
       },
       {
-        path: "ressources",
+        path: "recursos",
         name: "Recursos",
         component: Ressources
       },

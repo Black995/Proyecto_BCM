@@ -2,6 +2,7 @@ import os
 import re
 from telnetlib import STATUS
 from typing import OrderedDict
+from uuid import uuid4
 from django.db import models
 from django.conf import settings as api_settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
@@ -50,6 +51,7 @@ def send_mail(subject, message, from_email, recipient_list,
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
 
+    """
     if image_path:
         try:
             with open(image_path, mode='rb') as f:
@@ -59,6 +61,7 @@ def send_mail(subject, message, from_email, recipient_list,
                     'Content-ID', f"<{os.path.basename(image_path)}>")
         except FileNotFoundError:
             pass
+    """
 
     return mail.send()
 
@@ -160,6 +163,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.password = new_password
         self.save(update_fields=['password'])
     
+    def generate_password_reset_token(self):
+        self.password_reset_token = uuid4().hex
+        self.password_reset_token_datetime = timezone.now()
+        self.save(update_fields=['password_reset_token',
+                  'password_reset_token_datetime'])
     
     def send_password_reset_email(self):
         # Organization information
@@ -183,7 +191,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         message = get_template('password_reset.html').render(ctx)
         # Sending email
         send_mail(subject=subject, message='', from_email=api_settings.EMAIL_HOST_USER,
-                  recipient_list=[self.email], fail_silently=True, html_message=message, image_path=organization_logo_path)
+                  recipient_list=[self.email], fail_silently=False, html_message=message, image_path=organization_logo_path)
 
 
     def invalidate_password_reset_token(self, save: bool = True):

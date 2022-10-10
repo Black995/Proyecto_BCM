@@ -43,7 +43,12 @@
 
             <!-- Remind Passowrd -->
             <div id="formFooter">
-                <a class="underlineHover" href="#">¿Olvidó su contraseña?</a>
+                <a
+                    class="underlineHover"
+                    href="#"
+                    @click="show_modal_forget_password"
+                    >¿Olvidó su contraseña?</a
+                >
                 <div class="row"></div>
                 <a
                     class="underlineHover"
@@ -54,9 +59,10 @@
             </div>
         </div>
         <div class="row"></div>
+
         <!--
-        Modal activación de producto
-    -->
+            Modal activación de producto
+        -->
         <b-modal
             id="modal-activate-product"
             title="Activar producto"
@@ -90,6 +96,7 @@
                 </div>
             </template>
         </b-modal>
+
         <!--
             Modal confirmar activar
         -->
@@ -107,6 +114,48 @@
                         @click="activateProduct"
                     >
                         Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal olvidar contraseña
+        -->
+        <b-modal
+            id="modal-forget-password"
+            title="Olvido de contraseña"
+            ref="mmodal"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitForgetPassword">
+                <b-form-group
+                    label="Ingrese el correo al que se le enviarán las instrucciones para recuperar la cuenta"
+                    invalid-feedback="Este campo no puede estar vacio"
+                    :state="emailForgetState"
+                >
+                    <div class="text-center">
+                        <b-form-input
+                            v-model="emailForget"
+                            :state="emailForgetState"
+                            required
+                        ></b-form-input>
+                    </div>
+                </b-form-group>
+            </form>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="handleSubmitForgetPassword"
+                        :disabled="loadingPasswordButton"
+                    >
+                        <div v-if="!loadingPasswordButton">Enviar correo</div>
+                        <b-spinner
+                            v-if="loadingPasswordButton"
+                            small
+                        ></b-spinner>
                     </b-button>
                 </div>
             </template>
@@ -129,6 +178,7 @@ export default {
             password: "",
         },
         loadingButton: false,
+        loadingPasswordButton: false,
         activation: {
             id: 0,
             state: null,
@@ -136,6 +186,9 @@ export default {
         },
         key: "",
         keyState: null,
+
+        emailForget: "",
+        emailForgetState: null,
     }),
     /**
      * Se deja el mounted termporalmente
@@ -352,6 +405,71 @@ export default {
                         );
                     }
                 });
+        },
+        show_modal_forget_password() {
+            this.emailForgetState = null;
+            this.emailForget = "";
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-forget-password");
+            });
+        },
+        async handleSubmitForgetPassword() {
+            this.emailForgetState = null;
+            if (!this.emailForget) {
+                this.emailForgetState = false;
+            } else {
+                this.loadingPasswordButton = true;
+
+                let forgetPassword = {
+                    email: this.emailForget,
+                };
+                axios
+                    .post(
+                        `${SERVER_ADDRESS}/api/users/recover-account/`,
+                        forgetPassword
+                    )
+                    .then((res) => {
+                        this.loadingPasswordButton = true;
+                        console.log("FORGOT PASSWORD");
+                        //Ocultamos los modales
+                        this.$nextTick(() => {
+                            this.$bvModal.hide("modal-forget-password");
+                        });
+
+                        // Mensaje de éxito
+                        this.successMessage(
+                            "¡El correo ha sido enviado exitosamente! Por favor verificar en la bandeja de correos o en spam el email enviado"
+                        );
+                    })
+                    .catch((err) => {
+                        console.log("ERR");
+                        console.log(err);
+                        try {
+                            this.loadingPasswordButton = false;
+
+                            // Error 400 por unicidad o 500 generico
+                            if (err.response.status == 400) {
+                                for (let e in err.response.data) {
+                                    this.errorMessage(
+                                        e + ": " + err.response.data[e]
+                                    );
+                                }
+                            } else {
+                                // Servidor no disponible
+                                this.errorMessage(
+                                    "Ups! Ha ocurrido un error en el servidor"
+                                );
+                            }
+                        } catch {
+                            this.loadingPasswordButton = false;
+
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    });
+            }
         },
     },
 };

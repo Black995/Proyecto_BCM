@@ -75,19 +75,12 @@ class RecoverAccountViewSet(viewsets.ModelViewSet):
     model = User
     queryset = User.objects.all()
     serializer_class = RecoverAccountSerializer
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [IsAuthenticated()]
-        return super().get_permissions()
+    permission_classes=[AllowAny]
 
 
 class ResetPasswordViewSet(viewsets.ModelViewSet):
     model = User
     queryset = User.objects.all()
     serializer_class = ResetPasswordSerializer
+    permission_classes=[AllowAny]
 
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [IsAuthenticated()]
-        return super().get_permissions()

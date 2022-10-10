@@ -90,16 +90,12 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
-
 }
 
 # Configuration JWT object
@@ -114,7 +110,9 @@ ROOT_URLCONF = 'django_proyecto_bcm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates', 'email_templates'), 
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

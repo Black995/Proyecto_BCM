@@ -105,7 +105,7 @@
                         is_superuser == true ||
                         permissions.includes('bcm_phase2.view_ressource')
                     "
-                    to="/layout/ressources"
+                    to="/layout/recursos"
                     name="Recursos"
                     icon="ti-desktop"
                 />

@@ -6,7 +6,7 @@
                     <b-img
                         height="150"
                         width="150"
-                        src="user_profile.png"
+                        src="../../assets/img/login_icon.png"
                         fluid
                         :alt="profile.names"
                     ></b-img>
