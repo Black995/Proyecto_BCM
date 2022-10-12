@@ -2,7 +2,7 @@
     <div class="wrapper fadeInDown">
         <div id="formContent">
             <!-- Icon -->
-            <div class="fadeIn first">
+            <div class="fadeIn first mt-3">
                 <img
                     src="../../assets/img/login_icon.png"
                     id="icon"
@@ -44,6 +44,7 @@
             <!-- Remind Passowrd -->
             <div id="formFooter">
                 <a
+                    v-if="activation.state"
                     class="underlineHover"
                     href="#"
                     @click="show_modal_forget_password"

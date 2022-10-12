@@ -50,8 +50,7 @@ def send_mail(subject, message, from_email, recipient_list,
         subject, message, from_email, recipient_list, connection=connection)
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
-
-    """
+    
     if image_path:
         try:
             with open(image_path, mode='rb') as f:
@@ -61,7 +60,6 @@ def send_mail(subject, message, from_email, recipient_list,
                     'Content-ID', f"<{os.path.basename(image_path)}>")
         except FileNotFoundError:
             pass
-    """
 
     return mail.send()
 

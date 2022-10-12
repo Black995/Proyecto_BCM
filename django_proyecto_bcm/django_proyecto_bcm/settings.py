@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'bcm_phase1',
     'bcm_phase2',
     'bcm_phase3',
+    'notifications',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -203,6 +204,7 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'bcm_phase3', 'locale'),
     os.path.join(BASE_DIR, 'configuration', 'locale'),
     os.path.join(BASE_DIR, 'users', 'locale'),
+    os.path.join(BASE_DIR, 'notifications', 'locale'),
 )
 
 EMAIL_USE_TLS = env('EMAIL_USE_TLS')

@@ -42,6 +42,8 @@ import Headquarters from "@/pages/Configuration/Headquarters.vue";
 import Organization from "@/pages/Configuration/Organization.vue";
 import Roles from "@/pages/Configuration/Roles.vue";
 import Users from "@/pages/Configuration/Users.vue";
+// Notifications
+import Notification from "@/pages/Notifications/Notification.vue";
 
 
 const routes = [
@@ -186,6 +188,14 @@ const routes = [
         component: Users
       },
       /**
+       * Notification
+       */
+      {
+        path: "notificaciones",
+        name: "Notificaciones",
+        component: Notification
+      },
+      /**
        * Additional
        */
       {
@@ -194,7 +204,7 @@ const routes = [
         component: UserProfile
       },
       {
-        path: "notifications",
+        path: "notif",
         name: "notifications",
         component: Notifications
       },

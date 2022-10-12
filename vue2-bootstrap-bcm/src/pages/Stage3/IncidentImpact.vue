@@ -16,9 +16,18 @@
                     <b-col>
                         <h5>
                             <strong>Nota:</strong> como el incidente no posee
-                            fecha fin, se utilizó la fecha actual (tiempo
-                            transcurrido: {{ hoursNow }} horas,
-                            {{ minutesNow }} minutos)
+                            fecha fin, se utilizó la fecha actual (<strong
+                                >tiempo transcurrido:</strong
+                            >
+                            {{ hoursNow }} horas, {{ minutesNow }} minutos)
+                        </h5>
+                    </b-col>
+                </b-row>
+                <b-row v-if="incidentEnded" class="text-center">
+                    <b-col>
+                        <h5>
+                            <strong>Tiempo transcurrido:</strong>
+                            {{ hoursNow }} horas, {{ minutesNow }} minutos
                         </h5>
                     </b-col>
                 </b-row>
@@ -245,7 +254,7 @@
                     class="text-center"
                 >
                     Servicios que excedieron el RTO debido a la duración de la
-                    incidencias
+                    incidencia
                 </h5>
                 <div
                     v-if="
@@ -431,8 +440,11 @@ export default {
         incidentDurationTime: 0,
         hoursNow: 0,
         minutesNow: 0,
-        timeNow: "",
+        timeIncident: "",
         servicesByRTO: [],
+
+        timeNow: "",
+        incidentEnded: false,
 
         /**
          * Variables a utilizar para las gráficas de ApexChart
@@ -1652,6 +1664,7 @@ export default {
             // this.loadingRessources = false;
             this.incidentDurationTime = 0;
             this.timeNow = "";
+            this.incidentEnded = false;
             this.servicesOffered = [];
             this.staffs = [];
             this.servicesByRTO = [];
@@ -1692,6 +1705,7 @@ export default {
                         end_date_incident = new Date(
                             res.data.end_date
                         ).getTime();
+                        this.incidentEnded = true;
                     } else {
                         end_date_incident = Date.now();
                         this.timeNow = Date.now();
@@ -1710,7 +1724,7 @@ export default {
 
                     this.timeNowHoursMinutes(this.incidentDurationTime);
                     // Mínimo tiempo de duración para los servicios que exceden el RTO
-                    this.chartOptionsServicesOnlyMinimumRTO.yaxis.min =
+                    this.chartOptionsServicesNotExceedMinimumRTO.yaxis.min =
                         this.incidentDurationTime;
 
                     for (var i = 0; i < res.data.risks_incident.length; i++) {
@@ -1760,8 +1774,8 @@ export default {
                                     recovery_time_service =
                                         hours * 3600000 + minutes * 60000;
                                     if (
-                                        this.incidentDurationTime <=
-                                        recovery_time_service
+                                        recovery_time_service <=
+                                        this.incidentDurationTime
                                     ) {
                                         exceed_recovery_time = true;
                                     }
@@ -1811,17 +1825,12 @@ export default {
                                     this.seriesServicesOnlyMinimumRTO[0].data.push(
                                         recovery_time_service
                                     );
+
                                     /**
-                                     * Mientras más valores vamos insertando en el tiempo,
-                                     * Vamos actualizando el RTO más alto
+                                     * Máximo valor es el tiempo del RTO excedido
                                      */
-                                    if (
-                                        this.chartOptionsServicesOnlyMinimumRTO
-                                            .yaxis.max < recovery_time_service
-                                    ) {
-                                        this.chartOptionsServicesOnlyMinimumRTO.yaxis.max =
-                                            recovery_time_service;
-                                    }
+                                    this.chartOptionsServicesOnlyMinimumRTO.yaxis.max =
+                                        this.incidentDurationTime;
 
                                     /**
                                      * Se agregan los servicios de soporte afectados por servicios de la org.
@@ -1870,10 +1879,17 @@ export default {
                                         recovery_time_service
                                     );
                                     /**
-                                     * Máximo valor es el tiempo del RTO excedido
+                                     * Mientras más valores vamos insertando en el tiempo,
+                                     * Vamos actualizando el RTO más alto
                                      */
-                                    this.chartOptionsServicesNotExceedMinimumRTO.yaxis.max =
-                                        this.incidentDurationTime;
+                                    if (
+                                        this
+                                            .chartOptionsServicesNotExceedMinimumRTO
+                                            .yaxis.max < recovery_time_service
+                                    ) {
+                                        this.chartOptionsServicesNotExceedMinimumRTO.yaxis.max =
+                                            recovery_time_service;
+                                    }
                                 }
                             }
                             // Staffs

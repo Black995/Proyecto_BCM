@@ -1,9 +1,18 @@
 <template>
     <div class="wrapper fadeInDown">
         <div id="formContent">
+            <h5 class="text-center mt-3">Restablecer contraseña</h5>
+            <!-- Icon -->
+            <div class="fadeIn first">
+                <img
+                    src="../../assets/img/reset_password.png"
+                    id="icon"
+                    alt="User Icon"
+                    class="rounded mx-auto d-block icon-login"
+                />
+            </div>
             <!-- Login Form -->
             <form ref="form" @submit.stop.prevent="handleSubmit">
-                <h5 class="text-center mt-3">Restablecer contraseña</h5>
                 <b-form-input
                     type="password"
                     class="fadeIn second mt-3"
@@ -19,7 +28,7 @@
                     required
                 ></b-form-input>
                 <button type="submit" class="fadeIn fourth">
-                    <div>Restablecer contraseña</div>
+                    <div>Restablecer</div>
                 </button>
             </form>
         </div>
@@ -139,7 +148,7 @@ export default {
                     );
 
                     // Nos diriginmos al login
-                    this.$router.push("/layout/perfil");
+                    this.$router.push("/");
                 })
                 .catch((err) => {
                     try {

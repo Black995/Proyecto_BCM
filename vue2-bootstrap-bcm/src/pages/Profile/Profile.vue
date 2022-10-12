@@ -3,13 +3,12 @@
         <div class="col-xl-4 col-lg-5 col-md-6">
             <card class="card-user">
                 <div class="text-center">
-                    <b-img
+                    <img
                         height="150"
                         width="150"
                         src="../../assets/img/login_icon.png"
-                        fluid
                         :alt="profile.names"
-                    ></b-img>
+                    />
                 </div>
 
                 <div class="mt-3">
