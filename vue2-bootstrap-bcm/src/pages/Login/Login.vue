@@ -63,11 +63,11 @@
                     :state="keyState"
                 >
                     <b-row align-v="center">
-                        <b-form-input
-                        v-model="key"
-                        :state="keyState"
+                        <b-form-file
+                        v-model="file"
+                        :state="fileState"
                         required
-                        ></b-form-input>
+                        ></b-form-file>
                     </b-row>
                     
                 </b-form-group>
@@ -132,6 +132,9 @@ export default {
         },
         key:"",
         keyState: null,
+
+        file: null,
+        fileState: null
 
     }),
     /**
@@ -262,7 +265,6 @@ export default {
                             activation_date: null
                         }
                     }
-                    console.log(this.activation)
                 })
                 .catch((err) => {
                     try {
@@ -295,14 +297,15 @@ export default {
             })
         },
         handleSubmitActivate(){
-            this.keyState = null
-            if(!this.key){
-                this.keyState=false
+            this.fileState = null
+            if(!this.file){
+                this.fileState=false
             }
             else{
                 this.$nextTick(()=>{
                     this.$bvModal.show("modal-confirm-activate")
                 })
+                
             }
 
         },
@@ -310,13 +313,20 @@ export default {
             let usedKey ={
                 key: this.key
             }
+            let formData = new FormData()
+            formData.append("licencia", this.file,this.file.name)
             axios
-                .post(`${SERVER_ADDRESS}/api/config/activate/`, usedKey)
+                .post(`${SERVER_ADDRESS}/api/config/activate/`, formData)
                 .then((res)=>{
-                    console.log(res)
+                    this.$bvModal.hide("modal-activate-product")
+                    this.$bvModal.hide("modal-confirm-activate")
+                    this.getActivationState()
+                    
                 })
                 .catch((err) => {
                     try {
+                        console.log(err)
+                        console.log(err.response.data)
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
                             for (let e in err.response.data) {
