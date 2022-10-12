@@ -306,3 +306,26 @@ class ChangePasswordSerializer(serializers.Serializer):
         except ValidationError as e:
             raise serializers.ValidationError(e.message_dict)
 
+
+class RecoverAccountSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def save(self, **kwargs):
+        email = self.validated_data['email']
+        user = User.objects.filter(email=email).first()
+        if user is not None:
+            user.send_password_reset_email()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
+
+    def save(self, **kwargs):
+        try:
+            User.reset_password(
+                self.validated_data['token'],
+                self.validated_data['password']
+            )
+        except ValidationError as e:
+            raise serializers.ValidationError(e.message_dict)

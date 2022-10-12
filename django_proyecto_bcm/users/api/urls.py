@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (UserListViewSet, UserViewSet, StaffsWithoutUserViewSet,
                     PermissionViewSet, GroupListViewSet, GroupViewSet, ProfileView,
-                    ChangePasswordViewSet)
+                    ChangePasswordViewSet, RecoverAccountViewSet, ResetPasswordViewSet)
 
 
  
@@ -31,4 +31,11 @@ urlpatterns = [
     path('profile/', ProfileView.as_view(), name='profile_user'),
     path('change_password/', ChangePasswordViewSet.as_view({
         'post': 'create'}), name='change_password'),
+        
+    path('recover-account/', RecoverAccountViewSet.as_view({
+        'get': 'list',
+        'post': 'create'}), name='recover_account'),
+    path('reset-password/', ResetPasswordViewSet.as_view({
+        'get': 'list',
+        'post': 'create'}), name='reset_password'),
 ]

@@ -6,7 +6,7 @@
     <div
         :class="{
             'nav-open': $sidebar.showSidebar,
-            login: $route.name == 'Login',
+            login: $route.name == 'Login' || $route.name == 'ResetPassword',
         }"
     >
         <notifications></notifications>

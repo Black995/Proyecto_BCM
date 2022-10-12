@@ -29,7 +29,7 @@ urlpatterns = [
     path('api/phase3/',  include('bcm_phase3.api.urls')),
     path('api/config/',  include('configuration.api.urls')),
     path('api/users/',  include('users.api.urls')),
-
+    path('api/notifications/',  include('notifications.api.urls')),
 
     # URLs de Django REST framework
     path('api-auth/', include('rest_framework.urls')),

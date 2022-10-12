@@ -16,12 +16,54 @@
                     <b-col>
                         <h5>
                             <strong>Nota:</strong> como el incidente no posee
-                            fecha fin, se utilizó la fecha actual (tiempo
-                            transcurrido: {{ hoursNow }} horas,
-                            {{ minutesNow }} minutos)
+                            fecha fin, se utilizó la fecha actual (<strong
+                                >tiempo transcurrido:</strong
+                            >
+                            {{ hoursNow }} horas, {{ minutesNow }} minutos)
                         </h5>
                     </b-col>
                 </b-row>
+                <b-row v-if="incidentEnded" class="text-center">
+                    <b-col>
+                        <h5>
+                            <strong>Tiempo transcurrido:</strong>
+                            {{ hoursNow }} horas, {{ minutesNow }} minutos
+                        </h5>
+                    </b-col>
+                </b-row>
+            </b-col>
+        </b-row>
+        <b-row class="mt-3" align-v="center">
+            <b-col>
+                <b-form-group
+                    label="Fecha inicio del filtro"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="incidentDateFilterState.start_date"
+                >
+                    <b-form-datepicker
+                        v-model="incidentDateFilter.start_date"
+                        :state="incidentDateFilterState.start_date"
+                        locale="es"
+                    ></b-form-datepicker>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-form-group
+                    label="Fecha fin del filtro"
+                    invalid-feedback="Este campo es obligatorio"
+                    :state="incidentDateFilterState.end_date"
+                >
+                    <b-form-datepicker
+                        v-model="incidentDateFilter.end_date"
+                        :state="incidentDateFilterState.end_date"
+                        locale="es"
+                    ></b-form-datepicker>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-button variant="info" block @click="getIncidents">
+                    Filtrar incidentes
+                </b-button>
             </b-col>
         </b-row>
         <b-row class="mt-3" align-v="center">
@@ -109,6 +151,18 @@
                 >
                     Criticidad de los servicios de la organización afectados
                 </h5>
+                <h6
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities
+                    "
+                    class="text-center"
+                >
+                    <strong>Nota:</strong> seleccione uno de los servicios para
+                    poder visualizar el personal afectado por área y los
+                    recursos afectados por servicio
+                </h6>
                 <div
                     v-if="
                         loadingServicesOffered &&
@@ -178,6 +232,7 @@
                     id="ressources"
                 >
                     <apexchart
+                        ref="ressources"
                         type="donut"
                         height="500"
                         :options="chartOptionsRessources"
@@ -199,7 +254,7 @@
                     class="text-center"
                 >
                     Servicios que excedieron el RTO debido a la duración de la
-                    incidencias
+                    incidencia
                 </h5>
                 <div
                     v-if="
@@ -354,13 +409,21 @@ import VueApexCharts from "vue-apexcharts";
 export default {
     name: "IncidentHistory",
     components: {
-        VueApexCharts,
+        apexchart: VueApexCharts,
     },
     data: () => ({
         permissions: [],
         is_superuser: false,
 
         loadingIncidents: false,
+        incidentDateFilter: {
+            start_date: "",
+            end_date: "",
+        },
+        incidentDateFilterState: {
+            start_date: null,
+            end_date: null,
+        },
 
         incidents: [],
         incidentId: 0,
@@ -377,8 +440,11 @@ export default {
         incidentDurationTime: 0,
         hoursNow: 0,
         minutesNow: 0,
-        timeNow: "",
+        timeIncident: "",
         servicesByRTO: [],
+
+        timeNow: "",
+        incidentEnded: false,
 
         /**
          * Variables a utilizar para las gráficas de ApexChart
@@ -1104,72 +1170,115 @@ export default {
             this.countStaffsAreaByService(service.id);
             this.countRessources(service.id);
         },
+        checkFormValidityFilters() {
+            let valid = true;
+            if (
+                !this.incidentDateFilter.start_date &&
+                this.incidentDateFilter.end_date
+            ) {
+                this.incidentDateFilterState.start_date = false;
+                valid = false;
+            }
+            if (
+                this.incidentDateFilter.start_date &&
+                !this.incidentDateFilter.end_date
+            ) {
+                this.incidentDateFilterState.end_date = false;
+                valid = false;
+            }
+            if (
+                this.incidentDateFilter.start_date &&
+                this.incidentDateFilter.end_date &&
+                this.incidentDateFilter.start_date >
+                    this.incidentDateFilter.end_date
+            ) {
+                this.errorMessage(
+                    "La fecha inicio no puede ser superior a la fecha fin"
+                );
+                valid = false;
+            }
+            return valid;
+        },
         async getIncidents() {
-            this.incidents = [];
+            this.incidentDateFilterState.start_date = null;
+            this.incidentDateFilterState.end_date = null;
             this.loadingIncidents = true;
 
-            axios
-                .get(`${SERVER_ADDRESS}/api/phase3/incident-histories/`, {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: TOKEN,
-                    },
-                })
-                .then((res) => {
-                    for (var i = 0; i < res.data.length; i++) {
-                        let name = "";
-                        if (res.data[i].end_date) {
-                            name =
-                                res.data[i].crisis_scenario_name +
-                                " (Fecha de inicio: " +
-                                res.data[i].start_date.slice(0, 10) +
-                                " " +
-                                res.data[i].start_date.slice(11, 16) +
-                                " - Fecha fin: " +
-                                res.data[i].end_date.slice(0, 10) +
-                                " " +
-                                res.data[i].end_date.slice(11, 16) +
-                                ")";
-                        } else {
-                            name =
-                                res.data[i].crisis_scenario_name +
-                                " (Fecha de inicio: " +
-                                res.data[i].start_date.slice(0, 10) +
-                                " " +
-                                res.data[i].start_date.slice(11, 16) +
-                                " - Fecha fin: - )";
+            // Exit when the filter isn't valid
+            if (!this.checkFormValidityFilters()) {
+                this.loadingIncidents = false;
+                return;
+            } else {
+                this.incidents = [];
+                this.loadingIncidents = true;
+
+                axios
+                    .get(`${SERVER_ADDRESS}/api/phase3/incident-histories/`, {
+                        params: {
+                            start_date: this.incidentDateFilter.start_date,
+                            end_date: this.incidentDateFilter.end_date,
+                        },
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    })
+                    .then((res) => {
+                        for (var i = 0; i < res.data.length; i++) {
+                            let name = "";
+                            if (res.data[i].end_date) {
+                                name =
+                                    res.data[i].crisis_scenario_name +
+                                    " (Fecha de inicio: " +
+                                    res.data[i].start_date.slice(0, 10) +
+                                    " " +
+                                    res.data[i].start_date.slice(11, 16) +
+                                    " - Fecha fin: " +
+                                    res.data[i].end_date.slice(0, 10) +
+                                    " " +
+                                    res.data[i].end_date.slice(11, 16) +
+                                    ")";
+                            } else {
+                                name =
+                                    res.data[i].crisis_scenario_name +
+                                    " (Fecha de inicio: " +
+                                    res.data[i].start_date.slice(0, 10) +
+                                    " " +
+                                    res.data[i].start_date.slice(11, 16) +
+                                    " - Fecha fin: - )";
+                            }
+                            let inc = {
+                                id: res.data[i].id,
+                                name: name,
+                                description: res.data[i].description,
+                            };
+                            this.incidents.push(inc);
                         }
-                        let inc = {
-                            id: res.data[i].id,
-                            name: name,
-                            description: res.data[i].description,
-                        };
-                        this.incidents.push(inc);
-                    }
-                    this.loadingIncidents = false;
-                })
-                .catch((err) => {
-                    try {
-                        // Error 400 por unicidad o 500 generico
-                        if (err.response.status == 400) {
-                            for (let e in err.response.data) {
+                        this.loadingIncidents = false;
+                    })
+                    .catch((err) => {
+                        try {
+                            // Error 400 por unicidad o 500 generico
+                            if (err.response.status == 400) {
+                                for (let e in err.response.data) {
+                                    this.errorMessage(
+                                        e + ": " + err.response.data[e]
+                                    );
+                                }
+                            } else {
+                                // Servidor no disponible
                                 this.errorMessage(
-                                    e + ": " + err.response.data[e]
+                                    "Ups! Ha ocurrido un error en el servidor"
                                 );
                             }
-                        } else {
+                        } catch {
                             // Servidor no disponible
                             this.errorMessage(
                                 "Ups! Ha ocurrido un error en el servidor"
                             );
                         }
-                    } catch {
-                        // Servidor no disponible
-                        this.errorMessage(
-                            "Ups! Ha ocurrido un error en el servidor"
-                        );
-                    }
-                });
+                    });
+            }
         },
         async getServiceOfferedScale() {
             axios
@@ -1299,8 +1408,8 @@ export default {
         },
         clearFilter() {
             this.countStaffsArea();
-            this.chartOptionsRessources.labels = [];
-            this.seriesRessources = [];
+            this.chartOptionsRessources.labels = [""];
+            this.seriesRessources = [0];
         },
         countStaffsArea() {
             this.staffsArea = [];
@@ -1335,12 +1444,22 @@ export default {
             this.chartOptionsStaffsArea.labels = [];
             this.seriesStaffsArea = [];
 
+            // Ordenamos el array de json por orden alfabético del nombre del área
+            this.staffsArea.sort(function (a, b) {
+                return a.staff_area_name < b.staff_area_name
+                    ? -1
+                    : a.staff_area_name > b.staff_area_name
+                    ? 1
+                    : 0;
+            });
+
             for (var i = 0; i < this.staffsArea.length; i++) {
                 this.chartOptionsStaffsArea.labels.push(
                     this.staffsArea[i].staff_area_name
                 );
                 this.seriesStaffsArea.push(this.staffsArea[i].occurrence);
             }
+
             this.loadingStaffsArea = true;
         },
         countStaffsAreaByService(serviceId) {
@@ -1411,6 +1530,15 @@ export default {
             this.chartOptionsStaffsArea.labels = [];
             this.seriesStaffsArea = [];
 
+            // Ordenamos el array de json por orden alfabético del nombre del área
+            this.staffsArea.sort(function (a, b) {
+                return a.staff_area_name < b.staff_area_name
+                    ? -1
+                    : a.staff_area_name > b.staff_area_name
+                    ? 1
+                    : 0;
+            });
+
             for (var i = 0; i < this.staffsArea.length; i++) {
                 this.chartOptionsStaffsArea.labels.push(
                     this.staffsArea[i].staff_area_name
@@ -1425,6 +1553,7 @@ export default {
          */
         countRessources(serviceId) {
             this.loadingRessources = false;
+            let ressources = [];
 
             for (var i = 0; i < this.servicesOffered.length; i++) {
                 if (this.servicesOffered[i].id == serviceId) {
@@ -1436,16 +1565,31 @@ export default {
                         j < this.servicesOffered[i].ressources_service.length;
                         j++
                     ) {
-                        this.chartOptionsRessources.labels.push(
-                            this.servicesOffered[i].ressources_service[j]
-                                .ressource_name
-                        );
-                        this.seriesRessources.push(
-                            this.servicesOffered[i].ressources_service[j].amount
-                        );
+                        let objRessource = {
+                            label: this.servicesOffered[i].ressources_service[j]
+                                .ressource_name,
+                            serie: this.servicesOffered[i].ressources_service[j]
+                                .amount,
+                        };
+                        ressources.push(objRessource);
                     }
                     break;
                 }
+            }
+
+            // Ordenamos el array de json por orden alfabético del nombre del área
+            ressources.sort(function (a, b) {
+                return a.label < b.label ? -1 : a.label > b.label ? 1 : 0;
+            });
+            for (var i = 0; i < ressources.length; i++) {
+                this.chartOptionsRessources.labels.push(ressources[i].label);
+                this.seriesRessources.push(ressources[i].serie);
+            }
+
+            // Si no hay elementos que mostrar en el chart entonces se muestra vacío
+            if (!ressources.length) {
+                this.chartOptionsRessources.labels = [""];
+                this.seriesRessources = [0];
             }
 
             this.loadingRessources = true;
@@ -1517,9 +1661,10 @@ export default {
             this.loadingStaffsArea = false;
             this.loadingServicesMinimunRTO = false;
             this.loadingServicesOnlyMinimumRTO = false;
-            this.loadingRessources = false;
+            // this.loadingRessources = false;
             this.incidentDurationTime = 0;
             this.timeNow = "";
+            this.incidentEnded = false;
             this.servicesOffered = [];
             this.staffs = [];
             this.servicesByRTO = [];
@@ -1560,10 +1705,18 @@ export default {
                         end_date_incident = new Date(
                             res.data.end_date
                         ).getTime();
+                        this.incidentEnded = true;
                     } else {
                         end_date_incident = Date.now();
                         this.timeNow = Date.now();
                     }
+
+                    console.log("HORA INICIO INCIDENTE");
+                    console.log(start_date_incident);
+                    console.log(res.data.start_date);
+                    console.log("HORA FIN DEL INCIDENTE");
+                    console.log(Date(Date.now()).toString());
+                    console.log(this.timeNow);
 
                     // Duración del incidente en milisegundos
                     this.incidentDurationTime =
@@ -1571,7 +1724,7 @@ export default {
 
                     this.timeNowHoursMinutes(this.incidentDurationTime);
                     // Mínimo tiempo de duración para los servicios que exceden el RTO
-                    this.chartOptionsServicesOnlyMinimumRTO.yaxis.min =
+                    this.chartOptionsServicesNotExceedMinimumRTO.yaxis.min =
                         this.incidentDurationTime;
 
                     for (var i = 0; i < res.data.risks_incident.length; i++) {
@@ -1621,8 +1774,8 @@ export default {
                                     recovery_time_service =
                                         hours * 3600000 + minutes * 60000;
                                     if (
-                                        this.incidentDurationTime <=
-                                        recovery_time_service
+                                        recovery_time_service <=
+                                        this.incidentDurationTime
                                     ) {
                                         exceed_recovery_time = true;
                                     }
@@ -1672,17 +1825,12 @@ export default {
                                     this.seriesServicesOnlyMinimumRTO[0].data.push(
                                         recovery_time_service
                                     );
+
                                     /**
-                                     * Mientras más valores vamos insertando en el tiempo,
-                                     * Vamos actualizando el RTO más alto
+                                     * Máximo valor es el tiempo del RTO excedido
                                      */
-                                    if (
-                                        this.chartOptionsServicesOnlyMinimumRTO
-                                            .yaxis.max < recovery_time_service
-                                    ) {
-                                        this.chartOptionsServicesOnlyMinimumRTO.yaxis.max =
-                                            recovery_time_service;
-                                    }
+                                    this.chartOptionsServicesOnlyMinimumRTO.yaxis.max =
+                                        this.incidentDurationTime;
 
                                     /**
                                      * Se agregan los servicios de soporte afectados por servicios de la org.
@@ -1731,10 +1879,17 @@ export default {
                                         recovery_time_service
                                     );
                                     /**
-                                     * Máximo valor es el tiempo del RTO excedido
+                                     * Mientras más valores vamos insertando en el tiempo,
+                                     * Vamos actualizando el RTO más alto
                                      */
-                                    this.chartOptionsServicesNotExceedMinimumRTO.yaxis.max =
-                                        this.incidentDurationTime;
+                                    if (
+                                        this
+                                            .chartOptionsServicesNotExceedMinimumRTO
+                                            .yaxis.max < recovery_time_service
+                                    ) {
+                                        this.chartOptionsServicesNotExceedMinimumRTO.yaxis.max =
+                                            recovery_time_service;
+                                    }
                                 }
                             }
                             // Staffs

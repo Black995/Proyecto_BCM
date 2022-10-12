@@ -514,7 +514,21 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.permissionsList = res.data;
+                    for (let i = 0; i < res.data.length; i++) {
+                        /**
+                         * Se deshabilitará la opción de traer los permisos relacionados a:
+                         * - serial de activación
+                         * - permisos
+                         */
+                        if (
+                            res.data[i].model_name != "productactivation" &&
+                            res.data[i].model_name != "usedkeys" &&
+                            res.data[i].model_name != "permission" &&
+                            res.data[i].model_name != "organization"
+                        ) {
+                            this.permissionsList.push(res.data[i]);
+                        }
+                    }
 
                     // Guardar solamente los nombres de los modelos
                     this.permissionsList.forEach((x) => {

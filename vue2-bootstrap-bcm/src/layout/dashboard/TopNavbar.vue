@@ -15,13 +15,12 @@
             </button>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="ti-panel"></i>
-                            <p>Stats</p>
+                    <li class="nav-item" title-classes="nav-link">
+                        <a href="/#/layout/notificaciones" class="nav-link">
+                            <i class="ti-bell"></i>Notificaciones
                         </a>
                     </li>
-                    <drop-down
+                    <!--drop-down
                         class="nav-item"
                         title="5 Notifications"
                         title-classes="nav-link"
@@ -32,9 +31,10 @@
                         <a class="dropdown-item" href="#">Notification 3</a>
                         <a class="dropdown-item" href="#">Notification 4</a>
                         <a class="dropdown-item" href="#"
-                            >Another notification</a
+                            >Prueba de notificación lo suficientemente larga
+                            como para hacer una prueba</a
                         >
-                    </drop-down>
+                    </drop-down-->
                     <drop-down
                         class="nav-item"
                         title="Configuraciones"

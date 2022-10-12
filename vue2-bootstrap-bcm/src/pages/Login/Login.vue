@@ -2,7 +2,7 @@
     <div class="wrapper fadeInDown">
         <div id="formContent">
             <!-- Icon -->
-            <div class="fadeIn first">
+            <div class="fadeIn first mt-3">
                 <img
                     src="../../assets/img/login_icon.png"
                     id="icon"
@@ -27,7 +27,8 @@
                     v-model="user.password"
                     required
                 ></b-form-input>
-                <button v-if="activation.state"
+                <button
+                    v-if="activation.state"
                     type="submit"
                     class="fadeIn fourth"
                     :disabled="loadingButton && activation.state"
@@ -35,37 +36,51 @@
                     <div v-if="!loadingButton">Iniciar sesión</div>
                     <b-spinner v-if="loadingButton" small></b-spinner>
                 </button>
-                <h6 v-if="!activation.state" style="color: red;">Sistema descativado. Ingrese una llave para activarlo.</h6>
+                <h6 v-if="!activation.state" style="color: red">
+                    Sistema descativado. Ingrese una llave para activarlo.
+                </h6>
             </form>
 
             <!-- Remind Passowrd -->
             <div id="formFooter">
-                <a class="underlineHover" href="#">¿Olvidó su contraseña?</a>
+                <a
+                    v-if="activation.state"
+                    class="underlineHover"
+                    href="#"
+                    @click="show_modal_forget_password"
+                    >¿Olvidó su contraseña?</a
+                >
                 <div class="row"></div>
-                <a class="underlineHover" href="#" @click="show_modal_activation">Activar producto</a>
+                <a
+                    class="underlineHover"
+                    href="#"
+                    @click="show_modal_activation"
+                    >Activar producto</a
+                >
             </div>
-            
         </div>
         <div class="row"></div>
-    <!--
-        Modal activación de producto
-    -->
+
+        <!--
+            Modal activación de producto
+        -->
         <b-modal
-        id="modal-activate-product"
-        title="Activar producto"
-        ref="mmodal"
-        centered
+            id="modal-activate-product"
+            title="Activar producto"
+            ref="mmodal"
+            centered
         >
             <form ref="form" @submit.stop.prevent="handleSubmitActivate">
                 <b-form-group
                     label="Ingrese la llave de activación"
-                    invalid-feedback="Este campo no puede estar vacio"
+                    invalid-feedback="Seleccione un archivo valido"
                     :state="keyState"
                 >
                     <b-row align-v="center">
                         <b-form-file
                         v-model="file"
                         :state="fileState"
+                        size="sm"
                         required
                         ></b-form-file>
                     </b-row>
@@ -84,6 +99,7 @@
                 </div>
             </template>
         </b-modal>
+
         <!--
             Modal confirmar activar
         -->
@@ -105,9 +121,49 @@
                 </div>
             </template>
         </b-modal>
-    </div>
-    
 
+        <!--
+            Modal olvidar contraseña
+        -->
+        <b-modal
+            id="modal-forget-password"
+            title="Olvido de contraseña"
+            ref="mmodal"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitForgetPassword">
+                <b-form-group
+                    label="Ingrese el correo al que se le enviarán las instrucciones para recuperar la cuenta"
+                    invalid-feedback="Este campo no puede estar vacio"
+                    :state="emailForgetState"
+                >
+                    <div class="text-center">
+                        <b-form-input
+                            v-model="emailForget"
+                            :state="emailForgetState"
+                            required
+                        ></b-form-input>
+                    </div>
+                </b-form-group>
+            </form>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="handleSubmitForgetPassword"
+                        :disabled="loadingPasswordButton"
+                    >
+                        <div v-if="!loadingPasswordButton">Enviar correo</div>
+                        <b-spinner
+                            v-if="loadingPasswordButton"
+                            small
+                        ></b-spinner>
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+    </div>
 </template>
 
 <script>
@@ -125,23 +181,26 @@ export default {
             password: "",
         },
         loadingButton: false,
-        activation:{
+        loadingPasswordButton: false,
+        activation: {
             id: 0,
             state: null,
             activation_date: null,
         },
-        key:"",
+        key: "",
         keyState: null,
 
         file: null,
-        fileState: null
+        fileState: null,
 
+        emailForget: "",
+        emailForgetState: null,
     }),
     /**
      * Se deja el mounted termporalmente
      */
     mounted() {
-        this.getActivationState()
+        this.getActivationState();
         /*
         this.user = {
             email: "alansaul25@gmail.com",
@@ -152,6 +211,16 @@ export default {
     },
 
     methods: {
+        successMessage(successText) {
+            this.$notify({
+                component: NotificationTemplate,
+                title: successText,
+                icon: "ti-check",
+                horizontalAlign: "right",
+                verticalAlign: "top",
+                type: "success",
+            });
+        },
         errorMessage(errorText) {
             this.$notify({
                 component: NotificationTemplate,
@@ -248,22 +317,20 @@ export default {
                 });
             //}
         },
-        async getActivationState(){
+        async getActivationState() {
             axios
                 .get(`${SERVER_ADDRESS}/api/config/get_activation_state/`)
                 .then((res) => {
-                    
-                    if(res.data.length){
-                        this.activation ={
+                    if (res.data.length) {
+                        this.activation = {
                             state: res.data[0].state,
-                            activation_date: res.data[0].activation_date
-                        }
-                    }
-                    else{
-                        this.activation ={
+                            activation_date: res.data[0].activation_date,
+                        };
+                    } else {
+                        this.activation = {
                             state: false,
-                            activation_date: null
-                        }
+                            activation_date: null,
+                        };
                     }
                 })
                 .catch((err) => {
@@ -289,25 +356,22 @@ export default {
                     }
                 });
         },
-        show_modal_activation(){
-            this.keyState= null
-            this.key = ''
-            this.$nextTick(()=>{
-                this.$bvModal.show("modal-activate-product")
-            })
+        show_modal_activation() {
+            this.keyState = null;
+            this.key = "";
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-activate-product");
+            });
         },
-        handleSubmitActivate(){
-            this.fileState = null
-            if(!this.file){
-                this.fileState=false
+        handleSubmitActivate() {
+            this.fileState = null;
+            if ((!this.file) || (!this.file.name.endsWith('.txt'))) {
+                this.fileState = false;
+            } else {
+                this.$nextTick(() => {
+                    this.$bvModal.show("modal-confirm-activate");
+                });
             }
-            else{
-                this.$nextTick(()=>{
-                    this.$bvModal.show("modal-confirm-activate")
-                })
-                
-            }
-
         },
         async activateProduct(){
             let usedKey ={
@@ -347,8 +411,72 @@ export default {
                         );
                     }
                 });
-        }
+        },
+        show_modal_forget_password() {
+            this.emailForgetState = null;
+            this.emailForget = "";
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-forget-password");
+            });
+        },
+        async handleSubmitForgetPassword() {
+            this.emailForgetState = null;
+            if (!this.emailForget) {
+                this.emailForgetState = false;
+            } else {
+                this.loadingPasswordButton = true;
 
+                let forgetPassword = {
+                    email: this.emailForget,
+                };
+                axios
+                    .post(
+                        `${SERVER_ADDRESS}/api/users/recover-account/`,
+                        forgetPassword
+                    )
+                    .then((res) => {
+                        this.loadingPasswordButton = true;
+                        console.log("FORGOT PASSWORD");
+                        //Ocultamos los modales
+                        this.$nextTick(() => {
+                            this.$bvModal.hide("modal-forget-password");
+                        });
+
+                        // Mensaje de éxito
+                        this.successMessage(
+                            "¡El correo ha sido enviado exitosamente! Por favor verificar en la bandeja de correos o en spam el email enviado"
+                        );
+                    })
+                    .catch((err) => {
+                        console.log("ERR");
+                        console.log(err);
+                        try {
+                            this.loadingPasswordButton = false;
+
+                            // Error 400 por unicidad o 500 generico
+                            if (err.response.status == 400) {
+                                for (let e in err.response.data) {
+                                    this.errorMessage(
+                                        e + ": " + err.response.data[e]
+                                    );
+                                }
+                            } else {
+                                // Servidor no disponible
+                                this.errorMessage(
+                                    "Ups! Ha ocurrido un error en el servidor"
+                                );
+                            }
+                        } catch {
+                            this.loadingPasswordButton = false;
+
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    });
+            }
+        },
     },
 };
 </script>

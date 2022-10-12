@@ -2,7 +2,8 @@ from users.models import User
 from bcm_phase2.models import Staff
 from django.contrib.auth.models import Permission, Group
 from .serializers import (UserListSerializer, UserSerializer, StaffsWithoutUserSerializer, GroupListSerializer, 
-                            GroupSerializer, PermissionSerializer, ChangePasswordSerializer, ProfileSerializer)
+                            GroupSerializer, PermissionSerializer, ChangePasswordSerializer, ProfileSerializer,
+                            RecoverAccountSerializer, ResetPasswordSerializer)
 from django.db.models import Q, F
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.generics import (RetrieveAPIView)
@@ -68,3 +69,18 @@ class ChangePasswordViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return [IsAuthenticated()]
         return super().get_permissions()
+
+
+class RecoverAccountViewSet(viewsets.ModelViewSet):
+    model = User
+    queryset = User.objects.all()
+    serializer_class = RecoverAccountSerializer
+    permission_classes=[AllowAny]
+
+
+class ResetPasswordViewSet(viewsets.ModelViewSet):
+    model = User
+    queryset = User.objects.all()
+    serializer_class = ResetPasswordSerializer
+    permission_classes=[AllowAny]
+

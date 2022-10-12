@@ -213,6 +213,22 @@
                 <li class="list-group-item">
                     <strong>Sede: </strong>{{ staffDetail.headquarter_name }}
                 </li>
+                <li class="list-group-item">
+                    <strong>Ciudad de la sede: </strong
+                    >{{ staffDetail.headquarter_city }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Parroquia de la sede: </strong
+                    >{{ staffDetail.headquarter_parish }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Municipio de la sede: </strong
+                    >{{ staffDetail.headquarter_township }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Estado de la sede: </strong
+                    >{{ staffDetail.headquarter_state }}
+                </li>
             </ul>
 
             <template #modal-footer>
@@ -661,6 +677,10 @@ export default {
             area_name: "",
             position_name: "",
             headquarter_name: "",
+            headquarter_city: "",
+            headquarter_parish: "",
+            headquarter_township: "",
+            headquarter_state: "",
             user_email: "",
             phone_number_code_1: "",
             phone_number_1_format_international: "",
@@ -1012,6 +1032,10 @@ export default {
                 area_name: "",
                 position_name: "",
                 headquarter_name: "",
+                headquarter_city: "",
+                headquarter_parish: "",
+                headquarter_township: "",
+                headquarter_state: "",
                 user_email: "",
                 phone_number_code_1: "",
                 phone_number_1_format_international: "",

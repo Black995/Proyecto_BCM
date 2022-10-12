@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'bcm_phase1',
     'bcm_phase2',
     'bcm_phase3',
+    'notifications',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -90,16 +91,12 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
-
 }
 
 # Configuration JWT object
@@ -114,7 +111,9 @@ ROOT_URLCONF = 'django_proyecto_bcm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates', 'email_templates'), 
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -176,7 +175,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -205,7 +204,18 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'bcm_phase3', 'locale'),
     os.path.join(BASE_DIR, 'configuration', 'locale'),
     os.path.join(BASE_DIR, 'users', 'locale'),
+    os.path.join(BASE_DIR, 'notifications', 'locale'),
 )
+
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = int(env('EMAIL_PORT'))
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+PASSWORD_RESET_LINK = env('PASSWORD_RESET_LINK')
 
 ### LDAP Settings ###
 """

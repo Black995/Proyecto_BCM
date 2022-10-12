@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFoundPage.vue";
 
 // Login
 import Login from "@/pages/Login/Login.vue";
+// Reset password
+import ResetPassword from "@/pages/ResetPassword/ResetPassword.vue";
 // Admin pages
 import UserProfile from "@/pages/UserProfile.vue";
 import Notifications from "@/pages/Notifications.vue";
@@ -40,6 +42,8 @@ import Headquarters from "@/pages/Configuration/Headquarters.vue";
 import Organization from "@/pages/Configuration/Organization.vue";
 import Roles from "@/pages/Configuration/Roles.vue";
 import Users from "@/pages/Configuration/Users.vue";
+// Notifications
+import Notification from "@/pages/Notifications/Notification.vue";
 
 
 const routes = [
@@ -47,6 +51,11 @@ const routes = [
     path: '/',
     name: 'Login',
     component: Login,
+  },
+  {
+    path: '/restablecer-contrasenna/:token',
+    name: 'ResetPassword',
+    component: ResetPassword,
   },
   {
     path: "/layout",
@@ -98,7 +107,7 @@ const routes = [
         component: ServicesUsed
       },
       {
-        path: "ressources",
+        path: "recursos",
         name: "Recursos",
         component: Ressources
       },
@@ -115,11 +124,16 @@ const routes = [
         name: "Histórico de Incidentes",
         component: IncidentHistory
       },
+
+      // Esta vista no se muestra debido a que se desvirtúan ciertos elementos cuando hay 
+      // más de una incidencia
+      /*
       {
         path: "impacto-incidentes",
         name: "Impacto Incidentes (all)",
         component: IncidentImpactAll
       },
+      */
       {
         path: "impacto-incidente",
         name: "Impacto del Incidente",
@@ -174,6 +188,14 @@ const routes = [
         component: Users
       },
       /**
+       * Notification
+       */
+      {
+        path: "notificaciones",
+        name: "Notificaciones",
+        component: Notification
+      },
+      /**
        * Additional
        */
       {
@@ -182,7 +204,7 @@ const routes = [
         component: UserProfile
       },
       {
-        path: "notifications",
+        path: "notif",
         name: "notifications",
         component: Notifications
       },
