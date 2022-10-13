@@ -441,9 +441,10 @@ export default {
                         }
                         this.activation.activation_date = res.data[0].activation_date
                         var date1 = new Date(res.data[0].activation_date)
+                        date1.setDate(date1.getDate()+ 182)
                         var date2 = new Date()
-                        var days = Math.abs(date1-date2)
-                        days = Math.round((days/(1000*360*24))-0.5)
+                        var days = Math.abs(date2-date1)
+                        days = Math.round((days/(1000*3600*24))-0.5)
                         this.activation.days_remaining = days + " días"
                     } else {
                         this.activation = {
