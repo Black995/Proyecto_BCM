@@ -7,6 +7,7 @@ from notifications.models import Notification
 
 class NotificationSerializer(ModelSerializer):
     days = serializers.SerializerMethodField()
+    type_name = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Notification
@@ -14,6 +15,8 @@ class NotificationSerializer(ModelSerializer):
             "id",
             "title",
             "description",
+            "type",
+            "type_name",
             "read",
             "date",
             "users",
@@ -27,3 +30,6 @@ class NotificationSerializer(ModelSerializer):
     def get_days(self, obj):
         days = (datetime.now(timezone.utc)-obj.date).days
         return days
+        
+    def get_type_name(self, obj):
+        return dict(Notification.TYPE).get(obj.type)
