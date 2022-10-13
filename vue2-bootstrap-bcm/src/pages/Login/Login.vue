@@ -74,7 +74,7 @@
                 <b-form-group
                     label="Ingrese la llave de activación"
                     invalid-feedback="Seleccione un archivo valido"
-                    :state="keyState"
+                    :state="fileState"
                 >
                     <b-row align-v="center">
                         <b-form-file
@@ -357,8 +357,8 @@ export default {
                 });
         },
         show_modal_activation() {
-            this.keyState = null;
-            this.key = "";
+            this.file = null
+            this.fileState = null
             this.$nextTick(() => {
                 this.$bvModal.show("modal-activate-product");
             });
@@ -389,8 +389,6 @@ export default {
                 })
                 .catch((err) => {
                     try {
-                        console.log(err)
-                        console.log(err.response.data)
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
                             for (let e in err.response.data) {
