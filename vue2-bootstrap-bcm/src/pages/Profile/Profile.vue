@@ -37,6 +37,19 @@
                     </p>
                 </div>
             </card>
+            <card v-if="is_superuser" class="card-user" title="Información de activación">
+                <div class="mt-3">
+                    <h5>
+                        Estado: {{activation.state}}
+                    </h5>
+                    <h5>
+                        Fecha de activación: {{activation.activation_date}}
+                    </h5>
+                    <h5>
+                        Días restantes: {{ activation.days_remaining }}
+                    </h5>
+                </div>
+            </card>
         </div>
         <div class="col-xl-8 col-lg-7 col-md-6">
             <b-card-group deck>
@@ -134,6 +147,7 @@
                     </form>
                 </div>
             </card>
+            
 
             <b-modal
                 id="modal-confirm-update"
@@ -194,9 +208,20 @@ export default {
         },
 
         areas: [],
+
+        activations: [],
+        activation: {
+            state: "",
+            activation_date: "",
+            days_remaining: ""
+        },
+        is_superuser: false,
     }),
     mounted() {
+        this.is_superuser = localStorage.getItem("is_superuser");
         this.getProfile();
+        this.getActivationState()
+        
     },
     methods: {
         successMessage(successText) {
@@ -379,6 +404,53 @@ export default {
 
                     // Cargamos de nuevo la tabla de riesgos
                     this.getProfile();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getActivationState() {
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/get_activation_state/`)
+                .then((res) => {
+                    if (res.data.length) {
+                        if (res.data[0].state){
+                            this.activation.state = "Activado"
+                        }
+                        else {
+                            this.activation.state = "No activado"
+                        }
+                        this.activation.activation_date = res.data[0].activation_date
+                        var date1 = new Date(res.data[0].activation_date)
+                        var date2 = new Date()
+                        var days = Math.abs(date1-date2)
+                        days = Math.round((days/(1000*360*24))-0.5)
+                        this.activation.days_remaining = days + " días"
+                    } else {
+                        this.activation = {
+                            state: false,
+                            activation_date: null,
+                        };
+                    }
                 })
                 .catch((err) => {
                     try {

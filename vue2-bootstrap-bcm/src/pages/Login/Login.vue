@@ -73,16 +73,18 @@
             <form ref="form" @submit.stop.prevent="handleSubmitActivate">
                 <b-form-group
                     label="Ingrese la llave de activación"
-                    invalid-feedback="Este campo no puede estar vacio"
-                    :state="keyState"
+                    invalid-feedback="Seleccione un archivo valido"
+                    :state="fileState"
                 >
-                    <div class="text-center">
-                        <b-form-input
-                            v-model="key"
-                            :state="keyState"
-                            required
-                        ></b-form-input>
-                    </div>
+                    <b-row align-v="center">
+                        <b-form-file
+                        v-model="file"
+                        :state="fileState"
+                        size="sm"
+                        required
+                        ></b-form-file>
+                    </b-row>
+                    
                 </b-form-group>
             </form>
             <template #modal-footer>
@@ -187,6 +189,9 @@ export default {
         },
         key: "",
         keyState: null,
+
+        file: null,
+        fileState: null,
 
         emailForget: "",
         emailForgetState: null,
@@ -352,37 +357,35 @@ export default {
                 });
         },
         show_modal_activation() {
-            this.keyState = null;
-            this.key = "";
+            this.file = null
+            this.fileState = null
             this.$nextTick(() => {
                 this.$bvModal.show("modal-activate-product");
             });
         },
         handleSubmitActivate() {
-            this.keyState = null;
-            if (!this.key) {
-                this.keyState = false;
+            this.fileState = null;
+            if ((!this.file) || (!this.file.name.endsWith('.txt'))) {
+                this.fileState = false;
             } else {
                 this.$nextTick(() => {
                     this.$bvModal.show("modal-confirm-activate");
                 });
             }
         },
-        async activateProduct() {
-            let usedKey = {
-                key: this.key,
-            };
+        async activateProduct(){
+            let usedKey ={
+                key: this.key
+            }
+            let formData = new FormData()
+            formData.append("licencia", this.file,this.file.name)
             axios
-                .post(`${SERVER_ADDRESS}/api/config/activate/`, usedKey)
-                .then((res) => {
-                    // Mensaje de éxito
-                    this.successMessage(
-                        "¡El sistema ha sido activado exitosamente!"
-                    );
-
-                    // Recargamos la vista del login
-                    // this.$router.push("/layout/perfil");
-                    location.reload();
+                .post(`${SERVER_ADDRESS}/api/config/activate/`, formData)
+                .then((res)=>{
+                    this.$bvModal.hide("modal-activate-product")
+                    this.$bvModal.hide("modal-confirm-activate")
+                    this.getActivationState()
+                    
                 })
                 .catch((err) => {
                     try {

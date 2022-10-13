@@ -47,6 +47,9 @@
                             @click="show_modal_change_password = true"
                             >Cambiar contraseña</a
                         >
+                        <a class="dropdown-item" href="#" @click="show_modal_activation"
+                            >Activar producto</a
+                        >
                         <a class="dropdown-item" href="#" @click="logout"
                             >Cerrar sesión</a
                         >
@@ -139,6 +142,67 @@
                 </div>
             </template>
         </b-modal>
+
+        <!--
+            Modal activación de producto
+        -->
+        <b-modal
+            id="modal-activate-product"
+            title="Activar producto"
+            ref="mmodal"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitActivate">
+                <b-form-group
+                    label="Ingrese la llave de activación"
+                    invalid-feedback="Seleccione un archivo valido"
+                    :state="fileState"
+                >
+                    <b-row align-v="center">
+                        <b-form-file
+                        v-model="file"
+                        :state="fileState"
+                        size="sm"
+                        required
+                        ></b-form-file>
+                    </b-row>
+                    
+                </b-form-group>
+            </form>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="handleSubmitActivate"
+                    >
+                        Activar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal confirmar activar
+        -->
+        <b-modal
+            id="modal-confirm-activate"
+            title="Confirmar activación del producto"
+            centered
+        >
+            <h4>¿Está seguro que desea activar el producto?</h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="success"
+                        class="float-right"
+                        @click="activateProduct"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </nav>
 </template>
 
@@ -169,7 +233,15 @@ export default {
                 new_password2: null,
                 new_password: null,
             },
+            
+            is_superuser: null,
+            
+            file: null,
+            fileState: null,
         };
+    },
+    mounted(){
+        this.is_superuser = localStorage.getItem("is_superuser");
     },
     methods: {
         successMessage(successText) {
@@ -312,6 +384,99 @@ export default {
             localStorage.removeItem("isLoggedin");
 
             this.$router.push("/");
+        },
+        async getActivationState() {
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/get_activation_state/`)
+                .then((res) => {
+                    if (res.data.length) {
+                        this.activation = {
+                            state: res.data[0].state,
+                            activation_date: res.data[0].activation_date,
+                        };
+                    } else {
+                        this.activation = {
+                            state: false,
+                            activation_date: null,
+                        };
+                    }
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        show_modal_activation() {
+            this.file = null
+            this.fileState = null
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-activate-product");
+            });
+        },
+        handleSubmitActivate() {
+            this.fileState = null;
+            if ((!this.file) || (!this.file.name.endsWith('.txt'))) {
+                this.fileState = false;
+            } else {
+                this.$nextTick(() => {
+                    this.$bvModal.show("modal-confirm-activate");
+                });
+            }
+        },
+        async activateProduct(){
+            let usedKey ={
+                key: this.key
+            }
+            let formData = new FormData()
+            formData.append("licencia", this.file,this.file.name)
+            axios
+                .post(`${SERVER_ADDRESS}/api/config/activate/`, formData)
+                .then((res)=>{
+                    this.$bvModal.hide("modal-activate-product")
+                    this.$bvModal.hide("modal-confirm-activate")
+                    this.getActivationState()
+                    
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
         },
     },
 };
