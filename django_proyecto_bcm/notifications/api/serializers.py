@@ -28,7 +28,7 @@ class NotificationSerializer(ModelSerializer):
         }
 
     def get_days(self, obj):
-        days = (datetime.now(timezone.utc)-obj.date).days
+        days = (datetime.now(timezone.utc).replace(tzinfo=None)-obj.date).days
         return days
         
     def get_type_name(self, obj):

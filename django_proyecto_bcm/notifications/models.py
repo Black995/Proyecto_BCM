@@ -18,5 +18,5 @@ class Notification(models.Model):
     type = models.SmallIntegerField(choices=TYPE)
     read = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now=True)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, related_name='user_notifications')
 

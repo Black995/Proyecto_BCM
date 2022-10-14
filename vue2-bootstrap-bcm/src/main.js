@@ -99,6 +99,23 @@ import "@hipsjs/flowy-vue/dist/lib/flowy-vue.css";
 
 Vue.use(FlowyPlugin);
 
+/**
+ * Vuex
+ */
+//import Vuex from 'vuex'
+
+//Vue.use(Vuex)
+
+/**
+ * Variable global para manejar la cantidad de notificaciones
+ */
+
+Vue.prototype.$numberNotifications = 0;
+Vue.prototype.$changeNumberNotif = function (number) {
+  Vue.prototype.$numberNotifications = number;
+}
+
+
 
 /* eslint-disable no-new */
 new Vue({

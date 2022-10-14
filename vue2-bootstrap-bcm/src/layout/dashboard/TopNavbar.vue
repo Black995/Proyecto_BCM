@@ -16,8 +16,17 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item" title-classes="nav-link">
-                        <a href="/#/layout/notificaciones" class="nav-link">
-                            <i class="ti-bell"></i>Notificaciones
+                        <a
+                            href="/#/layout/notificaciones"
+                            class="nav-link notif"
+                        >
+                            <h1>{{ $numberNotifications }}</h1>
+                            <span
+                                v-if="$numberNotifications != 0"
+                                class="badge"
+                                >{{ $numberNotifications }}</span
+                            >
+                            <i class="ti-bell"></i> Notificaciones
                         </a>
                     </li>
                     <!--drop-down
@@ -47,7 +56,10 @@
                             @click="show_modal_change_password = true"
                             >Cambiar contraseña</a
                         >
-                        <a class="dropdown-item" href="#" @click="show_modal_activation"
+                        <a
+                            class="dropdown-item"
+                            href="#"
+                            @click="show_modal_activation"
                             >Activar producto</a
                         >
                         <a class="dropdown-item" href="#" @click="logout"
@@ -160,13 +172,12 @@
                 >
                     <b-row align-v="center">
                         <b-form-file
-                        v-model="file"
-                        :state="fileState"
-                        size="sm"
-                        required
+                            v-model="file"
+                            :state="fileState"
+                            size="sm"
+                            required
                         ></b-form-file>
                     </b-row>
-                    
                 </b-form-group>
             </form>
             <template #modal-footer>
@@ -210,6 +221,7 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import NotificationTemplate from "../../pages/Notifications/NotificationTemplate";
+// import { store } from "../../store/index";
 
 export default {
     computed: {
@@ -233,15 +245,17 @@ export default {
                 new_password2: null,
                 new_password: null,
             },
-            
+
             is_superuser: null,
-            
+
             file: null,
             fileState: null,
         };
     },
-    mounted(){
+    mounted() {
         this.is_superuser = localStorage.getItem("is_superuser");
+
+        this.getNumberOfUnreadNorifications();
     },
     methods: {
         successMessage(successText) {
@@ -425,15 +439,15 @@ export default {
                 });
         },
         show_modal_activation() {
-            this.file = null
-            this.fileState = null
+            this.file = null;
+            this.fileState = null;
             this.$nextTick(() => {
                 this.$bvModal.show("modal-activate-product");
             });
         },
         handleSubmitActivate() {
             this.fileState = null;
-            if ((!this.file) || (!this.file.name.endsWith('.txt'))) {
+            if (!this.file || !this.file.name.endsWith(".txt")) {
                 this.fileState = false;
             } else {
                 this.$nextTick(() => {
@@ -441,21 +455,69 @@ export default {
                 });
             }
         },
-        async activateProduct(){
-            let usedKey ={
-                key: this.key
-            }
-            let formData = new FormData()
-            formData.append("licencia", this.file,this.file.name)
+        async activateProduct() {
+            let usedKey = {
+                key: this.key,
+            };
+            let formData = new FormData();
+            formData.append("licencia", this.file, this.file.name);
             axios
                 .post(`${SERVER_ADDRESS}/api/config/activate/`, formData)
-                .then((res)=>{
-                    this.$bvModal.hide("modal-activate-product")
-                    this.$bvModal.hide("modal-confirm-activate")
-                    this.getActivationState()
-                    
+                .then((res) => {
+                    this.$bvModal.hide("modal-activate-product");
+                    this.$bvModal.hide("modal-confirm-activate");
+                    this.getActivationState();
                 })
                 .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getNumberOfUnreadNorifications() {
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/notifications/unread_notifications/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    console.log("Cantidad de notificaciones");
+                    console.log(res);
+                    console.log(this.$numberNotifications);
+                    if (res.data <= 9) {
+                        this.$changeNumberNotif(res.data);
+                        //this.$numberNotifications = res.data;
+                    } else {
+                        this.$changeNumberNotif("+9");
+                        //this.$numberNotifications = "+9";
+                    }
+                    console.log(this.$numberNotifications);
+                })
+                .catch((err) => {
+                    console.log("err");
+                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
@@ -482,4 +544,13 @@ export default {
 };
 </script>
 <style>
+.notif .badge {
+    position: relative;
+    top: -15px;
+    right: -27px;
+    padding: 5px 7px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+}
 </style>
