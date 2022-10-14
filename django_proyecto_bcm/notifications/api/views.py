@@ -5,6 +5,7 @@ from django.db.models import Q, F
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.generics import (ListCreateAPIView)
 
 
 class NotificacionListCreate(viewsets.ModelViewSet):
@@ -29,7 +30,7 @@ class NotificacionListCreate(viewsets.ModelViewSet):
 
 
 
-class unread_notifications(viewsets.ModelViewSet):
+class unread_notifications(ListCreateAPIView):
     queryset = Notification.objects.all()
 
     def get_permissions(self):

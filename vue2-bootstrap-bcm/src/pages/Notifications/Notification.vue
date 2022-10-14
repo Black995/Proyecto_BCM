@@ -11,43 +11,70 @@
                     :key="item.key"
                 >
                     <div v-if="item.type == 1" class="alert alert-info">
-                        <button
-                            @click="deleteNotification(item.id)"
-                            type="button"
-                            aria-hidden="true"
-                            class="close"
-                        >
-                            ×
-                        </button>
-                        <span>
-                            <b> {{ item.title }} </b> {{ item.description }}
-                        </span>
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                <strong>{{ item.title }}</strong>
+                            </h5>
+                            <small
+                                >{{ item.date }} (hace
+                                {{ item.days }} días)</small
+                            >
+                        </div>
+                        <div class="d-flex w-100 justify-content-between">
+                            <p class="mb-1">{{ item.description }}</p>
+                            <button
+                                @click="deleteNotification(item.id)"
+                                type="button"
+                                aria-hidden="true"
+                                class="close"
+                            >
+                                ×
+                            </button>
+                        </div>
                     </div>
                     <div v-if="item.type == 2" class="alert alert-warning">
-                        <button
-                            @click="deleteNotification(item.id)"
-                            type="button"
-                            aria-hidden="true"
-                            class="close"
-                        >
-                            ×
-                        </button>
-                        <span>
-                            <b> {{ item.title }} </b> {{ item.description }}
-                        </span>
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                <strong>{{ item.title }}</strong>
+                            </h5>
+                            <small
+                                >{{ item.date }} (hace
+                                {{ item.days }} días)</small
+                            >
+                        </div>
+                        <div class="d-flex w-100 justify-content-between">
+                            <p class="mb-1">{{ item.description }}</p>
+                            <button
+                                @click="deleteNotification(item.id)"
+                                type="button"
+                                aria-hidden="true"
+                                class="close"
+                            >
+                                ×
+                            </button>
+                        </div>
                     </div>
                     <div v-if="item.type == 3" class="alert alert-danger">
-                        <button
-                            @click="deleteNotification(item.id)"
-                            type="button"
-                            aria-hidden="true"
-                            class="close"
-                        >
-                            ×
-                        </button>
-                        <span>
-                            <b> {{ item.title }} </b> {{ item.description }}
-                        </span>
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                <strong>{{ item.title }}</strong>
+                            </h5>
+                            <small
+                                >{{ item.date }} (hace
+                                {{ item.days }} días)</small
+                            >
+                        </div>
+                        <div class="d-flex w-100 justify-content-between">
+                            <p class="mb-1">{{ item.description }}</p>
+                            <button
+                                @click="deleteNotification(item.id)"
+                                type="button"
+                                aria-hidden="true"
+                                class="close"
+                            >
+                                ×
+                            </button>
+                        </div>
                     </div>
                 </div>
             </b-col>
@@ -58,6 +85,12 @@
 <script>
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
+import NotificationTemplate from "./NotificationTemplate";
+import {
+    getRecoveryTimeText,
+    getRecoveryTime,
+    setRecoveryTime,
+} from "../../helpers/helpers";
 
 export default {
     name: "notification",
@@ -65,30 +98,11 @@ export default {
     data: () => ({
         loading: false,
 
-        notifications: [
-            {
-                id: 1,
-                title: "Notificación 1",
-                description: "Se le informa que esto es una notificación",
-                type: 1,
-            },
-            {
-                id: 2,
-                title: "Notificación 2",
-                description: "Se le informa que esto es una notificación",
-                type: 2,
-            },
-            {
-                id: 3,
-                title: "Notificación 3",
-                description: "Se le informa que esto es una notificación",
-                type: 3,
-            },
-        ],
+        notifications: [],
         notificationId: 0,
     }),
     mounted() {
-        // this.getNotifications();
+        this.getNotifications();
     },
     methods: {
         errorMessage(errorText) {
@@ -107,14 +121,24 @@ export default {
             this.notifications = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/config/areas/`, {
+                .get(`${SERVER_ADDRESS}/api/notifications/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
                     },
                 })
                 .then((res) => {
-                    this.notifications = res.data;
+                    for (var i = 0; i < res.data.length; i++) {
+                        //Convertimos en texto la duración
+                        res.data[i].date = getRecoveryTimeText(
+                            res.data[i].date
+                        );
+                        this.notifications.push(res.data[i]);
+                    }
+
+                    console.log("Notificaciones");
+                    console.log(this.notifications);
+
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -148,6 +172,53 @@ export default {
                 }
             }
         },
+    },
+    async destroyed() {
+        console.log("Saliendo de la página de notificaciones");
+
+        axios
+            .get(`${SERVER_ADDRESS}/api/notifications/unread_notifications/`, {
+                withCredentials: true,
+                headers: {
+                    Authorization: TOKEN,
+                },
+            })
+            .then((res) => {
+                console.log("Cantidad de notificaciones");
+                console.log(res);
+                console.log(this.$numberNotifications);
+                if (res.data <= 9) {
+                    this.$changeNumberNotif(res.data);
+                    //this.$numberNotifications = res.data;
+                } else {
+                    this.$changeNumberNotif("+9");
+                    //this.$numberNotifications = "+9";
+                }
+                this.$changeNumberNotif(7);
+                console.log(this.$numberNotifications);
+            })
+            .catch((err) => {
+                console.log("err");
+                console.log(err);
+                try {
+                    // Error 400 por unicidad o 500 generico
+                    if (err.response.status == 400) {
+                        for (let e in err.response.data) {
+                            this.errorMessage(e + ": " + err.response.data[e]);
+                        }
+                    } else {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                } catch {
+                    // Servidor no disponible
+                    this.errorMessage(
+                        "Ups! Ha ocurrido un error en el servidor"
+                    );
+                }
+            });
     },
 };
 </script>
