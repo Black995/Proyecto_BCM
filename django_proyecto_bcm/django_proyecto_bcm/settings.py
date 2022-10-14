@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from email.policy import default
 from pathlib import Path
+from celery.schedules import crontab
+from django_proyecto_bcm.celery import app
 import os
 import environ
 import datetime
@@ -58,6 +61,10 @@ INSTALLED_APPS = [
     'bcm_phase2',
     'bcm_phase3',
     'notifications',
+
+
+
+    'channels',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -127,6 +134,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_proyecto_bcm.wsgi.application'
+
+ASGI_APPLICATION = 'django_proyecto_bcm.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -246,3 +264,9 @@ if env('AUTH_LDAP'):
         'django.contrib.auth.backends.ModelBackend',
     )
 """
+
+CELERY_BROKER_URL = f'redis://{env("BROKER_HOST")}:{env("BROKER_PORT")}'
+app.conf.enable_utc = True
+CELERY_BEAT_SCHEDULE = {
+    
+}
