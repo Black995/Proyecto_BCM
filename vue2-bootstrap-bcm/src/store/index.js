@@ -1,7 +1,10 @@
 
+import Vue from 'vue'
 import Vuex from 'vuex'
 
-export const store = new Vuex.Store({
+Vue.use(Vuex)
+
+export default new Vuex.Store({
     state: {
         numberNotifications: null
     },

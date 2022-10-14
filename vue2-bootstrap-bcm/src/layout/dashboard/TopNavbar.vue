@@ -20,11 +20,10 @@
                             href="/#/layout/notificaciones"
                             class="nav-link notif"
                         >
-                            <h1>{{ $numberNotifications }}</h1>
                             <span
-                                v-if="$numberNotifications != 0"
+                                v-if="$store.state.numberNotifications != 0"
                                 class="badge"
-                                >{{ $numberNotifications }}</span
+                                >{{ $store.state.numberNotifications }}</span
                             >
                             <i class="ti-bell"></i> Notificaciones
                         </a>
@@ -221,7 +220,6 @@
 import axios from "axios";
 import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import NotificationTemplate from "../../pages/Notifications/NotificationTemplate";
-// import { store } from "../../store/index";
 
 export default {
     computed: {
@@ -503,21 +501,13 @@ export default {
                     }
                 )
                 .then((res) => {
-                    console.log("Cantidad de notificaciones");
-                    console.log(res);
-                    console.log(this.$numberNotifications);
                     if (res.data <= 9) {
-                        this.$changeNumberNotif(res.data);
-                        //this.$numberNotifications = res.data;
+                        this.$store.commit("changenumberNotif", res.data);
                     } else {
-                        this.$changeNumberNotif("+9");
-                        //this.$numberNotifications = "+9";
+                        this.$store.commit("changenumberNotif", "+9");
                     }
-                    console.log(this.$numberNotifications);
                 })
                 .catch((err) => {
-                    console.log("err");
-                    console.log(err);
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {

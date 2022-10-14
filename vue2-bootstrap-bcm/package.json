@@ -36,7 +36,8 @@
     "vue-notifyjs": "^0.3.0",
     "vue-phone-number-input": "^1.1.12",
     "vue-router": "^3.0.1",
-    "vue2-editor": "^2.10.3"
+    "vue2-editor": "^2.10.3",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.10.0",
