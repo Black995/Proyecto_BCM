@@ -946,6 +946,52 @@ export default {
                     });
 
                     this.getIncidents();
+
+                    /**
+                     * Se procede a enviar notificación al personal afectado por el incidente
+                     */
+                    let incidentId = {
+                        incident_history_id: res.data.id,
+                    };
+                    axios
+                        .post(
+                            `${SERVER_ADDRESS}/api/notifications/notify_incident_created/`,
+                            incidentId,
+                            {
+                                withCredentials: true,
+                                headers: {
+                                    Authorization: TOKEN,
+                                },
+                            }
+                        )
+                        .then((res) => {
+                            // Mensaje de éxito
+                            this.successMessage(
+                                "¡El personal afectado por el incidente ha sido notificado satisfactoriamente!"
+                            );
+                        })
+                        .catch((err) => {
+                            try {
+                                // Error 400 por unicidad o 500 generico
+                                if (err.response.status == 400) {
+                                    for (let e in err.response.data) {
+                                        this.errorMessage(
+                                            e + ": " + err.response.data[e]
+                                        );
+                                    }
+                                } else {
+                                    // Servidor no disponible
+                                    this.errorMessage(
+                                        "Ups! Ha ocurrido un error al enviar la notificación"
+                                    );
+                                }
+                            } catch {
+                                // Servidor no disponible
+                                this.errorMessage(
+                                    "Ups! Ha ocurrido un error al enviar la notificación"
+                                );
+                            }
+                        });
                 })
                 .catch((err) => {
                     try {

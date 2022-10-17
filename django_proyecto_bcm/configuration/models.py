@@ -51,9 +51,6 @@ class Parish(models.Model):
         Township, related_name='township_parish', on_delete=models.CASCADE)
 
 
-
-
-
 class Headquarter(models.Model):
     name = models.CharField(max_length=100, unique=True)
 

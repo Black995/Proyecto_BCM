@@ -15,10 +15,14 @@
                             <h5 class="mb-1">
                                 <strong>{{ item.title }}</strong>
                             </h5>
-                            <small
-                                >{{ item.date }} (hace
-                                {{ item.days }} días)</small
-                            >
+                            <p v-if="item.days == 1">
+                                {{ item.date_day }} {{ item.date_time }} (hace
+                                {{ item.days }} día)
+                            </p>
+                            <p v-if="item.days != 1">
+                                {{ item.date_day }} {{ item.date_time }} (hace
+                                {{ item.days }} días)
+                            </p>
                         </div>
                         <div class="d-flex w-100 justify-content-between">
                             <p class="mb-1">{{ item.description }}</p>
@@ -37,10 +41,14 @@
                             <h5 class="mb-1">
                                 <strong>{{ item.title }}</strong>
                             </h5>
-                            <small
-                                >{{ item.date }} (hace
-                                {{ item.days }} días)</small
-                            >
+                            <p v-if="item.days == 1">
+                                {{ item.date_day }} {{ item.date_time }} (hace
+                                {{ item.days }} día)
+                            </p>
+                            <p v-if="item.days != 1">
+                                {{ item.date_day }} {{ item.date_time }} (hace
+                                {{ item.days }} días)
+                            </p>
                         </div>
                         <div class="d-flex w-100 justify-content-between">
                             <p class="mb-1">{{ item.description }}</p>
@@ -59,10 +67,14 @@
                             <h5 class="mb-1">
                                 <strong>{{ item.title }}</strong>
                             </h5>
-                            <small
-                                >{{ item.date }} (hace
-                                {{ item.days }} días)</small
-                            >
+                            <p v-if="item.days == 1">
+                                {{ item.date_day }} {{ item.date_time }} (hace
+                                {{ item.days }} día)
+                            </p>
+                            <p v-if="item.days != 1">
+                                {{ item.date_day }} {{ item.date_time }} (hace
+                                {{ item.days }} días)
+                            </p>
                         </div>
                         <div class="d-flex w-100 justify-content-between">
                             <p class="mb-1">{{ item.description }}</p>
@@ -76,6 +88,12 @@
                             </button>
                         </div>
                     </div>
+                </div>
+                <div
+                    v-if="!loading && notifications.length == 0"
+                    class="text-center"
+                >
+                    <h5>¡No posee notificaciones pendientes!</h5>
                 </div>
             </b-col>
         </b-row>
@@ -121,7 +139,7 @@ export default {
             this.notifications = [];
 
             axios
-                .get(`${SERVER_ADDRESS}/api/notifications/`, {
+                .get(`${SERVER_ADDRESS}/api/notifications/notifications/`, {
                     withCredentials: true,
                     headers: {
                         Authorization: TOKEN,
@@ -129,15 +147,11 @@ export default {
                 })
                 .then((res) => {
                     for (var i = 0; i < res.data.length; i++) {
-                        //Convertimos en texto la duración
-                        res.data[i].date = getRecoveryTimeText(
-                            res.data[i].date
-                        );
+                        // Separamos la duración en día y hora
+                        res.data[i].date_day = res.data[i].date.slice(0, 10);
+                        res.data[i].date_time = res.data[i].date.slice(11, 16);
                         this.notifications.push(res.data[i]);
                     }
-
-                    console.log("Notificaciones");
-                    console.log(this.notifications);
 
                     this.loading = false;
                 })
@@ -165,17 +179,53 @@ export default {
                 });
         },
         deleteNotification(id) {
-            for (let i = 0; i < this.notifications.length; i++) {
-                if (this.notifications[i].id == id) {
-                    this.notifications.splice(i, 1);
-                    break;
-                }
-            }
+            let notificationRead = {
+                read: true,
+            };
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/notifications/notification/${id}/`,
+                    notificationRead,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    for (let i = 0; i < this.notifications.length; i++) {
+                        if (this.notifications[i].id == id) {
+                            this.notifications.splice(i, 1);
+                            break;
+                        }
+                    }
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
         },
     },
     async destroyed() {
-        console.log("Saliendo de la página de notificaciones");
-
         axios
             .get(`${SERVER_ADDRESS}/api/notifications/unread_notifications/`, {
                 withCredentials: true,
@@ -184,22 +234,13 @@ export default {
                 },
             })
             .then((res) => {
-                console.log("Cantidad de notificaciones");
-                console.log(res);
-                console.log(this.$numberNotifications);
                 if (res.data <= 9) {
-                    this.$changeNumberNotif(res.data);
-                    //this.$numberNotifications = res.data;
+                    this.$store.commit("changenumberNotif", res.data);
                 } else {
-                    this.$changeNumberNotif("+9");
-                    //this.$numberNotifications = "+9";
+                    this.$store.commit("changenumberNotif", "+9");
                 }
-                this.$changeNumberNotif(7);
-                console.log(this.$numberNotifications);
             })
             .catch((err) => {
-                console.log("err");
-                console.log(err);
                 try {
                     // Error 400 por unicidad o 500 generico
                     if (err.response.status == 400) {
