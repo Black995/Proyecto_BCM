@@ -1,6 +1,6 @@
 
-from notifications.models import Notification
-from .serializers import (NotificationSerializer)
+from notifications.models import Notification, N_U
+from .serializers import (NotificationSerializer, N_USerializer)
 from django.db.models import Q, F
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework import viewsets
@@ -16,31 +16,28 @@ from users.models import User
 
 
 class NotificacionListViewSet(viewsets.ModelViewSet):
-    queryset = Notification.objects.filter(read=False)
-    serializer_class = NotificationSerializer
+    queryset = N_U.objects.filter(read=False)
+    serializer_class = N_USerializer
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
             return [IsAuthenticated()]
         return super().get_permissions()
 
-    def perform_create(self, serializer):
-        return serializer.save(usuarios=self.request.user)
-
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
-        queryset = queryset.filter(users=user)
+        queryset = queryset.filter(user=user)
         return queryset
 
 
-class NotificacionViewSet(viewsets.ModelViewSet):
-    queryset = Notification.objects.all()
-    serializer_class = NotificationSerializer
+class N_UViewSet(viewsets.ModelViewSet):
+    queryset = N_U.objects.all()
+    serializer_class = N_USerializer
 
 
 class unread_notifications(ListCreateAPIView):
-    queryset = Notification.objects.all()
+    queryset = N_U.objects.all()
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
@@ -49,8 +46,7 @@ class unread_notifications(ListCreateAPIView):
 
     def get(self, request):
         user = request.user
-        amount = Notification.objects.filter(
-            users=user, read=False).count()
+        amount = N_U.objects.filter(user=user, read=False).count()
         return Response(amount)
 
 
@@ -85,23 +81,23 @@ class IncidentCreatedNotification(APIView):
             relevant_staff_id = SO_S.objects.filter(service_offered__in=services_offered_id, relevant=True).distinct().values('staff__id')
             relevant_staff_id
 
-            user_emails = User.objects.filter(staff__in=relevant_staff_id).values('id', 'email')
+            users = User.objects.filter(staff__in=relevant_staff_id)
 
             # 2. Staff with a relevant position
-            user_relevant_by_position = User.objects.filter(staff__isnull=False, staff__position__relevant=True).values('id', 'email')
+            user_relevant_by_position = User.objects.filter(staff__isnull=False, staff__position__relevant=True)
 
             # Save email and id from users
-            user_id_list = []
+            user_list = []
             email_list = []
-            for u in user_emails:
-                user_id_list.append(u['id'])
-                email_list.append(u['email'])
+            for u in users:
+                user_list.append(u)
+                email_list.append(u.email)
             
             for u in user_relevant_by_position:
-                if not u['id'] in user_id_list:
-                    user_id_list.append(u['id'])
-                    email_list.append(u['email'])
-            
+                if not u in user_list:
+                    user_list.append(u)
+                    email_list.append(u.email)
+            """
             email_message = EmailMessage(
                 subject=title,
                 body=description,
@@ -109,12 +105,19 @@ class IncidentCreatedNotification(APIView):
                 bcc=email_list
             )
             email_message.send()
+            """
 
             notif = Notification.objects.create(
                 title=title, 
                 description=description,
                 type=2
             )
-            notif.users.set(user_id_list)
+            for u in user_list:
+                N_U.objects.create(
+                    read=False,
+                    notification=notif,
+                    user=u
+                )
+            # notif.users.set(user_id_list)
             
             return Response()

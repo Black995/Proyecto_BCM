@@ -532,6 +532,7 @@ class R_SOSerializer(serializers.ModelSerializer):
     scale_max_value = serializers.IntegerField(read_only=True, source="service_offered.scale.max_value")
     criticality = serializers.IntegerField(read_only = True, source="service_offered.criticality")
     service_id = serializers.IntegerField(read_only = True,source="service_offered.id")
+    
     class Meta:
         model = R_SO
         fields = [
