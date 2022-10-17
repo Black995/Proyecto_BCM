@@ -1,7 +1,9 @@
 from django.db import models
-import os
+from datetime import datetime, timedelta, tzinfo
 from django.conf import settings
-
+from django.contrib.sessions.models import Session
+import os
+import urllib3
 
 def ruta_archivo_org(instance, filename):    
     return os.path.join(settings.STATICFILES_DIRS[0], str(instance.name), str(instance.name) + str(os.path.splitext(filename)[1]))
@@ -92,6 +94,34 @@ class ScaleView(models.Model):
 class ProductActivation(models.Model):
     state = models.BooleanField(default=False)
     activation_date = models.DateField(blank=True, null=True)
+    
+
+    @classmethod
+    def ExpirationDateVerification(cls):
+
+        activation = ProductActivation.objects.all()
+        http = urllib3.PoolManager()
+        res = http.request('GET','http://just-the-time.appspot.com/')
+        
+        result = res.data
+
+        date_str = result.decode('utf-8')
+
+        dateL = date_str.split(" ")
+
+        date = datetime.strptime(dateL[0], '%Y-%m-%d').date()
+        for a in activation:
+            expiration_date = a.activation_date + timedelta(weeks=26)
+            if ((expiration_date-date).days<=0 ):
+                a.state=False
+                a.save()
+                session = Session.objects.all()
+
+                if (session):
+                    Session.objects.delete()
+                
+        print(1)
+
 
 class UsedKeys(models.Model):
     key = models.CharField(max_length=500, unique=True)

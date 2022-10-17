@@ -38,7 +38,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$^%w4a)%zbi$(&p9kdb1vimran5&#@(!%24l(f5w3bz0k$3ld!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -268,5 +268,9 @@ if env('AUTH_LDAP'):
 CELERY_BROKER_URL = f'redis://{env("BROKER_HOST")}:{env("BROKER_PORT")}'
 app.conf.enable_utc = True
 CELERY_BEAT_SCHEDULE = {
-    
+    'every-minute':{
+        'task': 'configuration.tasks.ExpirationDateVerification',
+        'schedule': crontab(minute='0',hour='0'),
+
+    }
 }
