@@ -123,3 +123,7 @@ class ProductActivation(models.Model):
 class UsedKeys(models.Model):
     key = models.CharField(max_length=500, unique=True)
 
+
+class PrivatePublicKey(models.Model):
+    key = models.CharField(max_length=1500, unique=True)
+
