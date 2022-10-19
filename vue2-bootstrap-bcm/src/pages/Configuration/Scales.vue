@@ -1432,6 +1432,7 @@ export default {
                 )
                 .then((res) => {
                     // Mensaje de éxito
+                    console.log(res)
                     this.successMessage(
                         "¡La escala de la vista ha sido actualizada exitosamente!"
                     );

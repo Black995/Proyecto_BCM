@@ -1,4 +1,5 @@
 
+from configuration.models import ScaleView
 from notifications.models import Notification, N_U
 from .serializers import (NotificationSerializer, N_USerializer)
 from django.db.models import Q, F
@@ -131,13 +132,11 @@ class ModifiedScaleNotification(APIView):
 
     def post(self,request):
         scale_id = self.request.data.get("scale_id")
-
-        org_activities = OrganizationActivity.objects.filter(scale_id=scale_id)
-        servicesOffered = ServiceOffered.objects.filter(scale_id=scale_id)
-        servicesUsed = ServiceUsed.objects.filter(scale_id=scale_id)
-
+        scaleView = ScaleView.objects.get(id = scale_id)
         
-        if(servicesOffered):
+        
+        if(scaleView.name == "Servicios de la Organización"):
+            servicesOffered = ServiceOffered.objects.all()
             servOff_id = []
             for s in servicesOffered:
                 servOff_id.append(s.id)
@@ -184,8 +183,8 @@ class ModifiedScaleNotification(APIView):
             email_message.send()
             """
 
-        if(servicesUsed):
-            users = User.objects.filter(is_admin=True)
+        if(scaleView.name == "Servicios de Soporte"):
+            users = User.objects.filter(is_superuser=True)
 
             user_list = []
             email_list = []
@@ -217,7 +216,7 @@ class ModifiedScaleNotification(APIView):
             email_message.send()
             """
         
-        if(org_activities):
+        if(scaleView.name == "Actividades de la Organización"):
             users = User.objects.filter(is_admin=True)
 
             user_list = []

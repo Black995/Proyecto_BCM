@@ -72,7 +72,7 @@ class Notification(models.Model):
                 type=3
             )
 
-        admins = User.objects.filter(is_admin=True)
+        admins = User.objects.filter(is_superuser=True)
         user_list = []
         email_list = []
         for a in admins:
