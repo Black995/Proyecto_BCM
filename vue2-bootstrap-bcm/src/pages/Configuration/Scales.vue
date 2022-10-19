@@ -646,9 +646,8 @@
                     value="1"
                     unchecked-value="2"
                 >
-                    <strong>1. </strong>se colocarán en nulo todas las escalas
-                    de los Servicios de la Organización, Servicios de Soporte y
-                    Actividades de la Organización.
+                    <strong>1. </strong>se colocarán en nulo todas las
+                    criticidades del componente de la organización a actualizar.
                 </b-form-checkbox>
                 <b-form-checkbox
                     v-model="scaleView.option"
@@ -656,8 +655,8 @@
                     unchecked-value="1"
                 >
                     <strong>2. </strong>el sistema realizará automáticamente un
-                    ajuste de las escalas de acuerdo a la media entre la escala
-                    actual y la escala a modificar.
+                    ajuste de las criticidades de acuerdo a la media entre la
+                    escala actual y la escala a modificar.
                 </b-form-checkbox>
             </form>
 

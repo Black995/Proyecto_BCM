@@ -1,11 +1,26 @@
 <template>
     <div class="row">
         <div class="col-xl-4 col-lg-5 col-md-6">
-            <card class="card-user">
+            <b-card :img-src="'data:image/jpeg;base64,' + org.logo_base64">
+                <b-card-text>
+                    <h3 class="text-center">
+                        {{ org.name }}
+                    </h3>
+                    <h5 class="text-center">
+                        Identificación legal:
+                        {{ org.legal_id }}
+                    </h5>
+                    <p class="description text-center">
+                        {{ org.description }}
+                    </p>
+                </b-card-text>
+            </b-card>
+            <!--card class="card-user">
                 <div slot="image">
                     <b-img
                         :src="'data:image/jpeg;base64,' + org.logo_base64"
                         fluid
+                        v-bind="mainProps"
                         :alt="org.name"
                     ></b-img>
                 </div>
@@ -21,7 +36,7 @@
                         {{ org.description }}
                     </p>
                 </div>
-            </card>
+            </card-->
         </div>
         <div class="col-xl-8 col-lg-7 col-md-6">
             <card class="card" title="Editar datos de la empresa">
@@ -155,6 +170,8 @@ export default {
     name: "Organization",
 
     data: () => ({
+        mainProps: { width: 50, height: 50, class: "m1" },
+
         orgId: 0,
 
         org: {

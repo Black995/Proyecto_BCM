@@ -49,9 +49,7 @@ class ScaleviewViewSet(viewsets.ModelViewSet):
         scale_id = request.data.get('scale')
         option = request.data.get('option')
         new_scale = Scale.objects.get(id=scale_id)
-        print(option)
         if(option == '1'):
-            print('opción 1')
             if(name == 'Servicios de la Organización'):
                 ServiceOffered.objects.filter(criticality__isnull=False).update(criticality=None, scale=None)
             elif(name == 'Servicios de Soporte'):
