@@ -157,16 +157,12 @@ class UsedKeysViewSet(viewsets.ModelViewSet):
         
         pr_key = PrivatePublicKey.objects.all()
 
-
         private_key = pr_key[0].key
-
-        print(private_key)
         
         private_key = RSA.importKey(binascii.unhexlify(private_key))
         
         cipher = PKCS1_OAEP.new(private_key)
         
-
         file = validated_data.data.get('licencia')
         #file1 = open(file,'r')
         line1 = NULL
