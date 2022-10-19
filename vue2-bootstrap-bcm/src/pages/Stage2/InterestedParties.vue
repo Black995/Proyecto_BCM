@@ -699,18 +699,14 @@ export default {
         },
         checkFormValidity() {
             let valid = true;
-            console.log(this.party.name);
             if (!this.party.name) {
-                console.log(1);
                 (valid = false), (this.partyState.name = false);
             }
             if (this.party.type == 0) {
-                console.log(2);
                 valid = false;
                 this.partyState.type = false;
             }
             if (!this.party.description) {
-                console.log(3);
                 valid = false;
                 this.partyState.description = false;
             }
@@ -731,7 +727,6 @@ export default {
             this.partyState.description = null;
 
             if (!this.checkFormValidity()) {
-                console.log("entrando");
                 return;
             }
 
@@ -792,7 +787,6 @@ export default {
             this.partyState.description = null;
 
             if (!this.checkFormValidity()) {
-                console.log("entrando");
                 return;
             }
 
@@ -814,7 +808,6 @@ export default {
                     for (var i = 0; i < res.data.length; i++) {
                         this.parties.push(res.data[i]);
                     }
-                    console.log(this.parties);
                     this.loading = false;
                 });
         },
@@ -903,9 +896,9 @@ export default {
                     },
                 })
                 .then((res) => {
-                    console.log(res.data);
+                    //console.log(res.data);
                     this.partyDetail = res.data;
-                    console.log(this.partyDetail._services_offered);
+                    //console.log(this.partyDetail._services_offered);
                     this.$bvModal.show("modal-detail");
                 })
                 .catch((err) => {

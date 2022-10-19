@@ -794,7 +794,7 @@ export default {
             "Servicios de la Organización",
             "Servicios de Soporte",
             "Actividades de la Organización",
-            "Partes Interesadas",
+            // "Partes Interesadas",
         ],
         viewsNameList: [],
     }),
@@ -1295,6 +1295,9 @@ export default {
                         this.viewsNameList.push(this.viewsName[i]);
                     }
                 }
+            }
+            if (this.scalesView.length == 0) {
+                this.viewsNameList = this.viewsName;
             }
 
             this.$nextTick(() => {
