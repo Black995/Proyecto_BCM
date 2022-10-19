@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (NotificacionListViewSet, N_UViewSet, unread_notifications,
-                    IncidentCreatedNotification)
+                    IncidentCreatedNotification,ModifiedScaleNotification)
 
 
 urlpatterns = [
@@ -18,4 +18,6 @@ urlpatterns = [
     # Notification list    
     path("notify_incident_created/", IncidentCreatedNotification.as_view(),
          name="notify_incident_created"),
+    path("notify_modified_scale/", ModifiedScaleNotification.as_view(),
+         name="notify_modified_scale")
 ]

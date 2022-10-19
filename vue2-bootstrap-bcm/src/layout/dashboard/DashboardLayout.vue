@@ -320,9 +320,11 @@
 <style lang="scss">
 </style>
 <script>
+import axios from "axios";
 import TopNavbar from "./TopNavbar.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
+import { SERVER_ADDRESS } from "../../../config/config";
 export default {
     components: {
         TopNavbar,
@@ -332,10 +334,12 @@ export default {
     data: () => ({
         permissions: [],
         is_superuser: true,
+        activation: null
     }),
     mounted() {
         this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
+        this.verifyActivation()
     },
     methods: {
         toggleSidebar() {
@@ -343,6 +347,47 @@ export default {
                 this.$sidebar.displaySidebar(false);
             }
         },
+        async verifyActivation(){
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/get_activation_state/`)
+                    .then((res) => {
+                        if (res.data.length) {
+                            this.activation = res.data[0].state
+                            if (!localStorage.getItem("isLoggedin")){
+                                this.$router.push("/");
+                                
+                            }
+                        } else {
+                            this.activation = false
+                            this.$router.push("/");
+                            
+                        }
+                    })
+                    .catch((err) => {
+                        try {
+                            // Error 400 por unicidad o 500 generico
+                            if (err.response.status == 400) {
+                                for (let e in err.response.data) {
+                                    this.errorMessage(
+                                        e + ": " + err.response.data[e]
+                                    );
+                                }
+                            } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                                );
+                            }
+                        } catch {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    });
+        },
+
     },
+
 };
 </script>
