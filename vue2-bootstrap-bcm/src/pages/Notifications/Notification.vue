@@ -10,22 +10,27 @@
                     v-for="item in notifications"
                     :key="item.key"
                 >
-                    <div v-if="item.type == 1" class="alert alert-info">
+                    <div
+                        v-if="item.notification_type == 1"
+                        class="alert alert-info"
+                    >
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">
-                                <strong>{{ item.title }}</strong>
+                                <strong>{{ item.notification_title }}</strong>
                             </h5>
-                            <p v-if="item.days == 1">
+                            <p v-if="item.notification_days == 1">
                                 {{ item.date_day }} {{ item.date_time }} (hace
-                                {{ item.days }} día)
+                                {{ item.notification_days }} día)
                             </p>
-                            <p v-if="item.days != 1">
+                            <p v-if="item.notification_days != 1">
                                 {{ item.date_day }} {{ item.date_time }} (hace
-                                {{ item.days }} días)
+                                {{ item.notification_days }} días)
                             </p>
                         </div>
                         <div class="d-flex w-100 justify-content-between">
-                            <p class="mb-1">{{ item.description }}</p>
+                            <p class="mb-1">
+                                {{ item.notification_description }}
+                            </p>
                             <button
                                 @click="deleteNotification(item.id)"
                                 type="button"
@@ -36,22 +41,27 @@
                             </button>
                         </div>
                     </div>
-                    <div v-if="item.type == 2" class="alert alert-warning">
+                    <div
+                        v-if="item.notification_type == 2"
+                        class="alert alert-warning"
+                    >
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">
-                                <strong>{{ item.title }}</strong>
+                                <strong>{{ item.notification_title }}</strong>
                             </h5>
-                            <p v-if="item.days == 1">
+                            <p v-if="item.notification_days == 1">
                                 {{ item.date_day }} {{ item.date_time }} (hace
-                                {{ item.days }} día)
+                                {{ item.notification_days }} día)
                             </p>
-                            <p v-if="item.days != 1">
+                            <p v-if="item.notification_days != 1">
                                 {{ item.date_day }} {{ item.date_time }} (hace
-                                {{ item.days }} días)
+                                {{ item.notification_days }} días)
                             </p>
                         </div>
                         <div class="d-flex w-100 justify-content-between">
-                            <p class="mb-1">{{ item.description }}</p>
+                            <p class="mb-1">
+                                {{ item.notification_description }}
+                            </p>
                             <button
                                 @click="deleteNotification(item.id)"
                                 type="button"
@@ -62,22 +72,27 @@
                             </button>
                         </div>
                     </div>
-                    <div v-if="item.type == 3" class="alert alert-danger">
+                    <div
+                        v-if="item.notification_type == 3"
+                        class="alert alert-danger"
+                    >
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">
-                                <strong>{{ item.title }}</strong>
+                                <strong>{{ item.notification_title }}</strong>
                             </h5>
-                            <p v-if="item.days == 1">
+                            <p v-if="item.notification_days == 1">
                                 {{ item.date_day }} {{ item.date_time }} (hace
-                                {{ item.days }} día)
+                                {{ item.notification_days }} día)
                             </p>
-                            <p v-if="item.days != 1">
+                            <p v-if="item.notification_days != 1">
                                 {{ item.date_day }} {{ item.date_time }} (hace
-                                {{ item.days }} días)
+                                {{ item.notification_days }} días)
                             </p>
                         </div>
                         <div class="d-flex w-100 justify-content-between">
-                            <p class="mb-1">{{ item.description }}</p>
+                            <p class="mb-1">
+                                {{ item.notification_description }}
+                            </p>
                             <button
                                 @click="deleteNotification(item.id)"
                                 type="button"
@@ -148,8 +163,12 @@ export default {
                 .then((res) => {
                     for (var i = 0; i < res.data.length; i++) {
                         // Separamos la duración en día y hora
-                        res.data[i].date_day = res.data[i].date.slice(0, 10);
-                        res.data[i].date_time = res.data[i].date.slice(11, 16);
+                        res.data[i].date_day = res.data[
+                            i
+                        ].notification_date.slice(0, 10);
+                        res.data[i].date_time = res.data[
+                            i
+                        ].notification_date.slice(11, 16);
                         this.notifications.push(res.data[i]);
                     }
 

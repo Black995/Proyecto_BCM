@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (NotificacionListViewSet, NotificacionViewSet, unread_notifications,
+from .views import (NotificacionListViewSet, N_UViewSet, unread_notifications,
                     IncidentCreatedNotification)
 
 
@@ -8,7 +8,7 @@ urlpatterns = [
         'get': 'list',
         'post': 'create'
         }), name="notification_list"),
-    path('notification/<int:pk>/', NotificacionViewSet.as_view({
+    path('notification/<int:pk>/', N_UViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',
