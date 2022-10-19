@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from django.conf import settings
 from django.core.mail import EmailMessage
 from bcm_phase1.models import Risk, CrisisScenario
-from bcm_phase2.models import ServiceOffered, SO_S
+from bcm_phase2.models import OrganizationActivity, ServiceOffered, SO_S, ServiceUsed
 from bcm_phase3.models import IncidentHistory
 from users.models import User
 
@@ -121,3 +121,134 @@ class IncidentCreatedNotification(APIView):
             # notif.users.set(user_id_list)
             
             return Response()
+
+
+class ModifiedScaleNotification(APIView):
+    queryset = Notification.objects.all()
+    serializers = NotificationSerializer
+
+    def post(self,request):
+        scale_id = self.request.data.get("scale_id")
+
+        org_activities = OrganizationActivity.objects.filter(scale_id=scale_id)
+        servicesOffered = ServiceOffered.objects.filter(scale_id=scale_id)
+        servicesUsed = ServiceUsed.objects.filter(scale_id=scale_id)
+
+        
+        if(servicesOffered):
+            servOff_id = []
+            for s in servicesOffered:
+                servOff_id.append(s.id)
+
+            relevant_staff_id = SO_S.objects.filter(service_offered__in=servOff_id,relevant=True).distinct().values("staff__id")
+
+            users = User.objects.filter(staff__in=relevant_staff_id)
+
+            user_relevant_by_position = User.objects.filter(staff__isnull=False,staff__position__relevant=True)
+
+            user_list = []
+            email_list = []
+
+            for u in users:
+                user_list.append(u)
+                email_list.append(u.email)
+            
+            for u in user_relevant_by_position:
+                if not u in user_list:
+                    user_list.append(u)
+                    email_list.append(u.email)
+
+            title="Escala modificada - Sistema BCM"
+            description = "Se les informa que ha sido editata la escala relacionada a su servicio.Se les recomienda revisar si el servicio sufrio alguna modificación o quedo sin una criticidad asignada."
+
+            notif = Notification.objects.create(
+                title=title, 
+                description=description,
+                type=2
+            )
+            for u in user_list:
+                N_U.objects.create(
+                    read=False,
+                    notification=notif,
+                    user=u
+                )
+            """
+            email_message = EmailMessage(
+                subject=title,
+                body=description,
+                from_email=settings.EMAIL_HOST_USER,
+                bcc=email_list
+            )
+            email_message.send()
+            """
+
+        if(servicesUsed):
+            users = User.objects.filter(is_admin=True)
+
+            user_list = []
+            email_list = []
+
+            for u in users:
+                user_list.append(u)
+                email_list.append(u.email)
+            
+            title="Escala modificada - Sistema BCM"
+            description = "Se les informa que ha sido editata la escala relacionada a los servicios de soporte. Se les recomienda revisar si los servicios sufrieron alguna modificación o quedaron sin una criticidad asignada."
+            notif = Notification.objects.create(
+                title=title, 
+                description=description,
+                type=2
+            )
+            for u in user_list:
+                N_U.objects.create(
+                    read=False,
+                    notification=notif,
+                    user=u
+                )
+            """
+            email_message = EmailMessage(
+                subject=title,
+                body=description,
+                from_email=settings.EMAIL_HOST_USER,
+                bcc=email_list
+            )
+            email_message.send()
+            """
+        
+        if(org_activities):
+            users = User.objects.filter(is_admin=True)
+
+            user_list = []
+            email_list = []
+
+            for u in users:
+                user_list.append(u)
+                email_list.append(u.email)
+            
+            title="Escala modificada - Sistema BCM"
+            description = "Se les informa que ha sido editata la escala relacionada a las actividades de la organizacion. Se les recomienda revisar si las actividades sufrieron alguna modificación o quedaron sin una criticidad asignada."
+            notif = Notification.objects.create(
+                title=title, 
+                description=description,
+                type=2
+            )
+            for u in user_list:
+                N_U.objects.create(
+                    read=False,
+                    notification=notif,
+                    user=u
+                )
+            """
+            email_message = EmailMessage(
+                subject=title,
+                body=description,
+                from_email=settings.EMAIL_HOST_USER,
+                bcc=email_list
+            )
+            email_message.send()
+            """
+
+        return Response()
+
+
+        

@@ -272,5 +272,9 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'configuration.tasks.ExpirationDateVerification',
         'schedule': crontab(minute='0',hour='0'),
 
+    },
+    'every-day':{
+        'task': 'notifications.tasks.RemainingActivationTimeNotifiaction',
+        'schedule': crontab(minute='1',hour="0")
     }
 }

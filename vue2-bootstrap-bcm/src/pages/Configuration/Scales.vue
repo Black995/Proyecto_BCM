@@ -804,6 +804,8 @@ export default {
         this.getScalesView();
         this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
+
+        this.prueba_escala()
     },
     methods: {
         successMessage(successText) {
@@ -1417,6 +1419,7 @@ export default {
                 this.minimumRecoveryTimeScaleDuration
             );
 
+            
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/config/scale/view/${this.scaleViewId}/`,
@@ -1433,7 +1436,47 @@ export default {
                     this.successMessage(
                         "¡La escala de la vista ha sido actualizada exitosamente!"
                     );
-
+                    let scale_id = {
+                        scale_id: this.scaleViewId
+                    }
+                    axios
+                        .post(
+                                `${SERVER_ADDRESS}/api/notifications/notify_modified_scale/`,
+                                scale_id,
+                                {
+                                    withCredentials: true,
+                                    headers:{
+                                        Authorization: TOKEN,
+                                    },
+                                }
+                        )
+                        .then((res)=>{
+                            this.successMessage(
+                                "¡El personal ha sido notificado satisfactoriamente del cambio de la escala!"
+                            );
+                        })
+                        .catch((err) => {
+                            try {
+                                // Error 400 por unicidad o 500 generico
+                                if (err.response.status == 400) {
+                                    for (let e in err.response.data) {
+                                        this.errorMessage(
+                                            e + ": " + err.response.data[e]
+                                        );
+                                    }
+                                } else {
+                                    // Servidor no disponible
+                                    this.errorMessage(
+                                        "Ups! Ha ocurrido un error al enviar la notificación"
+                                    );
+                                }
+                            } catch {
+                                // Servidor no disponible
+                                this.errorMessage(
+                                    "Ups! Ha ocurrido un error al enviar la notificación"
+                                );
+                            }
+                        });
                     //Ocultamos los modales
                     this.$nextTick(() => {
                         this.$bvModal.hide("modal-confirm-update-scale-view");
@@ -1514,6 +1557,7 @@ export default {
                     }
                 });
         },
+        
     },
 };
 </script>
