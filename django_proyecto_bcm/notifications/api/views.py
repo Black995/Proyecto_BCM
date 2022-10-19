@@ -16,7 +16,7 @@ from users.models import User
 
 
 class NotificacionListViewSet(viewsets.ModelViewSet):
-    queryset = N_U.objects.filter(read=False)
+    queryset = N_U.objects.filter(read=False).order_by('-notification__date')
     serializer_class = N_USerializer
 
     def get_permissions(self):
@@ -65,7 +65,7 @@ class IncidentCreatedNotification(APIView):
 
         if (incident_history):
             title = "Nueva incidente creado - Sistema BCM"
-            description = "Se les informa que ha sido creado un nuevo incidente de \"" + incident_history.crisis_scenario.name + " \", el cual posee un rango de fechas desde el " + incident_history.start_date.strftime("%m/%d/%Y, %H:%M:%S") + " hasta el " + incident_history.end_date.strftime("%m/%d/%Y, %H:%M:%S") + ".\nSe les recomienda entrar en contacto con los supervisores y gerentes de la organización."
+            description = "Se le informa que ha sido creado un nuevo incidente de \"" + incident_history.crisis_scenario.name + " \", el cual posee un rango de fechas desde el " + incident_history.start_date.strftime("%m/%d/%Y, %H:%M:%S") + " hasta el " + incident_history.end_date.strftime("%m/%d/%Y, %H:%M:%S") + ".\nSe le recomienda entrar en contacto con los supervisores y gerentes de la organización."
 
 
             # Query to get all staff affected by incident
@@ -97,16 +97,8 @@ class IncidentCreatedNotification(APIView):
                 if not u in user_list:
                     user_list.append(u)
                     email_list.append(u.email)
-            """
-            email_message = EmailMessage(
-                subject=title,
-                body=description,
-                from_email=settings.EMAIL_HOST_USER,
-                bcc=email_list
-            )
-            email_message.send()
-            """
-
+            
+            # Notificación que se registra en el sistema
             notif = Notification.objects.create(
                 title=title, 
                 description=description,
@@ -118,8 +110,18 @@ class IncidentCreatedNotification(APIView):
                     notification=notif,
                     user=u
                 )
-            # notif.users.set(user_id_list)
             
+            # Notificación que se manda al correo
+            """
+            email_message = EmailMessage(
+                subject=title,
+                body=description,
+                from_email=settings.EMAIL_HOST_USER,
+                bcc=email_list
+            )
+            email_message.send()
+            """
+
             return Response()
 
 
@@ -159,7 +161,7 @@ class ModifiedScaleNotification(APIView):
                     email_list.append(u.email)
 
             title="Escala modificada - Sistema BCM"
-            description = "Se les informa que ha sido editata la escala relacionada a su servicio.Se les recomienda revisar si el servicio sufrio alguna modificación o quedo sin una criticidad asignada."
+            description = "Se le informa que ha sido editada la escala relacionada a los \"Servicios de la Organización\". Se le recomienda revisar si los servicios sufrieron alguna modificación o si quedaron sin una criticidad asignada."
 
             notif = Notification.objects.create(
                 title=title, 
@@ -193,7 +195,7 @@ class ModifiedScaleNotification(APIView):
                 email_list.append(u.email)
             
             title="Escala modificada - Sistema BCM"
-            description = "Se les informa que ha sido editata la escala relacionada a los servicios de soporte. Se les recomienda revisar si los servicios sufrieron alguna modificación o quedaron sin una criticidad asignada."
+            description = "Se le informa que ha sido editada la escala relacionada a los \"Servicios de Soporte\". Se le recomienda revisar si los servicios sufrieron alguna modificación o si quedaron sin una criticidad asignada."
             notif = Notification.objects.create(
                 title=title, 
                 description=description,
@@ -226,7 +228,7 @@ class ModifiedScaleNotification(APIView):
                 email_list.append(u.email)
             
             title="Escala modificada - Sistema BCM"
-            description = "Se les informa que ha sido editata la escala relacionada a las actividades de la organizacion. Se les recomienda revisar si las actividades sufrieron alguna modificación o quedaron sin una criticidad asignada."
+            description = "Se le informa que ha sido editada la escala relacionada a las \"Actividades de la Organización\". Se le recomienda revisar si las actividades sufrieron alguna modificación o si quedaron sin una criticidad asignada."
             notif = Notification.objects.create(
                 title=title, 
                 description=description,

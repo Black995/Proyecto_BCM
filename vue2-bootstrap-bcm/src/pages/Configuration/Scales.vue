@@ -803,8 +803,6 @@ export default {
         this.getScalesView();
         this.permissions = JSON.parse(localStorage.getItem("permissions"));
         this.is_superuser = localStorage.getItem("is_superuser");
-
-        this.prueba_escala()
     },
     methods: {
         successMessage(successText) {
@@ -1418,7 +1416,6 @@ export default {
                 this.minimumRecoveryTimeScaleDuration
             );
 
-            
             axios
                 .patch(
                     `${SERVER_ADDRESS}/api/config/scale/view/${this.scaleViewId}/`,
@@ -1436,20 +1433,20 @@ export default {
                         "¡La escala de la vista ha sido actualizada exitosamente!"
                     );
                     let scale_id = {
-                        scale_id: this.scaleViewId
-                    }
+                        scale_id: this.scaleViewId,
+                    };
                     axios
                         .post(
-                                `${SERVER_ADDRESS}/api/notifications/notify_modified_scale/`,
-                                scale_id,
-                                {
-                                    withCredentials: true,
-                                    headers:{
-                                        Authorization: TOKEN,
-                                    },
-                                }
+                            `${SERVER_ADDRESS}/api/notifications/notify_modified_scale/`,
+                            scale_id,
+                            {
+                                withCredentials: true,
+                                headers: {
+                                    Authorization: TOKEN,
+                                },
+                            }
                         )
-                        .then((res)=>{
+                        .then((res) => {
                             this.successMessage(
                                 "¡El personal ha sido notificado satisfactoriamente del cambio de la escala!"
                             );
@@ -1556,7 +1553,6 @@ export default {
                     }
                 });
         },
-        
     },
 };
 </script>
