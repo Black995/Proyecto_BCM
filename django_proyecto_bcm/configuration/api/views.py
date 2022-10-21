@@ -20,7 +20,7 @@ import urllib3
 import binascii
 import Crypto
 import io
-
+import rsa
 class AreaViewSet(viewsets.ModelViewSet):
     model = Area
     queryset = Area.objects.all().order_by('name')
@@ -141,7 +141,17 @@ class UsedKeysViewSet(viewsets.ModelViewSet):
     permission_classes=[AllowAny]
 
     def create(self, validated_data):
-        
+        key_file = open('privatekey.key','rb')
+        key_data = key_file.read()
+        key_file.close()
+
+        pr_key = rsa.PrivateKey.load_pkcs1(key_data)
+
+        key_file = open('publickeyPWC.key','rb')
+        key_data = key_file.read()
+        key_file.close()
+
+        pubPWC = rsa.PublicKey.load_pkcs1(key_data)
         http = urllib3.PoolManager()
         res = http.request('GET','http://just-the-time.appspot.com/')
         
@@ -152,47 +162,54 @@ class UsedKeysViewSet(viewsets.ModelViewSet):
         dateL = date_str.split(" ")
 
         date = datetime.strptime(dateL[0], '%Y-%m-%d').date()
+        try:
         
-        pr_key = PrivatePublicKey.objects.all()
+            file = validated_data.data.get('licencia')
+            cont = 0
+            message = NULL
+            signature = NULL
+            for l in file:
+                if cont == 0:
+                    message = l[:-2]
+                if cont == 1:
+                    signature = l
+                cont =+ 1
 
-        private_key = pr_key[0].key
         
-        private_key = RSA.importKey(binascii.unhexlify(private_key))
         
-        cipher = PKCS1_OAEP.new(private_key)
+            message = message.decode('unicode_escape').encode("raw_unicode_escape")
+            signature = signature.decode('unicode_escape').encode("raw_unicode_escape")
+        except:
+            return Response(data={"Error": "El archivo es inválido."},status=400)
+
+        try:
+            rsa.verify(message,signature,pubPWC)
+            message = rsa.decrypt(message,pr_key).decode('utf-8')
+        except:
+            return Response(data={"Error": "La llave o la firma son inválidas."},status=400)
         
-        file = validated_data.data.get('licencia')
-        #file1 = open(file,'r')
-        line1 = NULL
-        for l in file:
-            line1 = l
-        
-        key1 = line1.decode("utf-8")
-        kbyte = line1.decode("utf-8").replace("b'","")
-        kbyte = kbyte.replace("'","")
-        kbyte = bytes(kbyte,"utf-8").decode('unicode-escape').encode('ISO-8859-1')
-        key2 = cipher.decrypt(kbyte)
-        key_validate = key2.decode("utf-8")
-        keys = UsedKeys.objects.get(key=key1)
+
+  
+        keys = UsedKeys.objects.filter(key=message)
         if (keys):
             return Response(data={"Error": "La llave ya fue usada anteriormente"},status=400)
-        if ( 1507 <= sum(ord(ch) for ch in key_validate) <= 1607) and (('P' in key_validate or 'p' in key_validate) or ('W' in key_validate or 'W' in key_validate) or ('C' in key_validate or 'c' in key_validate))  :
+        if ( 1507 <= sum(ord(ch) for ch in message) <= 1607) and (('P' in message or 'p' in message) or ('W' in message or 'W' in message) or ('C' in message or 'c' in message))  :
             activated = ProductActivation.objects.all()
             if activated:
                 for a in activated:
                     if (a):
-                        keySaved = UsedKeys.objects.create(key=key1)
-                        new_date = a.activation_date + timedelta(weeks=52)
-                        a.activation_date = new_date
+                        keySaved = UsedKeys.objects.create(key=message)
+                        a.activation_date = date
                         a.save()
 
                     else:
-                        keySaved = UsedKeys.objects.create(key=key1)
+                        keySaved = UsedKeys.objects.create(key=message)
                         activated = ProductActivation.objects.create(state=True,activation_date=date)
             else:
-                keySaved = UsedKeys.objects.create(key=key1)
+                keySaved = UsedKeys.objects.create(key=message)
                 activated = ProductActivation.objects.create(state=True,activation_date=date )
             
             return Response(1)
         else:
             return Response(data={"Error":"La llave es invalida"}, status=400)
+        
