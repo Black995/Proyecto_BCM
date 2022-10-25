@@ -462,9 +462,13 @@ export default {
             axios
                 .post(`${SERVER_ADDRESS}/api/config/activate/`, formData)
                 .then((res) => {
+                    this.getActivationState();
+                    this.successMessage(
+                        "¡El sistema ha sido activado exitosamente!"
+                    );
                     this.$bvModal.hide("modal-activate-product");
                     this.$bvModal.hide("modal-confirm-activate");
-                    this.getActivationState();
+                    
                 })
                 .catch((err) => {
                     try {
