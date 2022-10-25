@@ -20,6 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
     model = User
     queryset = User.objects.all().order_by('email')
     serializer_class = UserSerializer 
+    permission_classes = [IsAuthenticated]
 
 
 class StaffsWithoutUserViewSet(viewsets.ModelViewSet):

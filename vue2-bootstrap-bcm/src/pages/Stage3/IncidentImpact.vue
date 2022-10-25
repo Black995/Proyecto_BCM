@@ -288,7 +288,7 @@
                     class="text-center"
                 >
                     Servicios que excedieron el RTO debido a la duración de la
-                    incidencias
+                    incidencia
                 </h5>
                 <div
                     v-if="
@@ -320,7 +320,7 @@
                     class="text-center"
                 >
                     Servicios que NO excedieron el RTO debido a la duración de
-                    la incidencias
+                    la incidencia
                 </h5>
                 <div
                     v-if="
@@ -349,7 +349,7 @@
                 >
                     Servicios de soporte afectados por los servicios de la
                     organización que excedieron el RTO debido a la duración de
-                    la incidencias
+                    la incidencia
                 </h5>
                 <b-list-group
                     v-if="servicesUsedAffectedByServicesOnlyMinimumRTO.length"
