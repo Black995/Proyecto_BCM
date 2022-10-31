@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .views import (RiskViewSet, CrisisScenarioViewSet, CrisisScenarioListViewSet, 
-                    CrisisScenarioListRisksViewSet, ServicesOfferedRiskListViewSet)
+                    CrisisScenarioListRisksViewSet, ServicesOfferedRiskListViewSet,
+                    DownloadCrisisScenarioDocument)
 
 
 urlpatterns = [
@@ -22,6 +23,8 @@ urlpatterns = [
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='crisis_scenario_detail'),
+    path('download_crisis_scenario_document/<int:id>/',
+         DownloadCrisisScenarioDocument.as_view(), name='download_crisis_scenario_document'),
     path('crisis_scenarios_list_risks/', CrisisScenarioListRisksViewSet.as_view({
         'get': 'list'}), name='crisis_scenarios_list_risks'),
     path('service_offered_risks_list/', ServicesOfferedRiskListViewSet.as_view({

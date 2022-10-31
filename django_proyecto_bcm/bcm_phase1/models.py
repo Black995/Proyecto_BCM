@@ -1,6 +1,11 @@
 from django.db import models
 from configuration.models import Headquarter
+from django.conf import settings
+import os
 
+
+def ruta_archivo_crisis(instance, filename):    
+    return os.path.join(settings.STATICFILES_DIRS[3], str(instance.name), str(instance.name) + str(os.path.splitext(filename)[1]))
 
 class Risk(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -30,6 +35,9 @@ class CrisisScenario(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=200)
     frequency = models.SmallIntegerField(choices=FREQUENCY)
+    documentation = models.FileField(
+        upload_to=ruta_archivo_crisis, null=True, blank=True, max_length=1000000)
+
 
     headquarters = models.ManyToManyField(
         Headquarter, related_name='headquarter_crisis_scenario')

@@ -93,62 +93,6 @@
                     "
                     class="text-center"
                 >
-                    Criticidad de los servicios de soporte afectados
-                </h5>
-                <div
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities
-                    "
-                    id="services-used"
-                >
-                    <apexchart
-                        type="bar"
-                        height="500"
-                        :options="chartOptionsServicesUsed"
-                        :series="seriesServicesUsed"
-                    ></apexchart>
-                </div>
-            </b-col>
-            <b-col>
-                <h5
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities
-                    "
-                    class="text-center"
-                >
-                    Criticidad de las actividades del negocio afectadas
-                </h5>
-                <div
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities
-                    "
-                    id="organization-activities"
-                >
-                    <apexchart
-                        type="bar"
-                        height="500"
-                        :options="chartOptionsOrgActivities"
-                        :series="seriesOrgActivities"
-                    ></apexchart>
-                </div>
-            </b-col>
-        </b-row>
-        <b-row class="mt-3" align-v="center">
-            <b-col>
-                <h5
-                    v-if="
-                        loadingServicesOffered &&
-                        loadingServicesUsed &&
-                        loadingOrgActivities
-                    "
-                    class="text-center"
-                >
                     Criticidad de los servicios de la organización afectados
                 </h5>
                 <h6
@@ -237,6 +181,62 @@
                         height="500"
                         :options="chartOptionsRessources"
                         :series="seriesRessources"
+                    ></apexchart>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row class="mt-3" align-v="center">
+            <b-col>
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities
+                    "
+                    class="text-center"
+                >
+                    Criticidad de los servicios de soporte afectados
+                </h5>
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities
+                    "
+                    id="services-used"
+                >
+                    <apexchart
+                        type="bar"
+                        height="500"
+                        :options="chartOptionsServicesUsed"
+                        :series="seriesServicesUsed"
+                    ></apexchart>
+                </div>
+            </b-col>
+            <b-col>
+                <h5
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities
+                    "
+                    class="text-center"
+                >
+                    Criticidad de las actividades del negocio afectadas
+                </h5>
+                <div
+                    v-if="
+                        loadingServicesOffered &&
+                        loadingServicesUsed &&
+                        loadingOrgActivities
+                    "
+                    id="organization-activities"
+                >
+                    <apexchart
+                        type="bar"
+                        height="500"
+                        :options="chartOptionsOrgActivities"
+                        :series="seriesOrgActivities"
                     ></apexchart>
                 </div>
             </b-col>

@@ -28,6 +28,43 @@
             </b-col>
         </b-row>
         <b-row
+            align-v="center"
+            class="mt-3"
+            v-if="!loadingNodes && loadingFirstNodes"
+        >
+            <b-col>
+                <div class="text-center">
+                    <b-button
+                        variant="success"
+                        class="float-center"
+                        @click="getDocument"
+                        :disabled="downloadDocument"
+                    >
+                        <div v-if="!spinnerDownloadDocument">
+                            <font-awesome-icon icon="fa-solid fa-download" />
+                            Descargar documentación del escenario crítico
+                        </div>
+                        <b-spinner
+                            v-if="spinnerDownloadDocument"
+                            small
+                        ></b-spinner>
+                    </b-button>
+                </div>
+            </b-col>
+            <b-col>
+                <div class="text-center">
+                    <b-button
+                        variant="info"
+                        class="float-center"
+                        @click="show_modal_update_doc = true"
+                    >
+                        <font-awesome-icon icon="fa-solid fa-upload" />
+                        Actualizar documentación del escenario crítico
+                    </b-button>
+                </div>
+            </b-col>
+        </b-row>
+        <b-row
             v-if="!loadingNodes && loadingFirstNodes"
             align-v="center"
             class="mt-5"
@@ -327,6 +364,63 @@
                 </div>
             </template>
         </b-modal>
+
+        <!--
+            Modal de actualizar documentación  
+        -->
+        <b-modal
+            v-model="show_modal_update_doc"
+            id="modal-update-document"
+            title="Actualizar documentación"
+            ref="modal"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitUpdateDocument">
+                <b-form-file
+                    v-model="crisisScenarioDoc.documentation"
+                    :state="crisisScenarioDocState.documentation"
+                    placeholder="Elija un archivo o arrástrelo aquí"
+                    drop-placeholder="Arrastre el archivo aquí"
+                ></b-form-file>
+            </form>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="handleSubmitUpdateDocument"
+                    >
+                        Actualizar documentación
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar actualizar documentación
+        -->
+        <b-modal
+            id="modal-confirm-update-document"
+            title="Confirmar actualizar documentación"
+            centered
+        >
+            <h4>
+                ¿Está seguro de actualizar la documentación del escenario
+                crítico?
+            </h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="updateDocument"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </div>
 </template>
 
@@ -339,6 +433,7 @@ import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 import NotificationTemplate from "../Notifications/NotificationTemplate";
 import DemoBlock from "./flowy-components/DemoBlock.vue";
 import { VueEditor } from "vue2-editor";
+import { saveAs } from "file-saver";
 //import DemoNode from "./flowy-components/DemoNode.vue";
 
 const DemoNode = {
@@ -354,9 +449,6 @@ const DemoNode = {
             this.remove();
         },
         deleteNode() {
-            console.log("Permisos");
-            console.log(this.$props);
-            console.log(this.$props.permissions);
             this.$props.node.action = "delete";
             this.remove();
         },
@@ -404,6 +496,16 @@ export default {
 
         crisisScenarios: [],
         crisisScenarioId: 0,
+
+        show_modal_update_doc: false,
+        downloadDocument: false,
+        spinnerDownloadDocument: false,
+        crisisScenarioDoc: {
+            documentation: null,
+        },
+        crisisScenarioDocState: {
+            documentation: null,
+        },
 
         editMainBlock: false,
         blockState: {
@@ -541,6 +643,19 @@ export default {
                     },
                 })
                 .then((res) => {
+                    /**
+                     * Verificamos que el escenario crítico contenga archivo
+                     */
+                    const file = this.crisisScenarios.filter(
+                        (c) => c.id == this.crisisScenarioId
+                    );
+
+                    if (file[0].documentation) {
+                        this.downloadDocument = false;
+                    } else {
+                        this.downloadDocument = true;
+                    }
+
                     let canBeEdited = false;
                     let canBeDeleted = false;
                     if (
@@ -904,6 +1019,137 @@ export default {
             }
 
             return valid;
+        },
+
+        /**
+         * Download documentation
+         */
+        async getDocument() {
+            this.downloadDocument = true;
+            this.spinnerDownloadDocument = true;
+
+            const extension = this.crisisScenarios.filter(
+                (c) => c.id == this.crisisScenarioId
+            );
+
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase1/download_crisis_scenario_document/${this.crisisScenarioId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    this.downloadDocument = false;
+                    this.spinnerDownloadDocument = false;
+
+                    saveAs(
+                        res.config.url,
+                        `document` + extension[0].documentation_extension
+                    );
+                })
+                .catch((err) => {
+                    this.downloadDocument = false;
+                    this.spinnerDownloadDocument = false;
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Update documentation
+         */
+        handleSubmitUpdateDocument() {
+            // Inicializamos variables de estados
+            this.crisisScenarioDocState.documentation = null;
+
+            // Exit when the form isn't valid
+
+            if (!this.crisisScenarioDoc.documentation) {
+                this.crisisScenarioDocState.documentarion = false;
+                return;
+            }
+
+            // Mostrar modal de confirmar
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-update-document");
+            });
+        },
+        async updateDocument() {
+            let formData = new FormData();
+            formData.append(
+                "documentation",
+                this.crisisScenarioDoc.documentation,
+                this.crisisScenarioDoc.documentation.name
+            );
+
+            axios
+                .patch(
+                    `${SERVER_ADDRESS}/api/phase1/crisis_scenario/${this.crisisScenarioId}/`,
+                    formData,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.downloadDocument = false;
+                    this.successMessage(
+                        "¡La documentación del escenario crítico ha sido actualizada exitosamente!"
+                    );
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-update-document");
+                        this.$bvModal.hide("modal-update-document");
+                    });
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
         },
     },
 };

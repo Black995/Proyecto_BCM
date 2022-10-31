@@ -60,6 +60,31 @@
                                 field="frequency_name"
                                 header="Frecuencia"
                             ></Column>
+                            <Column
+                                field="documentation"
+                                header="Documentación"
+                            >
+                                <template #body="slotProps">
+                                    <div class="text-center">
+                                        <b-button
+                                            v-if="slotProps.data.documentation"
+                                            :disabled="
+                                                slotProps.data.downloading
+                                            "
+                                            pill
+                                            title="Descargar documentación del escenario crítico riesgos"
+                                            variant="success"
+                                            @click="
+                                                getDocument(slotProps.data.id)
+                                            "
+                                        >
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-download"
+                                            />
+                                        </b-button>
+                                    </div>
+                                </template>
+                            </Column>
                             <Column field="id" header="Opciones">
                                 <template #body="slotProps">
                                     <b-button
@@ -597,7 +622,10 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.crisisScenarios = res.data;
+                    for (var i = 0; i < res.data.length; i++) {
+                        res.data[i].downloading = false;
+                        this.crisisScenarios.push(res.data[i]);
+                    }
                     this.loading = false;
 
                     // Mientras tanto vamos cargando la lista de riesgos
@@ -1062,6 +1090,62 @@ export default {
                     });
                 })
                 .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+        async getDocument(crisisScenarioId) {
+            let crisisIndex = 0;
+            for (var i = 0; i < this.crisisScenarios.length; i++) {
+                if (this.crisisScenarios[i].id == crisisScenarioId) {
+                    this.crisisScenarios[i].downloading = true;
+                    crisisIndex = i;
+                    break;
+                }
+            }
+
+            const extension = this.crisisScenarios.filter(
+                (c) => c.id == crisisScenarioId
+            );
+
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase1/download_crisis_scenario_document/${crisisScenarioId}/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    this.crisisScenarios[crisisIndex].downloading = false;
+
+                    saveAs(
+                        res.config.url,
+                        `document` + extension[0].documentation_extension
+                    );
+                })
+                .catch((err) => {
+                    this.crisisScenarios[crisisIndex].downloading = false;
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
