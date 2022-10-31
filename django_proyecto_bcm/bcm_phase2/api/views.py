@@ -9,12 +9,14 @@ from .serializers import (InterestedPartyListSerializer, OrganizationActivityLis
                             ServiceUsedSerializer, StaffListSerializer, StaffSerializer, interestedPartySerializer,
                             SO_SSerializer, ServiceOfferedWithStaffsSerializer)
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q, F
 from bcm_phase2.api.filters import (R_SOFilterBackend, SO_SFilterBackend)
 from rest_framework.generics import (ListAPIView)
 from django.http.response import Http404
 from django.shortcuts import HttpResponse
+from .utils import render_to_pdf
 
 
 class ServiceOfferedListViewSet(viewsets.ModelViewSet):
@@ -126,3 +128,28 @@ class RessourceWithServiceOfferedViewSet(viewsets.ModelViewSet):
     model = Ressource
     queryset = Ressource.objects.all()
     serializer_class = RessourceWithServiceOfferedSerializer
+
+
+class GenerateServiceOffered(APIView):
+    queryset = ServiceOffered.objects.all()
+
+    def get(self,request,*args,**kwargs):
+        services = ServiceOffered.objects.all()
+        serviceOffered = []
+        print(1)
+        for s in services:
+            serviceOffered.append({
+                "name": s.name,
+                "type": dict(ServiceOffered.TYPE).get(s.type),
+                "area": s.area.name,
+                "criticality": s.criticality,
+                "max_scale": s.scale.max_value,
+                "rto":s.maximum_recovery_time
+            })
+        
+        data = {
+            "serviceOffered": serviceOffered
+        }
+
+        pdf = render_to_pdf("service_offered.html",data)
+        return HttpResponse(pdf,content_type='application/pdf')

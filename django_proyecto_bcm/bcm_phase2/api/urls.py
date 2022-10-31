@@ -5,7 +5,7 @@ from bcm_phase2.api.filters import R_SOFilterBackend
 from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, R_SOViewSet, ServiceOfferedListViewSet, ServiceOfferedViewSet,
                     ServiceUsedListViewSet, ServiceUsedViewSet, StaffListViewSet,
                     StaffViewSet,OrganizationActivityListViewSet,OrganizationActivityViewSet, 
-                    SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_excel_massive_load_staff, RessourceWithServiceOfferedViewSet, RessourceViewSet, RessourceListViewSet)
+                    SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_excel_massive_load_staff, RessourceWithServiceOfferedViewSet, RessourceViewSet, RessourceListViewSet,GenerateServiceOffered)
 
 
 urlpatterns = [
@@ -82,7 +82,9 @@ urlpatterns = [
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',
-        'delete': 'destroy'}), name='r_so_detail')
+        'delete': 'destroy'}), name='r_so_detail'),
+    path('service_offered_report/', GenerateServiceOffered.as_view(), 
+            name='service_offered_report')
 
     
 ]
