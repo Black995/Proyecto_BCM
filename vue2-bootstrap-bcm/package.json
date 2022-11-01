@@ -21,6 +21,7 @@
     "bootstrap-vue": "^2.22.0",
     "chartist": "^0.11.0",
     "es6-promise": "^4.2.4",
+    "file-saver": "^2.0.5",
     "gojs": "^2.2.15",
     "gojs-vue": "^1.0.1",
     "js-file-download": "^0.4.12",

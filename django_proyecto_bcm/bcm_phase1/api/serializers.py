@@ -1,6 +1,7 @@
 from bcm_phase1.models import Risk, CrisisScenario
 from rest_framework import serializers
 from django.db.models import F, Q
+import os
 
 """
     Funciones utilizadas para el importe de los serializers con el fin de evitar
@@ -44,6 +45,7 @@ class CrisisScenarioSerializer(serializers.ModelSerializer):
     # Serializer aninado
     _risks = RiskSerializer(many=True, read_only=True)
     frequency_name = serializers.SerializerMethodField(read_only=True)
+    documentation_extension = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CrisisScenario
@@ -54,15 +56,23 @@ class CrisisScenarioSerializer(serializers.ModelSerializer):
             'risks',
             '_risks',
             'frequency',
-            'frequency_name'
+            'frequency_name',
+            'documentation',
+            'documentation_extension',
         ]
 
     def get_frequency_name(self, obj):
         return dict(CrisisScenario.FREQUENCY).get(obj.frequency)
+        
+    def get_documentation_extension(self, obj):
+        if(obj.documentation):
+            name, extension = os.path.splitext(obj.documentation.name)
+            return extension
 
 
 class CrisisScenarioListSerializer(serializers.ModelSerializer):
     frequency_name = serializers.SerializerMethodField(read_only=True)
+    documentation_extension = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CrisisScenario
@@ -71,11 +81,18 @@ class CrisisScenarioListSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'frequency',
-            'frequency_name'
+            'frequency_name',
+            'documentation',
+            'documentation_extension',
         ]
 
     def get_frequency_name(self, obj):
         return dict(CrisisScenario.FREQUENCY).get(obj.frequency)
+
+    def get_documentation_extension(self, obj):
+        if(obj.documentation):
+            name, extension = os.path.splitext(obj.documentation.name)
+            return extension
 
 
 """
