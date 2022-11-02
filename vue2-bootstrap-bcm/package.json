@@ -23,6 +23,7 @@
     "es6-promise": "^4.2.4",
     "gojs": "^2.2.15",
     "gojs-vue": "^1.0.1",
+    "js-file-download": "^0.4.12",
     "lodash": "^4.17.21",
     "primeicons": "^5.0.0",
     "primevue": "^2.9.2",

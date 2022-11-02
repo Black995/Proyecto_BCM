@@ -44,7 +44,9 @@
                                                 icon="fa-solid fa-plus"
                                             />
                                         </b-button>
+                                        
                                     </b-col>
+                                    
                                     <b-col sm="4">
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
@@ -55,6 +57,15 @@
                                                 placeholder="Buscar..."
                                             />
                                         </span>
+                                    </b-col>
+                                    <b-col sm="1">
+                                        <b-button
+                                            title="Descargar"
+                                            variant="warning"
+                                            @click="downloadServiceOffered" 
+                                        >
+                                        <font-awesome-icon icon="fa-solid fa-file-pdf" />
+                                        </b-button>
                                     </b-col>
                                 </b-row>
                             </template>
@@ -2336,6 +2347,50 @@ export default {
                     }
                 });
         },
+        async downloadServiceOffered(){
+            const FileDownload = require('js-file-download')
+            axios
+                .get(`${SERVER_ADDRESS}/api/phase2/service_offered_report/`,
+                    {
+                        withCredentials:true,
+                        headers: {
+                            Authorization: TOKEN
+                        },
+                        responseType: 'blob'
+                    }
+                )
+                .then(
+                    (res) => {
+                        FileDownload(res.data, 'reporte.pdf')
+                        //const href= URL.createObject
+                        //saveAs(res.data, 'Reporte Servicios de la Organización')
+                    }
+                )
+                .catch((err) => {
+                    console.log(err)
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+
+        }
     },
 };
 </script>
