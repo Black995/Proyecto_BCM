@@ -76,15 +76,14 @@
                     invalid-feedback="Seleccione un archivo valido"
                     :state="fileState"
                 >
-                    <b-row align-v="center">
-                        <b-form-file
+                    <b-form-file
                         v-model="file"
                         :state="fileState"
+                        placeholder="Elija un archivo o arrástrelo aquí"
+                        drop-placeholder="Arrastre el archivo aquí"
                         size="sm"
                         required
-                        ></b-form-file>
-                    </b-row>
-                    
+                    ></b-form-file>
                 </b-form-group>
             </form>
             <template #modal-footer>
@@ -357,15 +356,15 @@ export default {
                 });
         },
         show_modal_activation() {
-            this.file = null
-            this.fileState = null
+            this.file = null;
+            this.fileState = null;
             this.$nextTick(() => {
                 this.$bvModal.show("modal-activate-product");
             });
         },
         handleSubmitActivate() {
             this.fileState = null;
-            if ((!this.file) || (!this.file.name.endsWith('.txt'))) {
+            if (!this.file || !this.file.name.endsWith(".txt")) {
                 this.fileState = false;
             } else {
                 this.$nextTick(() => {
@@ -373,19 +372,18 @@ export default {
                 });
             }
         },
-        async activateProduct(){
-            let usedKey ={
-                key: this.key
-            }
-            let formData = new FormData()
-            formData.append("licencia", this.file,this.file.name)
+        async activateProduct() {
+            let usedKey = {
+                key: this.key,
+            };
+            let formData = new FormData();
+            formData.append("licencia", this.file, this.file.name);
             axios
                 .post(`${SERVER_ADDRESS}/api/config/activate/`, formData)
-                .then((res)=>{
-                    this.$bvModal.hide("modal-activate-product")
-                    this.$bvModal.hide("modal-confirm-activate")
-                    this.getActivationState()
-                    
+                .then((res) => {
+                    this.$bvModal.hide("modal-activate-product");
+                    this.$bvModal.hide("modal-confirm-activate");
+                    this.getActivationState();
                 })
                 .catch((err) => {
                     try {

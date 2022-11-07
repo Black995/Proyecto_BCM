@@ -31,7 +31,6 @@ import Ressources from "@/pages/Stage2/Ressources.vue"
 // Stage 3
 import IncidentHistory from "@/pages/Stage3/IncidentHistory.vue";
 import IncidentImpact from "@/pages/Stage3/IncidentImpact.vue";
-import IncidentImpactAll from "@/pages/Stage3/IncidentImpactAll.vue";
 import RiskHeatmap from "@/pages/Stage3/RiskHeatmap.vue";
 import ContingencyPlans from "@/pages/Stage3/ContingencyPlans.vue";
 // Configuration
@@ -124,16 +123,6 @@ const routes = [
         name: "Histórico de Incidentes",
         component: IncidentHistory
       },
-
-      // Esta vista no se muestra debido a que se desvirtúan ciertos elementos cuando hay 
-      // más de una incidencia
-      /*
-      {
-        path: "impacto-incidentes",
-        name: "Impacto Incidentes (all)",
-        component: IncidentImpactAll
-      },
-      */
       {
         path: "impacto-incidente",
         name: "Impacto del Incidente",

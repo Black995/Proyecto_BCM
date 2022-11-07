@@ -17,7 +17,7 @@
                         <h5>
                             <strong>Nota:</strong> como el incidente no posee
                             fecha fin, se utilizó la fecha actual (<strong
-                                >tiempo transcurrido:</strong
+                                >tiempo transcurrido del incidente:</strong
                             >
                             {{ hoursNow }} horas, {{ minutesNow }} minutos)
                         </h5>
@@ -26,7 +26,7 @@
                 <b-row v-if="incidentEnded" class="text-center">
                     <b-col>
                         <h5>
-                            <strong>Tiempo transcurrido:</strong>
+                            <strong>Duración del incidente:</strong>
                             {{ hoursNow }} horas, {{ minutesNow }} minutos
                         </h5>
                     </b-col>
@@ -1710,13 +1710,6 @@ export default {
                         end_date_incident = Date.now();
                         this.timeNow = Date.now();
                     }
-
-                    console.log("HORA INICIO INCIDENTE");
-                    console.log(start_date_incident);
-                    console.log(res.data.start_date);
-                    console.log("HORA FIN DEL INCIDENTE");
-                    console.log(Date(Date.now()).toString());
-                    console.log(this.timeNow);
 
                     // Duración del incidente en milisegundos
                     this.incidentDurationTime =

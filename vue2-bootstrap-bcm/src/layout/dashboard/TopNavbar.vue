@@ -169,14 +169,14 @@
                     invalid-feedback="Seleccione un archivo valido"
                     :state="fileState"
                 >
-                    <b-row align-v="center">
-                        <b-form-file
-                            v-model="file"
-                            :state="fileState"
-                            size="sm"
-                            required
-                        ></b-form-file>
-                    </b-row>
+                    <b-form-file
+                        v-model="file"
+                        :state="fileState"
+                        placeholder="Elija un archivo o arrástrelo aquí"
+                        drop-placeholder="Arrastre el archivo aquí"
+                        size="sm"
+                        required
+                    ></b-form-file>
                 </b-form-group>
             </form>
             <template #modal-footer>
@@ -468,7 +468,6 @@ export default {
                     );
                     this.$bvModal.hide("modal-activate-product");
                     this.$bvModal.hide("modal-confirm-activate");
-                    
                 })
                 .catch((err) => {
                     try {
