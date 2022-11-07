@@ -3,6 +3,8 @@ from django.db import models
 from users.models import User
 from configuration.models import ProductActivation
 from datetime import datetime, timedelta, tzinfo
+from django.conf import settings
+from django.core.mail import EmailMessage
 import urllib3
 
 
@@ -37,10 +39,11 @@ class Notification(models.Model):
         dateL = date_str.split(" ")
 
         date = datetime.strptime(dateL[0], '%Y-%m-%d').date()
-        title = "Tiempo para expiración de producto"
+        title = "Tiempo para expiración de producto - Sistema BCM"
         description = ""
         notif =NULL
-        if ((exp_date-date).days()==91):
+        print((exp_date-date).days)
+        if ((exp_date-date).days==91):
             description = "Estimado usuario, le quedan 3 meses de activación del producto. Recuerde renovar la llave para poder seguir disfrutando del sistema."
             notif = Notification.objects.create(
                 title=title, 
@@ -48,7 +51,7 @@ class Notification(models.Model):
                 type=1
             )
 
-        if ((exp_date-date).days()==60):
+        if ((exp_date-date).days==60):
             description = "Estimado usuario, le quedan 2 meses de activación del producto. Recuerde renovar la llave para poder seguir disfrutando del sistema."
             notif = Notification.objects.create(
                 title=title, 
@@ -56,7 +59,7 @@ class Notification(models.Model):
                 type=1
             )
 
-        if ((exp_date-date).days()==30):
+        if ((exp_date-date).days==30):
             description = "Estimado usuario, le queda 1 mes de activación del producto. Recuerde renovar la llave para poder seguir disfrutando del sistema."
             notif = Notification.objects.create(
                 title=title, 
@@ -64,7 +67,7 @@ class Notification(models.Model):
                 type=2
             )
 
-        if ((exp_date-date).days()<=15):
+        if (((exp_date-date).days>=0) and ((exp_date-date).days<=15)):
             description = "Estimado usuario, le quedan menos de 2 semanas de activación del producto. Recuerde renovar la llave para poder seguir disfrutando del sistema."
             notif = Notification.objects.create(
                 title=title, 
@@ -79,9 +82,9 @@ class Notification(models.Model):
             user_list.append(a)
             email_list.append(a.email)
             if (notif is not NULL):
-                n_u = N_U.objects.create(read=False,user=a.id,notification=notif.id)
+                n_u = N_U.objects.create(read=False,user=a,notification=notif)
         if notif is not NULL:        
-            """
+            
             email_message = EmailMessage(
                 subject=title,
                 body=description,
@@ -89,7 +92,7 @@ class Notification(models.Model):
                 bcc=email_list
             )
             email_message.send()
-            """
+            
         
 
 

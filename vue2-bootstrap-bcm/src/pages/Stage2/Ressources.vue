@@ -51,6 +51,15 @@ amount:
                                             />
                                         </span>
                                     </b-col>
+                                    <b-col sm="1">
+                                        <b-button
+                                            title="Descargar"
+                                            variant="warning"
+                                            @click="" 
+                                        >
+                                        <font-awesome-icon icon="fa-solid fa-file-pdf" />
+                                        </b-button>
+                                    </b-col>
                                 </b-row>
                             </template>
                             <Column field="name" header="Nombre"></Column>
