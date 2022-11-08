@@ -5,7 +5,8 @@ from bcm_phase2.api.filters import R_SOFilterBackend
 from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, R_SOViewSet, ServiceOfferedListViewSet, ServiceOfferedViewSet,
                     ServiceUsedListViewSet, ServiceUsedViewSet, StaffListViewSet,
                     StaffViewSet,OrganizationActivityListViewSet,OrganizationActivityViewSet, 
-                    SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_excel_massive_load_staff, RessourceWithServiceOfferedViewSet, RessourceViewSet, RessourceListViewSet,GenerateServiceOffered)
+                    SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_bulk_upload_template, BulkUploadStaffViewSet,
+                    RessourceWithServiceOfferedViewSet, RessourceViewSet, RessourceListViewSet,GenerateServiceOffered)
 
 
 urlpatterns = [
@@ -37,8 +38,10 @@ urlpatterns = [
         'put': 'update',
         'patch': 'partial_update',
         'delete': 'destroy'}), name='staff_detail'),
-    path('staffs/download_excel_massive_load_staff/', download_excel_massive_load_staff.as_view(),
+    path('staff/bulk_upload_template/', download_bulk_upload_template.as_view(),
          name='download_excel_massive_load_staff'),
+    path('staff/bulk_upload/', BulkUploadStaffViewSet.as_view({
+        'post': 'create'}), name='staff_list'),
     path('organizationActivities/', OrganizationActivityListViewSet.as_view({
         'get':'list',
         'post':'create'}), name='activity_list'),

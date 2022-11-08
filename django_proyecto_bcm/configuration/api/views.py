@@ -127,6 +127,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     model = Organization
     queryset = Organization.objects.order_by('name')
     serializer_class = OrganizationSerializer
+    permission_classes=[AllowAny]
 
 
 class ProductActivatationListViewSet(viewsets.ModelViewSet):

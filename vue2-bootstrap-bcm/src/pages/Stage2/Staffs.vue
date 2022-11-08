@@ -1,6 +1,39 @@
 <template>
     <div class="container-fluid">
-        <div class="row">
+        <b-row align-v="center">
+            <b-col>
+                <div class="text-center">
+                    <b-button
+                        variant="success"
+                        class="float-center"
+                        @click="getBulkUploadTemplate"
+                        :disabled="downloadBulkUploadTemplate"
+                    >
+                        <div v-if="!spinnerDownloadBulkUploadTemplate">
+                            <font-awesome-icon icon="fa-solid fa-download" />
+                            Descargar plantilla de carga masiva del personal
+                        </div>
+                        <b-spinner
+                            v-if="spinnerDownloadBulkUploadTemplate"
+                            small
+                        ></b-spinner>
+                    </b-button>
+                </div>
+            </b-col>
+            <b-col>
+                <div class="text-center">
+                    <b-button
+                        variant="info"
+                        class="float-center"
+                        @click="show_modal_bulk_upload = true"
+                    >
+                        <font-awesome-icon icon="fa-solid fa-upload" />
+                        Carga masiva del personal
+                    </b-button>
+                </div>
+            </b-col>
+        </b-row>
+        <div class="row mt-3">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body table-responsive">
@@ -60,9 +93,10 @@
                                         <b-button
                                             title="Descargar"
                                             variant="warning"
-                                            @click="" 
                                         >
-                                        <font-awesome-icon icon="fa-solid fa-file-pdf" />
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-file-pdf"
+                                            />
                                         </b-button>
                                     </b-col>
                                 </b-row>
@@ -651,6 +685,63 @@
                 </div>
             </template>
         </b-modal>
+
+        <!--
+            Modal de carga masiva del personal  
+        -->
+        <b-modal
+            v-model="show_modal_bulk_upload"
+            id="modal-bulk-upload"
+            title="Carga masiva del personal"
+            ref="modal"
+            centered
+        >
+            <form ref="form" @submit.stop.prevent="handleSubmitBulkUploadStaff">
+                <b-form-file
+                    v-model="bulkUploadTemplate.template"
+                    :state="bulkUploadTemplateState.template"
+                    placeholder="Elija un archivo o arrástrelo aquí"
+                    drop-placeholder="Arrastre el archivo aquí"
+                ></b-form-file>
+            </form>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="handleSubmitBulkUploadStaff"
+                    >
+                        Cargar archivo
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <!--
+            Modal de confirmar actualizar documentación
+        -->
+        <b-modal
+            id="modal-confirm-bulk-upload"
+            title="Confirmar carga masiva del personal"
+            centered
+        >
+            <h4>
+                ¿Está seguro de cargar masivamente al personal contenido en la
+                plantilla cargada?
+            </h4>
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="warning"
+                        class="float-right"
+                        @click="bulkUploadStaff"
+                    >
+                        Confirmar
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </div>
 </template>
 
@@ -745,6 +836,15 @@ export default {
                 error: false,
                 formatInternational: "",
             },
+        },
+        show_modal_bulk_upload: false,
+        downloadBulkUploadTemplate: false,
+        spinnerDownloadBulkUploadTemplate: false,
+        bulkUploadTemplate: {
+            template: null,
+        },
+        bulkUploadTemplateState: {
+            template: null,
         },
     }),
     mounted() {
@@ -1363,6 +1463,130 @@ export default {
                     });
 
                     this.getStaffs();
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Download bulk upload template
+         */
+        async getBulkUploadTemplate() {
+            this.downloadBulkUploadTemplate = true;
+            this.spinnerDownloadBulkUploadTemplate = true;
+
+            axios
+                .get(
+                    `${SERVER_ADDRESS}/api/phase2/staff/bulk_upload_template/`,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    this.downloadBulkUploadTemplate = false;
+                    this.spinnerDownloadBulkUploadTemplate = false;
+
+                    saveAs(res.config.url);
+                })
+                .catch((err) => {
+                    this.downloadBulkUploadTemplate = false;
+                    this.spinnerDownloadBulkUploadTemplate = false;
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
+        /**
+         * Bulk Upload staff
+         */
+        handleSubmitBulkUploadStaff() {
+            // Inicializamos variables de estados
+            this.bulkUploadTemplate.template = null;
+
+            // Exit when the form isn't valid
+
+            if (!this.bulkUploadTemplate.template) {
+                this.bulkUploadTemplateState.template = false;
+                return;
+            }
+
+            // Mostrar modal de confirmar
+            this.$nextTick(() => {
+                this.$bvModal.show("modal-confirm-bulk-upload");
+            });
+        },
+        async bulkUploadStaff() {
+            let formData = new FormData();
+            formData.append(
+                "bulk_uplaod_template",
+                this.bulkUploadTemplate.template,
+                this.bulkUploadTemplate.template.name
+            );
+
+            axios
+                .post(
+                    `${SERVER_ADDRESS}/api/phase2/staff/bulk_upload/`,
+                    formData,
+                    {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: TOKEN,
+                        },
+                    }
+                )
+                .then((res) => {
+                    // Mensaje de éxito
+                    this.successMessage(
+                        "¡El personal de la organización ha sido cargado exitosamente!"
+                    );
+                    this.getStaffs();
+
+                    //Ocultamos los modales
+                    this.$nextTick(() => {
+                        this.$bvModal.hide("modal-confirm-bulk-upload");
+                        this.$bvModal.hide("modal-bulk-upload");
+                    });
                 })
                 .catch((err) => {
                     try {

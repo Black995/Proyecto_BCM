@@ -55,9 +55,10 @@ amount:
                                         <b-button
                                             title="Descargar"
                                             variant="warning"
-                                            @click="" 
                                         >
-                                        <font-awesome-icon icon="fa-solid fa-file-pdf" />
+                                            <font-awesome-icon
+                                                icon="fa-solid fa-file-pdf"
+                                            />
                                         </b-button>
                                     </b-col>
                                 </b-row>

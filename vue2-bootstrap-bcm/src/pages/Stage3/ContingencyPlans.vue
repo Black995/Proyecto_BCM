@@ -277,7 +277,7 @@
         -->
         <b-modal
             id="modal-update"
-            title="Editar servicio"
+            title="Editar nodo"
             ref="modal"
             size="lg"
             centered
@@ -1117,7 +1117,6 @@ export default {
                 )
                 .then((res) => {
                     // Mensaje de éxito
-                    this.downloadDocument = false;
                     this.successMessage(
                         "¡La documentación del escenario crítico ha sido actualizada exitosamente!"
                     );

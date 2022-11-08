@@ -4,6 +4,13 @@
             <!-- Icon -->
             <div class="fadeIn first mt-3">
                 <img
+                    v-if="!loadingLogo && logo_org"
+                    :src="'data:image/jpeg;base64,' + logo_org"
+                    alt="Logo Icon"
+                    class="icon-login"
+                />
+                <img
+                    v-if="!loadingLogo && !logo_org"
                     src="../../assets/img/login_icon.png"
                     id="icon"
                     alt="User Icon"
@@ -12,7 +19,7 @@
             </div>
 
             <!-- Login Form -->
-            <form ref="form" @submit.stop.prevent="handleSubmit">
+            <form ref="form" class="mt-3" @submit.stop.prevent="handleSubmit">
                 <b-form-input
                     type="text"
                     class="fadeIn second"
@@ -167,14 +174,18 @@
 
 <script>
 import axios from "axios";
-import { SERVER_ADDRESS } from "../../../config/config";
+import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
 
 import NotificationTemplate from "../Notifications/NotificationTemplate";
+import TypographyVue from "../Typography.vue";
 
 export default {
     name: "Login",
 
     data: () => ({
+        loadingLogo: true,
+        logo_org: null,
+
         user: {
             email: "",
             password: "",
@@ -200,6 +211,7 @@ export default {
      */
     mounted() {
         this.getActivationState();
+        this.getLogoOrg();
         /*
         this.user = {
             email: "alansaul25@gmail.com",
@@ -230,6 +242,41 @@ export default {
                 type: "danger",
             });
         },
+
+        async getLogoOrg() {
+            this.loadingLogo = TypographyVue;
+
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/organizations/`)
+                .then((res) => {
+                    this.logo_org = res.data[0].logo_base64;
+                    this.loadingLogo = false;
+                })
+                .catch((err) => {
+                    this.loadingLogo = false;
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
+
         async handleSubmit() {
             this.loadingButton = true;
             axios
@@ -432,7 +479,6 @@ export default {
                     )
                     .then((res) => {
                         this.loadingPasswordButton = true;
-                        console.log("FORGOT PASSWORD");
                         //Ocultamos los modales
                         this.$nextTick(() => {
                             this.$bvModal.hide("modal-forget-password");
@@ -444,8 +490,6 @@ export default {
                         );
                     })
                     .catch((err) => {
-                        console.log("ERR");
-                        console.log(err);
                         try {
                             this.loadingPasswordButton = false;
 

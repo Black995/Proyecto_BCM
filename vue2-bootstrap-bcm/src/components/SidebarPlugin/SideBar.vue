@@ -12,9 +12,13 @@
         <div class="sidebar-wrapper" id="style-3">
             <div class="logo">
                 <a href="#" class="simple-text">
-                    <!--div class="logo-img">
-                <img src="@/assets/img/vue-logo.png" alt="">
-            </div-->
+                    <div v-if="logo_img" class="logo-img">
+                        <!--div class="logo-img"-->
+                        <img
+                            :src="'data:image/jpeg;base64,' + logo_img"
+                            alt=""
+                        />
+                    </div>
                     {{ title }}
                 </a>
             </div>
@@ -36,7 +40,11 @@
         </div>
     </div>
 </template>
+
 <script>
+import axios from "axios";
+import { SERVER_ADDRESS, TOKEN } from "../../../config/config";
+
 import MovingArrow from "./MovingArrow.vue";
 import SidebarLink from "./SidebarLink";
 export default {
@@ -104,6 +112,7 @@ export default {
             isWindows: false,
             hasAutoHeight: false,
             links: [],
+            logo_img: null,
         };
     },
     methods: {
@@ -124,11 +133,68 @@ export default {
                 this.links.splice(index, 1);
             }
         },
+
+        successMessage(successText) {
+            this.$notify({
+                component: NotificationTemplate,
+                title: successText,
+                icon: "ti-check",
+                horizontalAlign: "right",
+                verticalAlign: "top",
+                type: "success",
+            });
+        },
+        errorMessage(errorText) {
+            this.$notify({
+                component: NotificationTemplate,
+                title: errorText,
+                icon: "ti-close",
+                horizontalAlign: "right",
+                verticalAlign: "top",
+                type: "danger",
+            });
+        },
+
+        async getOrganization() {
+            axios
+                .get(`${SERVER_ADDRESS}/api/config/organizations/`, {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: TOKEN,
+                    },
+                })
+                .then((res) => {
+                    this.logo_img = res.data[0].logo_base64;
+                })
+                .catch((err) => {
+                    try {
+                        // Error 400 por unicidad o 500 generico
+                        if (err.response.status == 400) {
+                            for (let e in err.response.data) {
+                                this.errorMessage(
+                                    e + ": " + err.response.data[e]
+                                );
+                            }
+                        } else {
+                            // Servidor no disponible
+                            this.errorMessage(
+                                "Ups! Ha ocurrido un error en el servidor"
+                            );
+                        }
+                    } catch {
+                        // Servidor no disponible
+                        this.errorMessage(
+                            "Ups! Ha ocurrido un error en el servidor"
+                        );
+                    }
+                });
+        },
     },
     mounted() {
         this.$watch("$route", this.findActiveLink, {
             immediate: true,
         });
+        this.getOrganization();
     },
 };
 </script>

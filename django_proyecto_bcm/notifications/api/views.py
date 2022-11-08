@@ -97,7 +97,7 @@ class IncidentCreatedNotification(APIView):
             for u in user_relevant_by_position:
                 if not u in user_list:
                     user_list.append(u)
-                    email_list.append(u.email)
+                    # email_list.append(u.email)
             
             # Notificación que se registra en el sistema
             notif = Notification.objects.create(
@@ -157,7 +157,7 @@ class ModifiedScaleNotification(APIView):
             for u in user_relevant_by_position:
                 if not u in user_list:
                     user_list.append(u)
-                    email_list.append(u.email)
+                    # email_list.append(u.email)
 
             title="Escala modificada - Sistema BCM"
             description = "Se le informa que ha sido editada la escala relacionada a los \"Servicios de la Organización\". Se le recomienda revisar si los servicios sufrieron alguna modificación o si quedaron sin una criticidad asignada."
