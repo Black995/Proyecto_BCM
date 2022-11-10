@@ -6,12 +6,13 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
 from django.views.static import serve
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from configuration.models import (Headquarter, Area, Position)
 
 class BulkUploadViewSet(viewsets.ModelViewSet):
     bulk_upload_template_name = None
@@ -46,17 +47,18 @@ class BulkUploadViewSet(viewsets.ModelViewSet):
         try:
             try:
                 # Content type must be xlsm content type
-                content_type = 'application/vnd.ms-excel.sheet.macroenabled.12'
+                content_type_1 = 'application/vnd.ms-excel.sheet.macroenabled.12'
+                content_type_2 = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 # Getting file from request
                 template = request.FILES.get('template', None)
                 # Checking if file is not empty
                 if template is None:
                     raise serializers.ValidationError(
-                        {'template': _('This field is required.')})
+                        {'template': 'Este campo es requerido.'})
                 # Checking if file is an excel file
-                if template.content_type != content_type:
+                if template.content_type != content_type_1 and template.content_type != content_type_2:
                     raise serializers.ValidationError(
-                        {'template': _('Invalid file format. The allowed format is xlsx.')})
+                        {'template': 'Formato inválido. El formato permitido es xlsx.'})
                 # Loading file on memory
                 wb = openpyxl.load_workbook(
                     template, read_only=False, keep_vba=True)
@@ -80,6 +82,31 @@ class BulkUploadViewSet(viewsets.ModelViewSet):
                     data = dict(zip(field_names, row_values))
                     # Removing None values
                     data = {k: v for k, v in data.items() if v is not None}
+
+                    print(data)
+                    print(data['headquarter'])
+
+                    # Get ids in objects
+                    try:
+                        headquarter = Headquarter.objects.get(
+                            name=data['headquarter'].strip()).id
+                    except Headquarter.DoesNotExist:
+                        headquarter = None
+                    try:
+                        area = Area.objects.get(
+                            name=data['area'].strip()).id
+                    except Area.DoesNotExist:
+                        area = None
+                    try:
+                        position = Position.objects.get(
+                            name=data['position'].strip()).id
+                    except Position.DoesNotExist:
+                        position = None
+
+                    data['headquarter'] = headquarter
+                    data['area'] = area
+                    data['position'] = position
+
                     # Getting just values from data
                     values = list(data.values())
                     # Checking if not a empty row
@@ -111,13 +138,13 @@ class BulkUploadViewSet(viewsets.ModelViewSet):
                     # Saving workbook
                     wb = openpyxl.writer.excel.save_virtual_workbook(wb)
                     response = HttpResponse(
-                        wb, content_type=content_type, status=status.HTTP_400_BAD_REQUEST)
+                        wb, content_type=content_type_1, status=status.HTTP_400_BAD_REQUEST)
                     response['Content-Disposition'] = f'attachment; filename="{self.bulk_upload_template_name}"'
                     response.headers['Access-Control-Expose-Headers'] = 'Content-Disposition'
                     # Rolling back savepoint
                     transaction.savepoint_rollback(sid)
                     return response
-                response = Response({'detail': _('Successfully uploaded.')})
+                response = Response({'detail': 'Carga exitosa.'})
                 # Commiting savepoint
                 transaction.savepoint_commit(sid)
                 return response
@@ -127,7 +154,7 @@ class BulkUploadViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError({'template': e.message})
             except Exception as e:
                 raise serializers.ValidationError(
-                    {'detail': _('Something went wrong.')})
+                    {'detail': 'Algo ocurrió mal.'})
         except Exception as e:
             # Rolling back savepoint
             transaction.savepoint_rollback(sid)

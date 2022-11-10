@@ -8,6 +8,11 @@ from .views import (InterestedPartyListViewSet, InterestedPartyViewSet, R_SOView
                     SO_SViewSet, ServiceOfferedWithStaffsViewSet, download_bulk_upload_template, BulkUploadStaffViewSet,
                     RessourceWithServiceOfferedViewSet, RessourceViewSet, RessourceListViewSet,GenerateServiceOffered)
 
+from rest_framework import routers
+
+router = routers.SimpleRouter()
+router.register(r'staff_bulk_upload', BulkUploadStaffViewSet)
+
 
 urlpatterns = [
     path('services/offered/', ServiceOfferedListViewSet.as_view({
@@ -40,8 +45,6 @@ urlpatterns = [
         'delete': 'destroy'}), name='staff_detail'),
     path('staff/bulk_upload_template/', download_bulk_upload_template.as_view(),
          name='download_excel_massive_load_staff'),
-    path('staff/bulk_upload/', BulkUploadStaffViewSet.as_view({
-        'post': 'create'}), name='staff_list'),
     path('organizationActivities/', OrganizationActivityListViewSet.as_view({
         'get':'list',
         'post':'create'}), name='activity_list'),
@@ -88,6 +91,6 @@ urlpatterns = [
         'delete': 'destroy'}), name='r_so_detail'),
     path('service_offered_report/', GenerateServiceOffered.as_view(), 
             name='service_offered_report')
-
-    
 ]
+
+urlpatterns += router.urls

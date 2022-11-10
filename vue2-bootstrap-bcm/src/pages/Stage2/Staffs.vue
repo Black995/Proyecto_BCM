@@ -1542,7 +1542,7 @@ export default {
          */
         handleSubmitBulkUploadStaff() {
             // Inicializamos variables de estados
-            this.bulkUploadTemplate.template = null;
+            this.bulkUploadTemplateState.template = null;
 
             // Exit when the form isn't valid
 
@@ -1559,20 +1559,21 @@ export default {
         async bulkUploadStaff() {
             let formData = new FormData();
             formData.append(
-                "bulk_uplaod_template",
+                "template",
                 this.bulkUploadTemplate.template,
                 this.bulkUploadTemplate.template.name
             );
 
             axios
                 .post(
-                    `${SERVER_ADDRESS}/api/phase2/staff/bulk_upload/`,
+                    `${SERVER_ADDRESS}/api/phase2/staff_bulk_upload/bulk_upload/`,
                     formData,
                     {
                         withCredentials: true,
                         headers: {
                             Authorization: TOKEN,
                         },
+                        responseType: "blob",
                     }
                 )
                 .then((res) => {
@@ -1592,11 +1593,10 @@ export default {
                     try {
                         // Error 400 por unicidad o 500 generico
                         if (err.response.status == 400) {
-                            for (let e in err.response.data) {
-                                this.errorMessage(
-                                    e + ": " + err.response.data[e]
-                                );
-                            }
+                            this.errorMessage(
+                                "El documento contiene errores, por favor verificar el mismo"
+                            );
+                            saveAs(err.response.data, "error_response.xlsx");
                         } else {
                             // Servidor no disponible
                             this.errorMessage(
